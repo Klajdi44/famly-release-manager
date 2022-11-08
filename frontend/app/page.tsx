@@ -1,13 +1,15 @@
 import Image from "next/image";
 import styles from "./page.module.css";
+import Link from 'next/link';
 
 export default function Home() {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js version 13!</a>
-        </h1>
+
+        <h3 className={styles.title}>
+          See the dream team <Link href="/contact">here</Link>
+        </h3>
 
         <p className={styles.description}>
           Get started by editing{" "}
