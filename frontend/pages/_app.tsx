@@ -1,6 +1,5 @@
 import { MantineProvider } from "@mantine/core";
 import type { AppProps } from "next/app";
-import NavBar from "../components/navbar/navbar";
 
 import "../styles/globals.css";
 
@@ -14,7 +13,6 @@ export default function App({ Component, pageProps }: AppProps) {
         colorScheme: "dark",
       }}
     >
-      <NavBar />
       <Component {...pageProps} />
     </MantineProvider>
   );
