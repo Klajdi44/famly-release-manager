@@ -1,6 +1,8 @@
 import { MantineProvider } from "@mantine/core";
 import type { AppProps } from "next/app";
 
+import ApplicationShell from "../components/application-shell/application-shell";
+
 import "../styles/globals.css";
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -13,7 +15,9 @@ export default function App({ Component, pageProps }: AppProps) {
         colorScheme: "dark",
       }}
     >
-      <Component {...pageProps} />
+      <ApplicationShell>
+        <Component {...pageProps} />
+      </ApplicationShell>
     </MantineProvider>
   );
 }
