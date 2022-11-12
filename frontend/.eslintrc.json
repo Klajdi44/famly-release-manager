@@ -4,7 +4,7 @@
   "plugins": ["testing-library"],
   "rules": {
     "no-unused-vars": "error",
-    // eslint will try to fix errors that it able to
+    // eslint will try to fix errors that it is able to
     "indent": ["error", 2]
   },
   "overrides": [
