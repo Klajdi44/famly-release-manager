@@ -6,8 +6,14 @@ import {
   Container,
   Button,
 } from "@mantine/core";
+import { useState } from "react";
 
 const Login = () => {
+  const [email, setEmail] = useState<string | undefined>(undefined);
+  const [password, setPassword] = useState<string | undefined>(undefined);
+
+  const handleLogin = () => {};
+
   return (
     <Container size={420} my={40}>
       <Title align="center">Famly RM</Title>
@@ -19,9 +25,10 @@ const Login = () => {
           placeholder="Enter your password"
           required
           mt="md"
+          value={password}
         />
 
-        <Button fullWidth mt="xl">
+        <Button fullWidth mt="xl" onClick={handleLogin}>
           Log in
         </Button>
       </Paper>
