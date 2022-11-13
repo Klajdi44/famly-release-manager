@@ -8,4 +8,4 @@ type Action = UserTypes.Action;
 
 type Reducer = (state: State, action: Action) => State;
 
-export type { State, Reducer };
+export type { Action, State, Reducer };
