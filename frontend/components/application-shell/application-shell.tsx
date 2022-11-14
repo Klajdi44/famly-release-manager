@@ -27,9 +27,13 @@ const data = [
 
 type ApplicationShellProps = {
   children: ReactNode;
+  shouldRender: boolean;
 };
 
-const ApplicationShell = ({ children }: ApplicationShellProps) => {
+const ApplicationShell = ({
+  children,
+  shouldRender = true,
+}: ApplicationShellProps) => {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
   const [active, setActive] = useState("Billing");
@@ -67,6 +71,10 @@ const ApplicationShell = ({ children }: ApplicationShellProps) => {
       handleSetActive,
     ]
   );
+
+  if (shouldRender === false) {
+    return <AppShell>{children}</AppShell>;
+  }
 
   return (
     <AppShell
