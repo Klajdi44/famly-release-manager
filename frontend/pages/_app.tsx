@@ -1,15 +1,25 @@
-import { useReducer } from "react";
+import { useReducer, useMemo } from "react";
 import { MantineProvider } from "@mantine/core";
 import { reducer } from "../global-state/main-reducer";
 import { DEFAULT_STATE } from "../global-state/constants";
 import { Context } from "../global-state/context";
+import dynamic from "next/dynamic";
 
 import type { AppProps } from "next/app";
 
-import ApplicationShell from "../components/application-shell/application-shell";
+const ApplicationShell = dynamic(
+  () => import("../components/application-shell/application-shell"),
+  { ssr: false }
+);
 
 export default function App({ Component, pageProps }: AppProps) {
   const [state, dispatch] = useReducer(reducer, DEFAULT_STATE);
+
+  const isLoginPage = useMemo(
+    () =>
+      typeof window !== "undefined" && window.location.pathname === "/login",
+    []
+  );
 
   return (
     <MantineProvider
@@ -21,8 +31,8 @@ export default function App({ Component, pageProps }: AppProps) {
       }}
     >
       <Context.Provider value={[state, dispatch]}>
-        <ApplicationShell>
-          <Component {...pageProps} />
+        <ApplicationShell shouldRender={isLoginPage === false}>
+          <Component {...pageProps} suppressHydrationWarning="true" />
         </ApplicationShell>
       </Context.Provider>
     </MantineProvider>
