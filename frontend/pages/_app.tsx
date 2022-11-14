@@ -1,10 +1,11 @@
+
 import { useReducer, useMemo } from "react";
+import React from "react";
 import { MantineProvider } from "@mantine/core";
 import { reducer } from "../global-state/main-reducer";
 import { DEFAULT_STATE } from "../global-state/constants";
 import { Context } from "../global-state/context";
 import dynamic from "next/dynamic";
-
 import type { AppProps } from "next/app";
 
 const ApplicationShell = dynamic(
