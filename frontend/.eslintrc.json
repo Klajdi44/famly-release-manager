@@ -3,9 +3,7 @@
   "extends": ["next/core-web-vitals"],
   "plugins": ["testing-library"],
   "rules": {
-    "no-unused-vars": "error",
-    // eslint will try to fix errors that it is able to
-    "indent": ["error", 2]
+    "no-unused-vars": "error"
   },
   "overrides": [
     // Only uses Testing Library lint rules in test files

@@ -1,3 +1,5 @@
+import React from "react";
+
 import {
   TextInput,
   PasswordInput,
@@ -9,7 +11,9 @@ import {
 import { useState } from "react";
 
 const Login = () => {
+  // eslint-disable-next-line no-unused-vars
   const [email, setEmail] = useState<string | undefined>(undefined);
+  // eslint-disable-next-line no-unused-vars
   const [password, setPassword] = useState<string | undefined>(undefined);
 
   const handleLogin = () => {};
