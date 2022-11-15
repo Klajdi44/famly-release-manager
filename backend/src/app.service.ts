@@ -19,10 +19,4 @@ export class AppService {
     return this.features;
   }
 
-  // @Injectable()
-// export class AppService {
-//   getHello(): string {
-//     return 'Hello World!';
-//   }
-// }
 }
