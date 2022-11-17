@@ -1,11 +1,16 @@
-import express from 'express';
-import routes from './api/routes';
+import express from "express";
+import * as dotenv from "dotenv";
+
+import { router as featureRouter } from "./routes/features";
+
+dotenv.config();
 
 const app = express();
-const port = 3000;
 
-app.use('/api/', routes);
+app.use(express.json());
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+app.use("/api/features", featureRouter);
+
+app.listen(process.env.PORT, () => {
+  console.log(`Example app listening at http://localhost:${process.env.PORT}`);
 });
