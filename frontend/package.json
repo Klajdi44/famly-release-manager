@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest --watch",
+    "test": "jest",
     "prepare": "cd .. && husky install frontend/.husky",
     "pre-commit": "npm run lint --fix && git add -A ."
   },
