@@ -4,9 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:watch": "nodemon src/index.ts",
     "start": "npx ts-node src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:watch": "nodemon src/index.ts",
+    "start:dev": "nodemon ",
+    "build": "rm -rf ./build && tsc",
+    "start:prod": "npm run build && node build/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
   },
   "author": "Jonas, Klajdi, Andrei",
   "license": "ISC",
