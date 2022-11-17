@@ -6,14 +6,15 @@
   "scripts": {
     "start": "npx ts-node src/index.ts",
     "start:watch": "nodemon src/index.ts",
-    "start:dev": "nodemon ",
+    "start:dev": "nodemon",
     "build": "rm -rf ./build && tsc",
     "start:prod": "npm run build && node build/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jonas, Klajdi, Andrei",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "express": "^4.18.2"
   },
   "devDependencies": {
