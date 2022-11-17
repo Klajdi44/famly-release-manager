@@ -1,0 +1,73 @@
+name: CI - Frontend
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "*.*"
+
+jobs:
+  lint-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node.js 14.17.5
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18.0.0"
+
+      - name: Setup dependencies
+        run: |
+          npm ci
+        working-directory: ./frontend
+
+      - name: Lint frontend
+        run: |
+          npm lint
+        working-directory: ./frontend
+
+  unit-test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js 18.0.0
+        uses: actions/checkout@v3
+        with:
+          node-version: "18.0.0"
+
+      - name: Setup dependencies
+        run: |
+          npm ci
+        working-directory: ./frontend
+
+      - name: Unit test Frontend
+        run: |
+          npm test
+        working-directory: ./frontend
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js 18.0.0
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18.0.0"
+
+      - name: Setup dependencies
+        run: |
+          npm ci
+        working-directory: ./frontend
+
+      - name: Build next.js app
+        run: |
+          npm build
+        working-directory: ./frontend
+
+      - name: Store build artifacts # TODO: Do we need to store this here?
+        if: ${{ github.ref == 'ref/head/master' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: nextjs-build
+          path: ./frontend/out
