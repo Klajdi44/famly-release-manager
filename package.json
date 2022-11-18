@@ -2,5 +2,9 @@
   "scripts": {
     "setup-frontend": "cd ./frontend && npm install",
     "setup-backend": "cd  ./backend && npm install"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
   }
 }
