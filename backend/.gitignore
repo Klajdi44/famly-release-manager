@@ -1,1 +1,7 @@
+
+# dependencies
 /node_modules
+
+# JWT keys
+private.key
+public.key
