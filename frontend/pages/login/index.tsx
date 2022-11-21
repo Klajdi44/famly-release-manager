@@ -1,5 +1,4 @@
-import React from "react";
-
+import React, { useState } from "react";
 import {
   TextInput,
   PasswordInput,
@@ -8,15 +7,23 @@ import {
   Container,
   Button,
 } from "@mantine/core";
-import { useState } from "react";
+import type { RootState } from "../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../redux/userSlice";
 
 const Login = () => {
-  // eslint-disable-next-line no-unused-vars
-  const [email, setEmail] = useState<string | undefined>(undefined);
-  // eslint-disable-next-line no-unused-vars
-  const [password, setPassword] = useState<string | undefined>(undefined);
+  const [userInfo] = useState({
+    email: undefined,
+    password: undefined,
+  });
 
-  const handleLogin = () => {};
+  // eslint-disable-next-line no-unused-vars
+  const user = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch();
+
+  const handleLogIn = () => {
+    dispatch(login(userInfo));
+  };
 
   return (
     <Container size={420} my={40}>
@@ -29,10 +36,9 @@ const Login = () => {
           placeholder="Enter your password"
           required
           mt="md"
-          value={password}
         />
 
-        <Button fullWidth mt="xl" onClick={handleLogin}>
+        <Button fullWidth mt="xl" onClick={handleLogIn}>
           Log in
         </Button>
       </Paper>
