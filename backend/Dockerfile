@@ -1,18 +1,15 @@
 FROM node:18-alpine
 
+FROM node:alpine
+
 WORKDIR /app
 
-COPY package.json .
+COPY package.json /app
 
-RUN npm install -g npm@latest
-RUN npm install
+COPY package-lock.json /app
 
+COPY ./ /app
 
-COPY . .
+RUN npm i
 
-RUN chown -R node:node .
-
-USER node
-
-# CMD [ "npm", "run", "start:dev" ]
-CMD [ "nodemon", "src/index.ts" ]
+CMD ["npm", "run", "start"]

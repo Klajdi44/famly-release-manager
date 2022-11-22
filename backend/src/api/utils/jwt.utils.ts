@@ -14,7 +14,7 @@ export function generateToken() {
   };
   // read private key value
   const privateKey = {
-    key: fs.readFileSync(path.join(__dirname, "../../private.pem")),
+    key: fs.readFileSync(path.join(__dirname, "../../../private.pem")),
     passphrase: "andrei",
   };
 
@@ -44,7 +44,9 @@ interface TokenPayload {
  * @param token the expected token payload
  */
 export function validateToken(token: string): Promise<TokenPayload> {
-  const publicKey = fs.readFileSync(path.join(__dirname, "../../public.pem"));
+  const publicKey = fs.readFileSync(
+    path.join(__dirname, "../../../public.pem")
+  );
 
   const verifyOptions: VerifyOptions = {
     algorithms: ["RS256"],
