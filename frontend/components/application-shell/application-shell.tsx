@@ -7,6 +7,7 @@ import {
   Burger,
   useMantineTheme,
   Header,
+  Image
 } from "@mantine/core";
 import {
   IconSettings,
@@ -120,8 +121,16 @@ const ApplicationShell = ({
       header={
         <Header height={{ base: 50, md: 70 }} p="md">
           <div
-            style={{ display: "flex", alignItems: "center", height: "100%" }}
+            style={{ display: "flex", alignItems: "start", height: "100%" }}
           >
+               <div style={{ width: 100, marginLeft: 'auto', marginRight: 'auto' }}>
+      <Image
+        radius="md"
+        src="https://assets-global.website-files.com/5f64c1a06bfbf4ea417a71af/637b2d1ad6003159becdf6df_Famly_FullLogo_DarkDuo.svg"
+        alt="Random unsplash image"
+      />
+        </div>
+
             <MediaQuery largerThan="sm" styles={{ display: "none" }}>
               <Burger
                 opened={opened}
