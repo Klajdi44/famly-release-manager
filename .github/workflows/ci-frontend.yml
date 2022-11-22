@@ -3,6 +3,8 @@ name: Frontend
 on:
   push:
   pull_request:
+    paths:
+      - frontend/
     branches:
       - master
     tags-ignore:
