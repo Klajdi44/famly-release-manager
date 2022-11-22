@@ -2,9 +2,11 @@ name: Frontend
 
 on:
   push:
+    paths:
+      - "./fronted/**"
   pull_request:
     paths:
-      - ./frontend
+      - "./fronted/**"
     branches:
       - master
     tags-ignore:
