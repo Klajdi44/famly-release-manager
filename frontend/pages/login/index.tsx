@@ -16,9 +16,6 @@ const Login = () => {
   // eslint-disable-next-line no-unused-vars
   const [password, setPassword] = useState<string | undefined>(undefined);
 
-  // eslint-disable-next-line no-unused-vars
-  const test = "1234";
-
   const handleLogin = () => {};
 
   return (
