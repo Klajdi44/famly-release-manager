@@ -20,7 +20,7 @@ export default function App({ Component, pageProps }: AppProps) {
       typeof window !== "undefined" && window.location.pathname === "/login",
     []
   );
-
+  // test
   return (
     <MantineProvider
       withGlobalStyles
