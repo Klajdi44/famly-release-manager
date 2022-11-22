@@ -1,14 +1,12 @@
 FROM node:18-alpine
 
-FROM node:alpine
+WORKDIR /backend
 
-WORKDIR /app
+COPY package.json /backend/
 
-COPY package.json /app
+COPY package-lock.json /backend/
 
-COPY package-lock.json /app
-
-COPY ./ /app
+COPY ./ /backend/
 
 RUN npm i
 
