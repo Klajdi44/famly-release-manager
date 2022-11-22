@@ -6,7 +6,7 @@ import compression from "compression";
 import helmet from "helmet";
 import bodyParser from "body-parser";
 import cors from "cors";
-import { config } from "./config";
+// import { config } from "./config";
 import * as Auth from "../src/middlewares/auth.middleware";
 
 dotenv.config();
@@ -23,12 +23,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors()); // enable all CORS request
 
 // Only generate a token for lower level environments
-if (config.isProduction === false) {
+// if (config.isProduction === false) {
+//   console.log("*** JWT:", generateToken());
+// }
+
+if (process.env.NODE_ENV !== "production") {
   console.log("*** JWT:", generateToken());
 }
 
 app.listen(process.env.PORT, () => {
-  console.log(
-    `### The app is listening at http://localhost:${process.env.PORT} ###`
-  );
+  console.log(`### The app is listening at http://localhost:${process.env.PORT} ###`);
 });

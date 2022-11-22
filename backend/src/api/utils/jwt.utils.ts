@@ -1,6 +1,6 @@
-import { sign, SignOptions, verify, VerifyOptions } from 'jsonwebtoken';
-import * as fs from 'fs';
-import * as path from 'path';
+import { sign, SignOptions, verify, VerifyOptions } from "jsonwebtoken";
+import * as fs from "fs";
+import * as path from "path";
 
 /**
  * generates JWT used for local testing
@@ -8,32 +8,28 @@ import * as path from 'path';
 export function generateToken() {
   // information to be encoded in the JWT
   const payload = {
-    name: 'Andrei Mihutoni',
+    name: "Andrei Mihutoni",
     userId: 123,
-    accessTypes: [
-      'getAllFeatures',
-    ]
+    accessTypes: ["getAllFeatures"],
   };
   // read private key value
   const privateKey = {
-    key: fs.readFileSync(path.join(__dirname, '../../private.key')),
-    passphrase: 'andrei'
-};
+    key: fs.readFileSync(path.join(__dirname, "../../private.pem")),
+    passphrase: "andrei",
+  };
 
   const signInOptions: SignOptions = {
     // RS256 uses a public/private key pair. The API provides the private key
     // to generate the JWT. The client gets a public key to validate the
     // signature
-    algorithm: 'RS256',
-    expiresIn: '24h'
+    algorithm: "RS256",
+    expiresIn: "24h",
   };
   // console.log('JWT', payload, privateKey, signInOptions);
 
-
   // generate JWT
   return sign(payload, privateKey, signInOptions);
-
-};
+}
 
 interface TokenPayload {
   exp: number;
@@ -48,10 +44,10 @@ interface TokenPayload {
  * @param token the expected token payload
  */
 export function validateToken(token: string): Promise<TokenPayload> {
-  const publicKey = fs.readFileSync(path.join(__dirname, '../../public.key'));
+  const publicKey = fs.readFileSync(path.join(__dirname, "../../public.pem"));
 
   const verifyOptions: VerifyOptions = {
-    algorithms: ['RS256'],
+    algorithms: ["RS256"],
   };
 
   return new Promise((resolve, reject) => {
@@ -59,6 +55,6 @@ export function validateToken(token: string): Promise<TokenPayload> {
       if (error) return reject(error);
 
       resolve(decoded);
-    })
+    });
   });
 }
