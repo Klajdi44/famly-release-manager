@@ -4,8 +4,6 @@
   "editor.bracketPairColorization.enabled": true,
   "editor.wordWrap": "on",
   "editor.tabSize": 2,
-  "editor.fontFamily": "jetbrains mono nl,fira code",
-  "editor.fontLigatures": true,
   "prettier.singleQuote": false,
   "prettier.arrowParens": "avoid",
   "[javascript]": {
