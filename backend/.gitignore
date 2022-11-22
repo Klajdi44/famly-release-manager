@@ -5,5 +5,5 @@
 /.env
 
 # JWT keys
-private.key
-public.key
+private.pem
+public.pem
