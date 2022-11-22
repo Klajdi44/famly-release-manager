@@ -10,7 +10,7 @@ import { config } from "./config";
 import * as Auth from "../src/middlewares/auth.middleware";
 
 dotenv.config();
-//? test;
+
 const app = express();
 
 app.use(express.json());
