@@ -1,13 +1,27 @@
 version: "3.8"
 services:
+  database:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=famly
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=db_dev
+    volumes:
+      - famly_db_dev_data:/var/lib/postgresql/data
+
   backend:
     build: ./backend
     container_name: backend_container
     ports:
       - "5000:5000"
     volumes:
-      - ./backend:/app
+      - ./backend:/backend
       - /backend/node_modules
+    depends_on:
+      - database
+
   frontend:
     build: ./frontend
     container_name: frontend_container
@@ -18,3 +32,6 @@ services:
       - /frontend/node_modules
     stdin_open: true
     tty: true
+
+volumes:
+  famly_db_dev_data:
