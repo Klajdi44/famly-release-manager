@@ -1,6 +1,5 @@
 version: "3.8"
 services:
-
   database:
     image: postgres:15
     ports:
@@ -16,7 +15,7 @@ services:
     build: ./backend
     container_name: backend_container
     ports:
-      - “5000:5000"
+      - "5000:5000"
     volumes:
       - ./backend:/backend
       - /backend/node_modules
@@ -27,7 +26,7 @@ services:
     build: ./frontend
     container_name: frontend_container
     ports:
-      - “3000:3000"
+      - "3000:3000"
     volumes:
       - ./frontend:/app
       - /frontend/node_modules
