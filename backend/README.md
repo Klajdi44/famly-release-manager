@@ -1,4 +1,4 @@
-## Installation
+## Local installation
 
 ```bash
 $ npm install
@@ -6,8 +6,19 @@ $ npm install
 
 ```bash
 # Generate RSA Key Pair
-$ openssl genrsa -des3 -out private.pem 2048
+$ openssl genrsa -out private.pem 2048
 $ openssl rsa -in private.pem -outform PEM -pubout -out public.pem
+```
+
+```bash
+# attach to the db container
+$ docker compose exec database psql -U famly db_dev
+```
+
+```bash
+# attach to the backend container
+docker compose exec backend sh
+$
 ```
 
 ## Running the app
@@ -41,3 +52,14 @@ The body-parser middleware parses all incoming requests body content and adds th
 ## cors
 
 Our API needs to be accessible from different client origins, for example, from a mobile device, or from a web browser while the API is running in a different server.
+
+## DB
+
+```bash
+# db sequelize init
+$ npx sequelize init --force
+
+
+# generate the user model
+$ npx sequelize-cli model:generate --name User --attributes firstName:string,lastName:string,email:string
+```

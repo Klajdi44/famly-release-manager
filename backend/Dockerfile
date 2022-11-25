@@ -10,4 +10,5 @@ COPY ./ /backend/
 
 RUN npm i
 
-CMD ["npm", "run", "start"]
+ENTRYPOINT ["sh","./src/config/init.sh"]
+
