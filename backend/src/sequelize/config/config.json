@@ -2,22 +2,22 @@
   "development": {
     "username": "famly",
     "password": "secret",
-    "database": "database_development",
+    "database": "db_dev",
     "host": "database",
     "dialect": "postgres"
   },
   "test": {
-    "username": "famly",
-    "password": "secret",
+    "username": "root",
+    "password": null,
     "database": "database_test",
-    "host": "database",
-    "dialect": "postgres"
+    "host": "127.0.0.1",
+    "dialect": "mysql"
   },
   "production": {
-    "username": "famly",
-    "password": "change_me",
+    "username": "root",
+    "password": null,
     "database": "database_production",
-    "host": "database",
-    "dialect": "postgres"
+    "host": "127.0.0.1",
+    "dialect": "mysql"
   }
 }

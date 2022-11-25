@@ -2,6 +2,7 @@ version: "3.8"
 services:
   database:
     image: postgres:15
+    container_name: famly_db
     ports:
       - "5432:5432"
     environment:
@@ -13,7 +14,7 @@ services:
 
   backend:
     build: ./backend
-    container_name: backend_container
+    container_name: famly_backend
     ports:
       - "5000:5000"
     volumes:
@@ -24,7 +25,7 @@ services:
 
   frontend:
     build: ./frontend
-    container_name: frontend_container
+    container_name: famly_frontend
     ports:
       - "3000:3000"
     volumes:
