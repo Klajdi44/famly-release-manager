@@ -6,6 +6,7 @@ type State = {
 
 type Action = UserTypes.Action;
 
+// eslint-disable-next-line no-unused-vars
 type Reducer = (state: State, action: Action) => State;
 
 export type { Action, State, Reducer };

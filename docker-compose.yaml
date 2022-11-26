@@ -29,7 +29,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/app
+      - ./frontend:/frontend
       - /frontend/node_modules
     stdin_open: true
     tty: true
