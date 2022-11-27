@@ -9,7 +9,7 @@
     "build": "tsc && vite build",
     "test": "jest",
     "preview": "vite preview",
-    "lint": "eslint",
+    "lint": "eslint . --ext .ts",
     "prepare": "cd .. && husky install frontend/.husky",
     "pre-commit": "npm run lint --fix && git add -A ."
   },
