@@ -2,6 +2,9 @@ FROM node:18-alpine
 
 WORKDIR /frontend
 
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 COPY package.json /frontend/
 
 COPY package-lock.json /frontend/
@@ -10,6 +13,6 @@ RUN npm install
 
 COPY ./ /frontend/
 
-EXPOSE 3000
+ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "docker-dev"]
