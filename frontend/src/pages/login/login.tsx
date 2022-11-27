@@ -6,12 +6,17 @@ import {
   Container,
   Button,
 } from "@mantine/core";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const Login = () => {
-  const [email, setEmail] = useState<string | undefined>(undefined);
+  const [email, setEmail] = useState("");
 
-  const [password, setPassword] = useState<string | undefined>(undefined);
+  const [password, setPassword] = useState("");
+
+  const isLoginButtonDisabled = useMemo(
+    () => email === "" || password === "",
+    [email, password]
+  );
 
   const handleLogin = () => {
     // make call to api
@@ -24,6 +29,7 @@ const Login = () => {
       <Paper withBorder shadow="md" p={30} mt={30} radius="md">
         <TextInput
           label="Email"
+          name="email"
           placeholder="Enter your email"
           required
           value={email}
@@ -31,6 +37,7 @@ const Login = () => {
         />
         <PasswordInput
           label="Password"
+          name="password"
           placeholder="Enter your password"
           required
           mt="md"
@@ -38,7 +45,12 @@ const Login = () => {
           onChange={e => setPassword(e.target.value)}
         />
 
-        <Button fullWidth mt="xl" onClick={handleLogin}>
+        <Button
+          fullWidth
+          mt="xl"
+          onClick={handleLogin}
+          disabled={isLoginButtonDisabled}
+        >
           Log in
         </Button>
       </Paper>
