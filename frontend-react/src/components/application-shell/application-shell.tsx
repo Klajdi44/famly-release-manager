@@ -10,17 +10,14 @@ import {
 } from "@mantine/core";
 import {
   IconSettings,
-  Icon2fa,
-  IconSwitchHorizontal,
   IconLogout,
-  IconHome,
+  IconToggleRight,
 } from "@tabler/icons";
 
 import { useStyles } from "./styles";
 
 const data = [
-  { link: "/", label: "Home", icon: IconHome },
-  { link: "", label: "Authentication", icon: Icon2fa },
+  { link: "/", label: "Release toggles", icon: IconToggleRight },
   { link: "/segments", label: "Segments", icon: IconSettings },
 ];
 
@@ -96,15 +93,6 @@ const ApplicationShell = ({
           <Navbar.Section grow>{links}</Navbar.Section>
 
           <Navbar.Section className={classes.footer}>
-            <a
-              href="#"
-              className={classes.link}
-              onClick={event => event.preventDefault()}
-            >
-              <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
-              <span>Change account</span>
-            </a>
-
             <a
               href="#"
               className={classes.link}
