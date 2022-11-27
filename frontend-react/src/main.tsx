@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 
 import { MantineProvider } from "@mantine/core";
 import App from "./App";
+import ApplicationShell from "./components/application-shell/application-shell";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
@@ -16,7 +17,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
           colorScheme: "dark",
         }}
       >
-        <App />
+        <ApplicationShell shouldRender={window.location.pathname !== "/login"}>
+          <App />
+        </ApplicationShell>
       </MantineProvider>
     </BrowserRouter>
   </React.StrictMode>

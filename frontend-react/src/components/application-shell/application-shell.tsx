@@ -1,4 +1,4 @@
-import React from "react";
+import { Link } from "react-router-dom";
 import { useState, ReactNode, useCallback, useMemo } from "react";
 import {
   AppShell,
@@ -26,7 +26,7 @@ const data = [
 
 type ApplicationShellProps = {
   children: ReactNode;
-  shouldRender: boolean;
+  shouldRender?: boolean;
 };
 
 const ApplicationShell = ({
@@ -50,7 +50,7 @@ const ApplicationShell = ({
     () =>
       data.map(link => (
         <Link
-          href={link.link}
+          to={link.link}
           key={link.label}
           className={cx(classes.link, {
             [classes.linkActive]: link.label === active,
