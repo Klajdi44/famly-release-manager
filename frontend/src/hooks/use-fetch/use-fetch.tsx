@@ -6,6 +6,9 @@ const useFetch = <T,>(url: string) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    if (!url) {
+      return;
+    }
     const abortController = new AbortController();
 
     (async () => {
