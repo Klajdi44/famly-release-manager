@@ -6,7 +6,7 @@ const FEATURES = [
   { id: 3, name: "Fingerprint authenication", country: "Uk", segment: 554 },
 ];
 
-export const getAllFeatures = (req: Request, res: Response) => {
+export const getAllReleaseToggles = (req: Request, res: Response) => {
   const session = req.session;
   // req.session.save();
 

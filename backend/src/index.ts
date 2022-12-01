@@ -1,13 +1,12 @@
 import express from "express";
 import * as dotenv from "dotenv";
 import { generateToken } from "./api/utils/jwt.utils";
-import { router as featureRouter } from "./routes/features";
+import { router as releaseToggleRouter } from "./routes/releaseToggles";
 import compression from "compression";
 import helmet from "helmet";
 import bodyParser from "body-parser";
 import cors from "cors";
 import { config } from "./config";
-import * as Auth from "../src/middlewares/auth.middleware";
 import { createClient } from "redis";
 import connectRedis from "connect-redis";
 import session from "express-session";
@@ -56,7 +55,7 @@ app.use(
   })
 );
 
-app.use("/api/features", featureRouter);
+app.use("/api/v1/release-toggles", releaseToggleRouter);
 
 // Only generate a token for lower level environments
 if (config.isProduction === false) {
