@@ -8,7 +8,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import { config } from "./config";
 import * as Auth from "../src/middlewares/auth.middleware";
-import * as redis from "redis";
+import { createClient } from "redis";
 import connectRedis from "connect-redis";
 import session from "express-session";
 
@@ -27,18 +27,13 @@ app.use(cors()); // enable all CORS request
 const RedisStore = connectRedis(session);
 //Configure redis client
 
-const redis_url = process.env.REDIS_URL || "redis://localhost:6379";
-const redisClient = redis.createClient({
-  url: redis_url,
+const redisUrl = "redis://redis:6379";
+const redisClient = createClient({
+  url: redisUrl,
+  legacyMode: true,
 });
 
-redisClient.on("error", err => {
-  console.error("Could not establish a connection with redis. " + err);
-});
-
-redisClient.on("connect", err => {
-  console.error("Connected to redis successfully");
-});
+redisClient.connect().catch(console.error);
 
 //Configure session middleware
 app.use(
