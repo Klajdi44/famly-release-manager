@@ -24,6 +24,12 @@ app.use(bodyParser.json()); // parse incoming request body and append data to `r
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors()); // enable all CORS request
 
+declare module "express-session" {
+  export interface SessionData {
+    user: { [key: string]: any };
+  }
+}
+
 const RedisStore = connectRedis(session);
 //Configure redis client
 

@@ -8,7 +8,12 @@ const FEATURES = [
 
 export const getAllFeatures = (req: Request, res: Response) => {
   const session = req.session;
-  req.session.save();
+  // req.session.save();
+
+  req.session.user = {
+    id: req.sessionID,
+  };
+
   console.log({ session, sessionId: req.sessionID });
 
   res.send(FEATURES);
