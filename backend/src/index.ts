@@ -50,7 +50,7 @@ app.use(
     cookie: {
       secure: config.isProduction, // if true only transmit cookie over https
       httpOnly: config.isProduction, // if true prevent client side JS from reading the cookie
-      maxAge: 10 * 24 * 60 * 60 * 1000, // session max age in miliseconds: 10 days
+      maxAge: 5 * 24 * 60 * 60 * 1000, // session max age in miliseconds: 10 days
     },
   })
 );
