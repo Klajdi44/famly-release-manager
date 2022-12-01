@@ -12,6 +12,12 @@ services:
     volumes:
       - famly_db_dev_data:/var/lib/postgresql/data
 
+  redis:
+    image: redis
+    container_name: redis
+    expose:
+      - 6379
+
   backend:
     build: ./backend
     container_name: famly_backend
@@ -19,9 +25,13 @@ services:
       - "5000:5000"
     volumes:
       - ./backend:/backend
-      - /backend/node_modules
     depends_on:
       - database
+      - redis
+    links:
+      - redis
+    # environment:
+    # - REDIS_URL=redis://cache
 
   frontend:
     build: ./frontend

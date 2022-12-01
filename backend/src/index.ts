@@ -8,19 +8,55 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import { config } from "./config";
 import * as Auth from "../src/middlewares/auth.middleware";
+import { createClient } from "redis";
+import connectRedis from "connect-redis";
+import session from "express-session";
 
 dotenv.config();
 
 const app = express();
 
 app.use(express.json());
-app.use(Auth.authorize(["getAllFeatures"])); // JWT authorize accessTypes
-app.use("/api/features", featureRouter);
+// app.use(Auth.authorize(["getAllFeatures"])); // JWT authorize accessTypes
 app.use(compression()); // compresses all the responses
 app.use(helmet()); // adding set of security middlewares
 app.use(bodyParser.json()); // parse incoming request body and append data to `req.body`
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors()); // enable all CORS request
+
+declare module "express-session" {
+  export interface SessionData {
+    user: { [key: string]: any };
+  }
+}
+
+const RedisStore = connectRedis(session);
+//Configure redis client
+
+const redisUrl = "redis://redis:6379";
+const redisClient = createClient({
+  url: redisUrl,
+  legacyMode: true,
+});
+
+redisClient.connect().catch(console.error);
+
+//Configure session middleware
+app.use(
+  session({
+    store: new RedisStore({ client: redisClient }),
+    secret: process.env.REDIS_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: config.isProduction, // if true only transmit cookie over https
+      httpOnly: config.isProduction, // if true prevent client side JS from reading the cookie
+      maxAge: 10 * 24 * 60 * 60 * 1000, // session max age in miliseconds: 10 days
+    },
+  })
+);
+
+app.use("/api/features", featureRouter);
 
 // Only generate a token for lower level environments
 if (config.isProduction === false) {
