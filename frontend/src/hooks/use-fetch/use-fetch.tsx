@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 
-const useFetch = <T,>(url: string) => {
+type Props = {
+  url: string;
+  method?: string;
+  body?: any;
+};
+const useFetch = <T,>({ url, method = "GET", body }: Props) => {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -13,7 +18,12 @@ const useFetch = <T,>(url: string) => {
 
     (async () => {
       try {
-        const request = await fetch(url, { signal: abortController.signal });
+        const request = await fetch(url, {
+          method,
+          signal: abortController.signal,
+          credentials: "include",
+          body,
+        });
 
         if (!request.ok) {
           setIsLoading(false);
