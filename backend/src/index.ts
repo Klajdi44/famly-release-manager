@@ -2,6 +2,8 @@ import express from "express";
 import * as dotenv from "dotenv";
 import { generateToken } from "./api/utils/jwt.utils";
 import { router as releaseToggleRouter } from "./routes/releaseToggles";
+import { router as authRouter } from "./routes/auth";
+
 import compression from "compression";
 import helmet from "helmet";
 import bodyParser from "body-parser";
@@ -55,6 +57,7 @@ const RedisStore = connectRedis(session);
 // );
 
 app.use("/api/v1/release-toggles", releaseToggleRouter);
+app.use("/api/v1/auth", authRouter);
 
 // Only generate a token for lower level environments
 if (config.isProduction === false) {

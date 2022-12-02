@@ -9,10 +9,10 @@ import { config } from "../../config";
  */
 const generateToken = (
   payload: {
-    name: string;
+    email: string;
     userId: number;
   } = {
-    name: "Andrei Mihutoni",
+    email: "Andrei Mihutoni",
     userId: 123,
   }
 ) => {
@@ -37,7 +37,7 @@ const generateToken = (
 type TokenPayload = {
   exp: number;
   accessTypes: string[];
-  name: string;
+  email: string;
   userId: number;
 };
 
