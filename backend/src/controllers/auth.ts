@@ -5,13 +5,13 @@ import { redisClient } from "../redis/index";
 const login = async (req: Request, res: Response) => {
   // TODO: handle DB authentication
 
-  const userId = Math.random().toString();
+  const userId = "1";
 
   const accessToken = jwt.generateToken();
   const refreshToken = jwt.generateToken();
 
   try {
-    await redisClient.set(userId, refreshToken);
+    await redisClient.setEx(refreshToken, 24 * 60 * 60, userId);
   } catch (error) {
     res.status(500).send("Something went wrong, please try again later");
   }
@@ -26,4 +26,22 @@ const login = async (req: Request, res: Response) => {
   });
 };
 
-export { login };
+const refresh = async (req: Request, res: Response) => {
+  const { refreshToken, userId } = req.body;
+
+  // if (!refreshToken || userId) {
+  //   return res.status(401).send("Not Authorized");
+  // }
+
+  try {
+    const redisRefreshToken = await redisClient.get(refreshToken);
+    if (redisRefreshToken === undefined) {
+      res.status(400).send("Token does not exist");
+    }
+    res.send(redisRefreshToken);
+  } catch (error) {
+    res.status(500).send("Failed to get token");
+  }
+};
+
+export { login, refresh };
