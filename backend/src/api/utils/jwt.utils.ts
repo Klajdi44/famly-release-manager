@@ -7,11 +7,14 @@ import { config } from "../../config";
 /**
  * generates JWT used for local testing
  */
+type TokenType = "access" | "refresh";
+type Payload = {
+  email: string;
+  userId: number;
+};
 const generateToken = (
-  payload: {
-    email: string;
-    userId: number;
-  } = {
+  type: TokenType = "access",
+  payload: Payload = {
     email: "Andrei Mihutoni",
     userId: 123,
   }
@@ -27,7 +30,7 @@ const generateToken = (
     // to generate the JWT. The client gets a public key to validate the
     // signature
     algorithm: "RS256",
-    expiresIn: config.isProduction ? "24h" : "1m",
+    expiresIn: type === "access" ? "24h" : 0,
   };
 
   // generate JWT

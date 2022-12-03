@@ -8,7 +8,7 @@ const login = async (req: Request, res: Response) => {
   const userId = "1";
 
   const accessToken = jwt.generateToken();
-  const refreshToken = jwt.generateToken();
+  const refreshToken = jwt.generateToken("refresh");
 
   try {
     await redisClient.setEx(refreshToken, 24 * 60 * 60, userId);
