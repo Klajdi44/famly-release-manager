@@ -7,14 +7,7 @@ const FEATURES = [
 ];
 
 export const getAllReleaseToggles = (req: Request, res: Response) => {
-  const session = req.session;
-  // req.session.save();
-
-  req.session.user = {
-    id: req.sessionID,
-  };
-
-  console.log({ session, sessionId: req.sessionID });
+  console.log(req.headers.authorization);
 
   res.send(FEATURES);
 };

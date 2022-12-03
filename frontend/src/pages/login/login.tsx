@@ -6,20 +6,47 @@ import {
   Container,
   Button,
 } from "@mantine/core";
+import { useLocalStorage } from "@mantine/hooks";
+import axios from "axios";
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
-
   const [password, setPassword] = useState("");
+  // TODO: add token names in constants
+  const [, setAccessToken] = useLocalStorage({
+    key: "accessToken",
+  });
+  const [, setRefreshToken] = useLocalStorage({
+    key: "refreshToken",
+  });
+
+  const navigate = useNavigate();
 
   const isLoginButtonDisabled = useMemo(
     () => email === "" || password === "",
     [email, password]
   );
 
-  const handleLogin = () => {
-    // make call to api
+  const handleLogin = async () => {
+    try {
+      const result = await axios.post(
+        "http://localhost:5000/api/v1/auth/login/",
+        {
+          email,
+          password,
+        }
+      );
+
+      if (result.status === 200) {
+        setAccessToken(result.data.token.access);
+        setRefreshToken(result.data.token.refresh);
+        navigate("/");
+      }
+    } catch (error) {
+      console.log("Something went wrong while loging in");
+    }
   };
 
   return (

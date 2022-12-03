@@ -3,7 +3,8 @@ import * as jwt from "../api/utils/jwt.utils";
 import { redisClient } from "../redis/index";
 
 const login = async (req: Request, res: Response) => {
-  // TODO: handle DB authentication
+  // TODO: get user from DB
+  // verify user email exists, verify user pass exists
 
   const userId = "1";
 
@@ -11,17 +12,20 @@ const login = async (req: Request, res: Response) => {
   const refreshToken = jwt.generateToken("refresh");
 
   try {
-    await redisClient.setEx(refreshToken, 24 * 60 * 60, userId);
+    await redisClient.set(refreshToken, userId);
   } catch (error) {
     res.status(500).send("Something went wrong, please try again later");
   }
+  console.log({ accessToken });
 
   res.send({
     user: {
       email: "1234",
       name: "1234",
-      accessToken,
-      refreshToken,
+    },
+    token: {
+      access: accessToken,
+      refresh: refreshToken,
     },
   });
 };
@@ -29,6 +33,8 @@ const login = async (req: Request, res: Response) => {
 const refresh = async (req: Request, res: Response) => {
   const { refreshToken, userId } = req.body;
 
+  // TODO: check if refresh token is there and userId as well
+  // TODO: check if token has `bearer` in front
   // if (!refreshToken || userId) {
   //   return res.status(401).send("Not Authorized");
   // }
@@ -38,7 +44,18 @@ const refresh = async (req: Request, res: Response) => {
     if (redisRefreshToken === undefined) {
       res.status(400).send("Token does not exist");
     }
-    res.send(redisRefreshToken);
+
+    redisClient.del(refreshToken);
+    const newAccessToken = jwt.generateToken("access");
+    const newRefreshToken = jwt.generateToken("refresh");
+    redisClient.set(newRefreshToken, userId);
+
+    res.send({
+      token: {
+        access: newAccessToken,
+        refresh: newRefreshToken,
+      },
+    });
   } catch (error) {
     res.status(500).send("Failed to get token");
   }
