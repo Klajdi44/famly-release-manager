@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { isAuthenticated } from "../../util/auth/isAuthenticated";
+import { isAuthenticated } from "../../util/auth";
 
 const PersistLogin = () => {
   if (isAuthenticated()) {

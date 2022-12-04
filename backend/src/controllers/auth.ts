@@ -36,6 +36,7 @@ const refresh = async (req: Request, res: Response) => {
 
   // TODO: check if refresh token is there and userId as well
   // TODO: check if token has `bearer` in front
+  // TODO: grab user from the DB
   // if (!refreshToken || userId) {
   //   return res.status(401).send("Not Authorized");
   // }
@@ -52,6 +53,10 @@ const refresh = async (req: Request, res: Response) => {
     redisClient.set(newRefreshToken, userId);
 
     res.send({
+      name: "test",
+      surname: "test",
+      email: "test",
+      id: "1",
       token: {
         access: newAccessToken,
         refresh: newRefreshToken,

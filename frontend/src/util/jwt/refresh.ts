@@ -1,15 +1,13 @@
 import axios from "axios";
+import { User } from "../../pages/login/types";
 
 type Response = {
-  token: {
-    access: string;
-    refresh: string;
-  };
+  user: User;
 };
 
 const refresh = async (
   refreshToken: string | undefined
-): Promise<{ access: string; refresh: string } | undefined> => {
+): Promise<User | undefined> => {
   if (refreshToken === undefined) {
     return;
   }
@@ -25,10 +23,7 @@ const refresh = async (
 
     if (response.status === 200) {
       // TODO: is checking res necessary with axios?
-      return {
-        access: response.data.token.access,
-        refresh: response.data.token.refresh,
-      };
+      return response.data.user;
     }
 
     return undefined;
