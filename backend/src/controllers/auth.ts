@@ -22,10 +22,11 @@ const login = async (req: Request, res: Response) => {
     user: {
       email: "1234",
       name: "1234",
-    },
-    token: {
-      access: accessToken,
-      refresh: refreshToken,
+      id: userId,
+      token: {
+        access: accessToken,
+        refresh: refreshToken,
+      },
     },
   });
 };

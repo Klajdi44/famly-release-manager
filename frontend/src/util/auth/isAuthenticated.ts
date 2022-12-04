@@ -5,7 +5,7 @@ const isAuthenticated = () => {
   const refreshToken = localStorage.getItem("refreshToken");
 
   if (accessToken === null || refreshToken === null) {
-    return true;
+    return false;
   }
 
   const currentDate = Date.now();
