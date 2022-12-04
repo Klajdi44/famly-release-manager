@@ -41,6 +41,7 @@ const Login = () => {
       );
       // TODO: do we need to check for status with axios?
       if (result.status === 200) {
+        localStorage.removeItem("user");
         setUser(result.data.user);
         dispatch({
           type: "AUTH_ADD_USER",

@@ -1,15 +1,13 @@
 import axios from "axios";
 import jwtDecode from "jwt-decode";
-import { User } from "../../pages/login/types";
+import { getUser } from "../auth";
 import { refresh } from "../jwt/refresh";
 
 // TODO: put this in a .env
 const baseURL = "http://localhost:5000/api/";
 
 // TODO: add token names in constants
-const user: User | null = localStorage.getItem("user")
-  ? JSON.parse(localStorage.getItem("user") ?? "null")
-  : null;
+const user = getUser();
 
 const jwtAxios = axios.create({
   baseURL,
@@ -34,9 +32,12 @@ jwtAxios.interceptors.request.use(async req => {
 
     if (hasExpired && user !== null) {
       const newUser = await refresh(user.token.refresh);
+
       if (newUser !== undefined) {
         req.headers["authorization"] = `Bearer ${newUser.token.access}`;
-        localStorage.setItem("user", newUser);
+        localStorage.setItem("user", JSON.stringify(newUser));
+      } else {
+        localStorage.removeItem("user");
       }
     }
   }
