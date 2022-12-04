@@ -1,9 +1,7 @@
 import axios from "axios";
 import { User } from "../../pages/login/types";
 
-type Response = {
-  user: User;
-};
+type Response = User;
 
 const refresh = async (
   refreshToken: string | undefined
@@ -13,7 +11,7 @@ const refresh = async (
   }
   try {
     const response = await axios.post<Response>(
-      //TODO: add .env here
+      //TODO: add .env here for domain name
       "http://localhost:5000/api/v1/auth/refresh",
       {
         refreshToken,
@@ -23,7 +21,7 @@ const refresh = async (
 
     if (response.status === 200) {
       // TODO: is checking res necessary with axios?
-      return response.data.user;
+      return response.data;
     }
 
     return undefined;

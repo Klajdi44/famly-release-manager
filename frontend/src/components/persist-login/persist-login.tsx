@@ -1,12 +1,14 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { isAuthenticated } from "../../util/auth";
+import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
 
 const PersistLogin = () => {
-  if (isAuthenticated()) {
+  const [state] = useGlobalState();
+
+  if (state.user !== null) {
     return <Outlet />;
   }
 
-  return <Navigate to="/login" />;
+  return <Navigate to="/login" replace />;
 };
 
 export default PersistLogin;
