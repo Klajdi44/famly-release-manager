@@ -15,13 +15,13 @@ dotenv.config();
 
 const app = express();
 
-app.use(express.json());
+// app.use(express.json());
 // app.use(Auth.authorize(["getAllFeatures"])); // JWT authorize accessTypes
-app.use(compression()); // compresses all the responses
-app.use(helmet()); // adding set of security middlewares
-app.use(bodyParser.json()); // parse incoming request body and append data to `req.body`
+// app.use(compression()); // compresses all the responses
+// app.use(helmet()); // adding set of security middlewares
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors()); // enable all CORS request
+app.use(bodyParser.json()); // parse incoming request body and append data to `req.body`
+// app.use(cors()); // enable all CORS request
 
 declare module "express-session" {
   export interface SessionData {
