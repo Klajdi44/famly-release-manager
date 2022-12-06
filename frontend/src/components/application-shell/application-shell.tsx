@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { useState, ReactNode, useCallback, useMemo } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import React, { useState, ReactNode, useCallback, useMemo } from "react";
 import {
   AppShell,
   Navbar,
@@ -8,13 +8,10 @@ import {
   useMantineTheme,
   Header,
 } from "@mantine/core";
-import {
-  IconSettings,
-  IconLogout,
-  IconToggleRight,
-} from "@tabler/icons";
+import { IconSettings, IconLogout, IconToggleRight } from "@tabler/icons";
 
 import { useStyles } from "./styles";
+import { resetTokens } from "../../util/jwt";
 
 const data = [
   { link: "/", label: "Release toggles", icon: IconToggleRight },
@@ -33,8 +30,14 @@ const ApplicationShell = ({
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
   const [active, setActive] = useState("Billing");
-
+  const navigate = useNavigate();
   const handleOpen = useCallback(() => setOpened(opened => !opened), []);
+
+  const handleLogout = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    resetTokens();
+    navigate("/login", { replace: true });
+  };
 
   const handleSetActive = useCallback(
     (label: string) => () => setActive(label),
@@ -93,11 +96,7 @@ const ApplicationShell = ({
           <Navbar.Section grow>{links}</Navbar.Section>
 
           <Navbar.Section className={classes.footer}>
-            <a
-              href="#"
-              className={classes.link}
-              onClick={event => event.preventDefault()}
-            >
+            <a href="#" className={classes.link} onClick={handleLogout}>
               <IconLogout className={classes.linkIcon} stroke={1.5} />
               <span>Logout</span>
             </a>
