@@ -1,7 +1,7 @@
 import * as Types from "./types";
 
 const DEFAULT_STATE: Types.State = {
-  user: null,
+  user: JSON.parse(localStorage.getItem("user") ?? "null") ?? null,
 };
 
 export { DEFAULT_STATE };

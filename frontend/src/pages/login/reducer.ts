@@ -5,11 +5,7 @@ const reducer: GlobalStateTypes.Reducer = (state, action) => {
     case "AUTH_ADD_USER":
       return {
         ...state,
-        user: {
-          name: "ABC",
-          surname: "CBA",
-          email: "123@gmail.com",
-        },
+        user: action.payload,
       };
     default:
       return state;

@@ -7,8 +7,6 @@ import {
   deleteOneReleaseToggle,
 } from "../controllers/releaseToggles";
 
-import * as Auth from "../middlewares/auth.middleware";
-
 const router = express.Router();
 
 // route without auth:
@@ -18,8 +16,5 @@ router
   .post("/", createReleaseToggle)
   .patch("/:id", updateOneReleaseToggle)
   .delete("/:id", deleteOneReleaseToggle);
-
-// route with JWT auth:
-// router.get("/", Auth.authorize(['getAllFeatures']));
 
 export { router };

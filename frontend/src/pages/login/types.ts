@@ -1,7 +1,12 @@
 type User = {
+  id: number;
   name: string;
   surname: string;
   email: string;
+  token: {
+    access: string;
+    refresh: string;
+  };
 };
 
 type State = User | null;

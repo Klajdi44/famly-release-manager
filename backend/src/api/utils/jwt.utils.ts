@@ -2,20 +2,27 @@ import { sign, SignOptions, verify, VerifyOptions } from "jsonwebtoken";
 import * as fs from "fs";
 import * as path from "path";
 
+import { config } from "../../config";
+
 /**
  * generates JWT used for local testing
  */
-export function generateToken() {
-  // information to be encoded in the JWT
-  const payload = {
-    name: "Andrei Mihutoni",
+type TokenType = "access" | "refresh";
+type Payload = {
+  email: string;
+  userId: number;
+};
+const generateToken = (
+  type: TokenType = "access",
+  payload: Payload = {
+    email: "Andrei Mihutoni",
     userId: 123,
-    accessTypes: ["getAllFeatures"],
-  };
+  }
+) => {
   // read private key value
   const privateKey = {
     key: fs.readFileSync(path.join(__dirname, "../../../private.pem")),
-    passphrase: "andrei",
+    passphrase: "",
   };
 
   const signInOptions: SignOptions = {
@@ -23,27 +30,27 @@ export function generateToken() {
     // to generate the JWT. The client gets a public key to validate the
     // signature
     algorithm: "RS256",
-    expiresIn: "24h",
+    expiresIn: type === "access" ? "1h" : "999y",
+    // expiresIn: type === "access" ? (config.isProduction ? "24h" : "15m") : 0,
   };
-  // console.log('JWT', payload, privateKey, signInOptions);
 
   // generate JWT
   return sign(payload, privateKey, signInOptions);
-}
+};
 
-interface TokenPayload {
+type TokenPayload = {
   exp: number;
   accessTypes: string[];
-  name: string;
+  email: string;
   userId: number;
-}
+};
 
 /**
  * checks if JWT token is valid
  *
  * @param token the expected token payload
  */
-export function validateToken(token: string): Promise<TokenPayload> {
+const validateToken = (token: string): Promise<TokenPayload> => {
   const publicKey = fs.readFileSync(
     path.join(__dirname, "../../../public.pem")
   );
@@ -59,4 +66,6 @@ export function validateToken(token: string): Promise<TokenPayload> {
       resolve(decoded);
     });
   });
-}
+};
+
+export { generateToken, validateToken };
