@@ -1,15 +1,12 @@
-import { useEffect } from "react";
-import jwtAxios from "../../util/axios/axiosInstance";
+import { useFetch } from "../../hooks/use-fetch/use-fetch";
 
-const realeseTogglesUrl = "v1/release-toggles";
+const realeseTogglesUrl = "/v1/release-toggles";
 
 const ReleaseToggles = () => {
-  useEffect(() => {
-    (async () => {
-      const result = await jwtAxios.get(realeseTogglesUrl);
-      console.log(result.data);
-    })();
-  }, []);
+  const { data, error, isLoading } = useFetch({
+    url: realeseTogglesUrl,
+  });
+  console.log({ data, error, isLoading });
 
   return <h1>Release toggle</h1>;
 };
