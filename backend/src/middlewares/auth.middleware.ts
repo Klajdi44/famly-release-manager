@@ -26,13 +26,19 @@ export const authorize =
         ? jwt.slice("bearer".length).trim()
         : jwt;
 
-      // verify token hasn't expired yet
-      const decodedToken = await validateToken(possibleJwtWithoutBearer);
+      // verify token
+      await validateToken(possibleJwtWithoutBearer);
 
       next();
     } catch (error) {
       if (error.name === "TokenExpiredError") {
         res.status(401).json({ message: "Expired token" });
+        return;
+      }
+
+      if (error.name === "JsonWebTokenError") {
+        // token provided is invalid
+        res.status(401).json({ message: "Token is invalid" });
         return;
       }
 
