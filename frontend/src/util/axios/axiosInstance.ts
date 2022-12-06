@@ -6,21 +6,18 @@ import { refresh } from "../jwt";
 // TODO: put this in a .env
 const baseURL = "http://localhost:5000/api/";
 
-// TODO: add token names in constants
-const user = getUser();
-
 const jwtAxios = axios.create({
   baseURL,
-  headers: {
-    authorization: `Bearer ${user?.token?.access}`,
-  },
 });
 
 jwtAxios.interceptors.request.use(async req => {
+  const user = getUser();
   // remove TS possibly undefined error
   req.headers = req.headers ?? {};
 
   if (user !== null) {
+    console.log("went inside");
+
     req.headers.authorization = `Bearer ${user.token.access}`;
 
     const decodedToken = jwtDecode<{
