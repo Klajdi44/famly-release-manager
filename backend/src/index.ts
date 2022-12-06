@@ -16,18 +16,13 @@ const app = express();
 
 app.use(express.json());
 app.set("trust proxy", 1);
-// app.use(Auth.authorize(["getAllFeatures"])); // JWT authorize accessTypes
 app.use(compression()); // compresses all the responses
 app.use(helmet()); // adding set of security middlewares
 app.use(bodyParser.json()); // parse incoming request body and append data to `req.body`
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
-  })
-);
+app.use(cors());
 
+app.use(Auth.authorize()); // JWT authorize accessTypes
 app.use("/api/v1/release-toggles", releaseToggleRouter);
 app.use("/api/v1/auth", authRouter);
 

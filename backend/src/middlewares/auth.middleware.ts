@@ -4,39 +4,33 @@ import { validateToken } from "../api/utils/jwt.utils";
 /**
  * middleware to check whether user has access to a specific endpoint
  *
- * @param allowedAccessTypes list of allowed access types of a specific endpoint
  */
 export const authorize =
-  (allowedAccessTypes: string[]) =>
-  async (req: Request, res: Response, next: NextFunction) => {
-    if (req.url === "/api/v1/login/") {
-      next();
+  () => async (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.path);
+
+    if (req.path === "/api/v1/auth/login/") {
+      console.log("went inside if");
+      return next();
     }
+
     try {
-      let jwt = req.headers.authorization;
+      const jwt = req.headers.authorization;
 
       // verify request has token
       if (!jwt) {
-        return res.status(401).json({ message: "Invalid token " });
+        return res.status(401).json({ message: "Tokken is missing" });
       }
 
       // remove Bearer if using Bearer Authorization mechanism
-      if (jwt.toLowerCase().startsWith("bearer")) {
-        jwt = jwt.slice("bearer".length).trim();
-      }
+      const possibleJwtWithoutBearer = jwt.toLowerCase().startsWith("bearer")
+        ? jwt.slice("bearer".length).trim()
+        : jwt;
 
       // verify token hasn't expired yet
-      const decodedToken = await validateToken(jwt);
+      const decodedToken = await validateToken(possibleJwtWithoutBearer);
 
-      const hasAccessToEndpoint = allowedAccessTypes.some(at =>
-        decodedToken.accessTypes.some(uat => uat === at)
-      );
-
-      if (!hasAccessToEndpoint) {
-        return res
-          .status(401)
-          .json({ message: "No enough privileges to access endpoint" });
-      }
+      console.log({ decodedToken, as: "hasd" });
 
       next();
     } catch (error) {
