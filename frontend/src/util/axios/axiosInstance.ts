@@ -16,8 +16,6 @@ jwtAxios.interceptors.request.use(async req => {
   req.headers = req.headers ?? {};
 
   if (user !== null) {
-    console.log("went inside");
-
     req.headers.authorization = `Bearer ${user.token.access}`;
 
     const decodedToken = jwtDecode<{
