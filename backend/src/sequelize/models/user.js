@@ -22,6 +22,9 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     password: DataTypes.STRING
   }, {
+    defaultScope: {
+      attributes: { exclude: ['password'] }, // Remove password by default when querying
+    },
     sequelize,
     modelName: 'User',
   });

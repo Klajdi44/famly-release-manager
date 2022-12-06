@@ -1,6 +1,5 @@
 import express from "express";
 import * as dotenv from "dotenv";
-import { generateToken } from "./api/utils/jwt.utils";
 import { router as releaseToggleRouter } from "./routes/releaseToggles";
 import { router as authRouter } from "./routes/auth";
 import * as Auth from "./middlewares/auth.middleware";
