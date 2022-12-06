@@ -12,111 +12,105 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
-    return queryInterface.bulkInsert('Sites', [
+     return queryInterface.bulkInsert('SiteSegments', [
+      // Segment # 6
       {
-        name: 'Site #1',
         createdAt: new Date(),
         updatedAt: new Date(),
-        countryId: 1,
-        subscriptionId: 1,
+        segmentId: 6,
+        siteId: 1,
       },
       {
-        name: 'Site #2',
         createdAt: new Date(),
         updatedAt: new Date(),
-        countryId: 1,
-        subscriptionId: 1,
+        segmentId: 6,
+        siteId: 2,
       },
       {
-        name: 'Site #3',
         createdAt: new Date(),
         updatedAt: new Date(),
-        countryId: 1,
-        subscriptionId: 1,
+        segmentId: 6,
+        siteId: 3,
       },
       {
-        name: 'Site #4',
         createdAt: new Date(),
         updatedAt: new Date(),
-        countryId: 1,
-        subscriptionId: 1,
+        segmentId: 6,
+        siteId: 4,
       },
       {
-        name: 'Site #5',
         createdAt: new Date(),
         updatedAt: new Date(),
-        countryId: 2,
-        subscriptionId: 1,
+        segmentId: 6,
+        siteId: 5,
+      },
+      // Segment # 7
+      {
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        segmentId: 7,
+        siteId: 6,
       },
       {
-        name: 'Site #6',
         createdAt: new Date(),
         updatedAt: new Date(),
-        countryId: 2,
-        subscriptionId: 1,
+        segmentId: 7,
+        siteId: 7,
       },
       {
-        name: 'Site #7',
         createdAt: new Date(),
         updatedAt: new Date(),
-        countryId: 2,
-        subscriptionId: 1,
+        segmentId: 7,
+        siteId: 8,
       },
       {
-        name: 'Site #8',
         createdAt: new Date(),
         updatedAt: new Date(),
-        countryId: 2,
-        subscriptionId: 1,
+        segmentId: 7,
+        siteId: 9,
       },
       {
-        name: 'Site #9',
         createdAt: new Date(),
         updatedAt: new Date(),
-        countryId: 3,
-        subscriptionId: 1,
+        segmentId: 7,
+        siteId: 10,
+      },
+      // Segment # 8
+      {
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        segmentId: 8,
+        siteId: 11,
       },
       {
-        name: 'Site #10',
         createdAt: new Date(),
         updatedAt: new Date(),
-        countryId: 3,
-        subscriptionId: 1,
+        segmentId: 8,
+        siteId: 12,
       },
       {
-        name: 'Site #11',
         createdAt: new Date(),
         updatedAt: new Date(),
-        countryId: 3,
-        subscriptionId: 1,
+        segmentId: 8,
+        siteId: 13,
       },
       {
-        name: 'Site #12',
         createdAt: new Date(),
         updatedAt: new Date(),
-        countryId: 4,
-        subscriptionId: 1,
+        segmentId: 8,
+        siteId: 14,
       },
       {
-        name: 'Site #13',
         createdAt: new Date(),
         updatedAt: new Date(),
-        countryId: 4,
-        subscriptionId: 1,
+        segmentId: 8,
+        siteId: 15,
       },
       {
-        name: 'Site #14',
         createdAt: new Date(),
         updatedAt: new Date(),
-        countryId: 4,
-        subscriptionId: 1,
-      },
-      {
-        name: 'Site #15',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        countryId: 5,
-        subscriptionId: 1,
+        segmentId: 8,
+        siteId: 16,
       },
     ]);
   },
@@ -128,6 +122,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    return queryInterface.bulkDelete('Sites', null, {});
+    return queryInterface.bulkDelete('SiteSegments', null, {});
   }
 };

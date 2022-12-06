@@ -11,6 +11,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+
+      // this.belongsTo(models.Site, {
+      //   foreignKey: 'siteId'
+      // });
+      // this.belongsTo(models.Segment, {
+      //   foreignKey: 'segmentId'
+      // });
     }
   }
   SiteSegment.init({
