@@ -44,10 +44,11 @@ const refresh = async (req: Request, res: Response) => {
   try {
     const redisRefreshToken = await redisClient.get(refreshToken);
     if (redisRefreshToken === undefined) {
-      res.status(400).send("Token does not exist");
+      res.status(401).send("Token does not exist");
     }
-
+    // Delete old refresh token
     redisClient.del(refreshToken);
+
     const newAccessToken = jwt.generateToken("access");
     const newRefreshToken = jwt.generateToken("refresh");
     redisClient.set(newRefreshToken, userId);

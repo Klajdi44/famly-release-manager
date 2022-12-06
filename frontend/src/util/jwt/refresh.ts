@@ -8,7 +8,9 @@ const refresh = async (
 ): Promise<User | undefined> => {
   if (refreshToken === undefined) {
     return;
+    // TODO: throw an error
   }
+
   try {
     const response = await axios.post<Response>(
       //TODO: add .env here for domain name

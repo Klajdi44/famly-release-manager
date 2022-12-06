@@ -3,16 +3,12 @@ import * as dotenv from "dotenv";
 import { generateToken } from "./api/utils/jwt.utils";
 import { router as releaseToggleRouter } from "./routes/releaseToggles";
 import { router as authRouter } from "./routes/auth";
-
+import * as Auth from "./middlewares/auth.middleware";
 import compression from "compression";
 import helmet from "helmet";
 import bodyParser from "body-parser";
 import cors from "cors";
 import { config } from "./config";
-import { createClient } from "redis";
-import connectRedis from "connect-redis";
-import session from "express-session";
-import { redisClient } from "./redis";
 
 dotenv.config();
 
@@ -29,32 +25,8 @@ app.use(
   cors({
     origin: "http://localhost:3000",
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
-    credentials: true,
   })
 );
-
-declare module "express-session" {
-  export interface SessionData {
-    user: { [key: string]: any };
-  }
-}
-
-const RedisStore = connectRedis(session);
-//Configure session middleware
-// app.use(
-//   session({
-//     store: new RedisStore({ client: redisClient }),
-//     secret: process.env.REDIS_SECRET,
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: {
-//       secure: config.isProduction, // if true only transmit cookie over https
-//       httpOnly: false, // if true prevent client side JS from reading the cookie
-//       // maxAge: 5 * 24 * 60 * 60 * 1000, // session max age in miliseconds: 10 days
-//       maxAge: 15000, // session max age in miliseconds: 10 days
-//     },
-//   })
-// );
 
 app.use("/api/v1/release-toggles", releaseToggleRouter);
 app.use("/api/v1/auth", authRouter);
