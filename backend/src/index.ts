@@ -26,11 +26,6 @@ app.use(Auth.authorize()); // JWT authorize accessTypes
 app.use("/api/v1/release-toggles", releaseToggleRouter);
 app.use("/api/v1/auth", authRouter);
 
-// Only generate a token for lower level environments
-if (config.isProduction === false) {
-  console.log("*** JWT:", generateToken());
-}
-
 app.listen(process.env.PORT, () => {
   console.log(
     `### The app is listening at http://localhost:${process.env.PORT} ###`

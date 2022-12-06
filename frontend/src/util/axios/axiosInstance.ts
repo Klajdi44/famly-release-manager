@@ -1,7 +1,7 @@
 import axios from "axios";
 import jwtDecode from "jwt-decode";
 import { getUser } from "../auth";
-import { refresh } from "../jwt/refresh";
+import { refresh } from "../jwt";
 
 // TODO: put this in a .env
 const baseURL = "http://localhost:5000/api/";

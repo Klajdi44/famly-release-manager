@@ -10,7 +10,6 @@ export const authorize =
     console.log(req.path);
 
     if (req.path === "/api/v1/auth/login/") {
-      console.log("went inside if");
       return next();
     }
 
@@ -29,8 +28,6 @@ export const authorize =
 
       // verify token hasn't expired yet
       const decodedToken = await validateToken(possibleJwtWithoutBearer);
-
-      console.log({ decodedToken, as: "hasd" });
 
       next();
     } catch (error) {

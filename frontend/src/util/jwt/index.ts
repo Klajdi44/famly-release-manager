@@ -32,4 +32,8 @@ const refresh = async (
   }
 };
 
-export { refresh };
+const resetTokens = () => {
+  localStorage.removeItem("user");
+};
+
+export { refresh, resetTokens };

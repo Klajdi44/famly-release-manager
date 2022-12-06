@@ -6,11 +6,11 @@ import {
   Container,
   Button,
 } from "@mantine/core";
-import { useLocalStorage } from "@mantine/hooks";
 import axios from "axios";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
+import { resetTokens } from "../../util/jwt";
 import { User } from "./types";
 
 const Login = () => {
@@ -18,10 +18,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   const [, dispatch] = useGlobalState();
-
-  const [, setUser] = useLocalStorage<User>({
-    key: "user",
-  });
 
   const navigate = useNavigate();
 
@@ -41,8 +37,8 @@ const Login = () => {
       );
       // TODO: do we need to check for status with axios?
       if (result.status === 200) {
-        localStorage.removeItem("user");
-        setUser(result.data.user);
+        resetTokens();
+        localStorage.setItem("user", JSON.stringify(result.data.user));
         dispatch({
           type: "AUTH_ADD_USER",
           payload: result.data.user,
