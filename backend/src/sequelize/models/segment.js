@@ -15,13 +15,19 @@ module.exports = (sequelize, DataTypes) => {
         through: 'SiteSegments',
         foreignKey: 'segmentId'
       });
-      this.belongsToMany(models.ReleaseToggle, {
-        through: 'SegmentReleaseToggles',
+
+      // Works
+      // this.belongsToMany(models.ReleaseToggle, {
+      //   through: 'SegmentReleaseToggles',
+      //   foreignKey: 'segmentId'
+      // });
+
+      // Experimental
+      this.hasMany(models.SiteSegment, {
         foreignKey: 'segmentId'
       });
-
       // this.hasMany(models.SiteSegment, {
-      //   foreignKey: 'segmentId'
+      //   foreignKey: 'segmentId',
       // });
     }
   }

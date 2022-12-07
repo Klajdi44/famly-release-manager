@@ -22,7 +22,7 @@ app.use(bodyParser.json()); // parse incoming request body and append data to `r
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
-app.use(Auth.authorize()); // JWT authorize accessTypes
+// app.use(Auth.authorize()); // JWT authorize accessTypes
 app.use("/api/v1/release-toggles", releaseToggleRouter);
 app.use("/api/v1/sites", siteRouter);
 app.use("/api/v1/auth", authRouter);

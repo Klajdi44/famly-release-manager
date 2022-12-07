@@ -17,14 +17,17 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Subscription, {
         foreignKey: 'subscriptionId'
       });
-      this.belongsToMany(models.Segment, {
-        through: 'SiteSegments',
+
+      // Works
+      // this.belongsToMany(models.Segment, {
+      //   through: 'SiteSegments',
+      //   foreignKey: 'siteId',
+      // });
+
+      // Eksperimental
+      this.hasMany(models.SiteSegment, {
         foreignKey: 'siteId'
       });
-
-      // this.hasMany(models.SiteSegment, {
-      //   foreignKey: 'siteId'
-      // });
     }
   }
   Site.init({

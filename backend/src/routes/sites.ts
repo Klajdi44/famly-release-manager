@@ -14,10 +14,10 @@ const router = express.Router();
 // route without auth:
 router
   .get("/", getAllSites)
-  .get("/:id", getOneSite);
-//   .post("/", createSite)
-//   .patch("/:id", updateOneSite)
-//   .delete("/:id", deleteOneSite);
+  .get("/:id", getOneSite)
+  .post("/", createSite)
+  .patch("/:id", updateOneSite)
+  .delete("/:id", deleteOneSite);
 
 // route with JWT auth:
 // router.get("/", Auth.authorize(['getAllFeatures']));

@@ -12,16 +12,21 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
 
-      // this.belongsTo(models.Site, {
-      //   foreignKey: 'siteId'
-      // });
-      // this.belongsTo(models.Segment, {
-      //   foreignKey: 'segmentId'
-      // });
+      // this.belongsTo(models.Site);
+      // this.belongsTo(models.Segment);
+
+      this.belongsTo(models.Site, {
+        // as: 'situm',
+        foreignKey: 'siteId'
+      });
+      this.belongsTo(models.Segment, {
+        // as: 'segmentum',
+        foreignKey: 'segmentId'
+      });
     }
   }
   SiteSegment.init({
-    test: DataTypes.STRING
+    // test: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'SiteSegment',
