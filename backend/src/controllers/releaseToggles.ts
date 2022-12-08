@@ -1,15 +1,11 @@
 import { Request, Response } from "express";
 // const { sequelize } = require("../sequelize/models");
-const { ReleaseToggle, User, Segment } = require("../sequelize/models");
+const { ReleaseToggle, User, Segment, Site } = require("../sequelize/models");
 
 export const getAllReleaseToggles = async (req: Request, res: Response) => {
-  // TODO: Validate req: user
-
-  console.log("** Running controller: getAllReleaseToggles");
 
   try {
-    const releaseToggles = await ReleaseToggle.findAll();
-    // const releaseToggles = await ReleaseToggle.findAll({ include: [User, Segment] });
+    const releaseToggles = await ReleaseToggle.findAll({ include: ['segments', User]});
     return res.status(200).json(releaseToggles);
   } catch (error) {
     return res
@@ -19,13 +15,12 @@ export const getAllReleaseToggles = async (req: Request, res: Response) => {
 };
 
 export const getOneReleaseToggle = async (req: Request, res: Response) => {
-  console.log("** Running controller: getOneReleaseToggle");
 
-  // TODO: Validate req.params.id
-  // Make sure to check if it is an INT / NUMBER
+  // Check if req.params.id is a number
+  if (!Number(req.params.id)) { return res.json({error: 'ID is not a number'}); }
 
   try {
-    const releaseToggle = await ReleaseToggle.findByPk(req.params.id, { include: [User, Segment] });
+    const releaseToggle = await ReleaseToggle.findByPk(req.params.id, { include: ['segments', User] });
 
     if (releaseToggle === null) {
       return res
@@ -40,11 +35,7 @@ export const getOneReleaseToggle = async (req: Request, res: Response) => {
 };
 
 export const createReleaseToggle = async (req: Request, res: Response) => {
-  console.log("** Running controller: createReleaseToggle");
-
-  console.log("** Request body", req.body);
-
-  // TODO: Validate Data
+  // Validate Data
   if (!req.body.name) {
     return res.status(400).json({ error: "Name must be defined.." });
   }
@@ -72,10 +63,8 @@ export const createReleaseToggle = async (req: Request, res: Response) => {
 };
 
 export const updateOneReleaseToggle = async (req: Request, res: Response) => {
-  console.log("** Running controller: updateOneReleaseToggle", req.method);
-
-  // TODO: Validate req.params.id
-  console.log("** Req body: ", req.body);
+  // Check if req.params.id is a number
+  if (!Number(req.params.id)) { return res.json({error: 'ID is not a number'}); }
 
   // Data payload for update
   interface Payload {
@@ -109,10 +98,8 @@ export const updateOneReleaseToggle = async (req: Request, res: Response) => {
 };
 
 export const deleteOneReleaseToggle = async (req: Request, res: Response) => {
-  console.log("** Running controller: deleteOneReleaseToggle", req.method);
-  console.log("id: ", req.params.id, "type of id: ", typeof req.params.id);
-
-  // TODO: Validate req.params.id
+  // Validate req.params.id
+  if (!Number(req.params.id)) { return res.json({error: 'ID is not a number'}); }
 
   try {
     const releaseToggle = await ReleaseToggle.destroy({
@@ -120,6 +107,7 @@ export const deleteOneReleaseToggle = async (req: Request, res: Response) => {
         id: req.params.id,
       },
     });
+    if (releaseToggle === 0) { return res.status(404).json({failed: 'No segment matching this ID - Nothing deleted'}); }
     return res.status(200).json(releaseToggle);
   } catch (error) {
     return res.status(500).json(error);
