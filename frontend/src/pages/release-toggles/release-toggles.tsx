@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 
 import CenteredLoader from "../../components/centered-loader/centered-loader";
 import { useFetch } from "../../hooks/use-fetch/use-fetch";
+import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
 import jwtAxios from "../../util/axios/axiosInstance";
 import { ReleaseToggle } from "../types/release-toggle/apitypes";
 import ReleaseToggleModal, { OnSubmitParams } from "./modal/modal";
@@ -23,6 +24,7 @@ type ReleaseTogglesProps = {
 };
 
 const ReleaseToggles = ({ releaseToggles }: ReleaseTogglesProps) => {
+  const [state] = useGlobalState();
   const [isAddNewToggleOpened, setIsAddNewToggleOpened] = useState(false);
 
   const toggleModalVisibility = () =>
@@ -32,7 +34,7 @@ const ReleaseToggles = ({ releaseToggles }: ReleaseTogglesProps) => {
     jwtAxios.post("/v1/release-toggles", {
       name,
       description,
-      userId: 1,
+      userId: state.user?.id,
     });
 
     toggleModalVisibility();
