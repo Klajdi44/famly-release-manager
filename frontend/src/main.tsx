@@ -15,6 +15,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         theme={{
           /** Put your mantine theme override here */
           colorScheme: "dark",
+          loader: "bars",
         }}
       >
         <NotificationsProvider>

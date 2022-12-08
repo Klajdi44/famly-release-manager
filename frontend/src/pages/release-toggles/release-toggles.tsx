@@ -1,63 +1,76 @@
-import { Button, Container, Modal, Paper, TextInput } from "@mantine/core";
+import {
+  Button,
+  Center,
+  Container,
+  Loader,
+  Modal,
+  Paper,
+  TextInput,
+} from "@mantine/core";
 import { useState } from "react";
 import { useFetch } from "../../hooks/use-fetch/use-fetch";
 import jwtAxios from "../../util/axios/axiosInstance";
+import { ReleaseToggle } from "../types/release-toggle/apitypes";
+import ReleaseToggleModal, { OnSubmitParams } from "./modal/modal";
 
 const realeseTogglesUrl = "/v1/release-toggles";
 
-const ReleaseToggles = () => {
+type ReleaseTogglesProps = {
+  releaseToggles: ReleaseToggle[];
+};
+
+const ReleaseToggles = ({ releaseToggles }: ReleaseTogglesProps) => {
   const [isAddNewToggleOpened, setIsAddNewToggleOpened] = useState(false);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
 
-  const { data, error, isLoading } = useFetch({
-    url: realeseTogglesUrl,
-  });
+  const handleToggleModal = () =>
+    setIsAddNewToggleOpened(prevState => !prevState);
 
-  console.log({ data });
-
-  const handleAddToggle = () => {
+  const handleAddToggle = ({ name, description }: OnSubmitParams) => {
     jwtAxios.post("/v1/release-toggles", {
       name,
       description,
       userId: 1,
     });
+
+    handleToggleModal();
   };
+
+  console.log(releaseToggles);
 
   return (
     <Container>
-      <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-        <Button variant="filled" onClick={() => setIsAddNewToggleOpened(true)}>
-          Add release toggle
-        </Button>
+      {/* <Paper withBorder shadow="md" p={30} mt={30} radius="md"> */}
+      <Button variant="filled" onClick={() => setIsAddNewToggleOpened(true)}>
+        Add release toggle
+      </Button>
 
-        <Modal
-          opened={isAddNewToggleOpened}
-          onClose={() => setIsAddNewToggleOpened(false)}
-          title="New Release Toggle"
-        >
-          <TextInput
-            label="Name"
-            name="name"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            required
-          />
-          <TextInput
-            label="Description"
-            name="description"
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            required
-          />
-
-          <Button mt={20} variant="filled" onClick={handleAddToggle}>
-            Submit
-          </Button>
-        </Modal>
-      </Paper>
+      <ReleaseToggleModal
+        isVisible={isAddNewToggleOpened}
+        onClose={handleToggleModal}
+        onSubmit={handleAddToggle}
+      />
     </Container>
   );
 };
 
-export default ReleaseToggles;
+const DataLoader = () => {
+  const { data, error, isLoading } = useFetch<ReleaseToggle[]>({
+    url: realeseTogglesUrl,
+  });
+
+  if (isLoading) {
+    return (
+      <Center h={"80%"}>
+        <Loader />
+      </Center>
+    );
+  }
+
+  if ((error && error !== "canceled") || data === null) {
+    return <div>Something went wrong... please try again</div>;
+  }
+
+  return <ReleaseToggles releaseToggles={data} />;
+};
+
+export default DataLoader;
