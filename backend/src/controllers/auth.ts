@@ -1,28 +1,47 @@
 import { Request, Response } from "express";
+import bcrypt from "bcrypt";
+
 import * as jwt from "../api/utils/jwt.utils";
 import { redisClient } from "../redis/index";
+const { User } = require("../sequelize/models");
 
 const login = async (req: Request, res: Response) => {
-  // TODO: get user from DB
-  // verify user email exists, verify user pass exists
+  const { email, password } = req.body;
 
-  const userId = "1";
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password are required" });
+  }
 
-  const accessToken = jwt.generateToken();
-  const refreshToken = jwt.generateToken("refresh");
+  const user = await User.findOne({
+    where: { email },
+    attributes: ["id", "firstName", "lastName", "email", "password"],
+  });
+
+  if (user === null) {
+    return res.status(400).json({ message: "Invalid credentials" });
+  }
+
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+  if (isPasswordCorrect === false) {
+    return res.status(400).json({ message: "Invalid credentials" });
+  }
+
+  const userWithoutPassword = { ...user.dataValues, password: null };
+
+  const accessToken = jwt.generateToken("access", userWithoutPassword);
+  const refreshToken = jwt.generateToken("refresh", userWithoutPassword);
 
   try {
-    await redisClient.set(refreshToken, userId);
+    await redisClient.set(refreshToken, user.id);
   } catch (error) {
     res.status(500).send("Something went wrong, please try again later");
   }
   console.log({ accessToken });
 
-  res.send({
+  return res.send({
     user: {
-      email: "1234",
-      name: "1234",
-      id: userId,
+      ...userWithoutPassword,
       token: {
         access: accessToken,
         refresh: refreshToken,

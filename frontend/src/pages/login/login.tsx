@@ -6,7 +6,9 @@ import {
   Container,
   Button,
 } from "@mantine/core";
-import axios from "axios";
+import { showNotification } from "@mantine/notifications";
+import { IconX } from "@tabler/icons";
+import axios, { AxiosError } from "axios";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
@@ -46,7 +48,14 @@ const Login = () => {
         navigate("/");
       }
     } catch (error) {
-      console.log("Something went wrong while loging in");
+      if (error instanceof AxiosError) {
+        showNotification({
+          title: "Something went wrong!",
+          message: error.response?.data.message,
+          color: "red",
+          icon: <IconX />,
+        });
+      }
     }
   };
 
