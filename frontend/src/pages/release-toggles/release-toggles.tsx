@@ -2,12 +2,16 @@ import {
   Button,
   Center,
   Container,
+  Divider,
+  Flex,
   Loader,
-  Modal,
   Paper,
-  TextInput,
+  Switch,
+  Title,
 } from "@mantine/core";
-import { useState } from "react";
+import { Fragment, useState } from "react";
+import { Link } from "react-router-dom";
+
 import { useFetch } from "../../hooks/use-fetch/use-fetch";
 import jwtAxios from "../../util/axios/axiosInstance";
 import { ReleaseToggle } from "../types/release-toggle/apitypes";
@@ -22,7 +26,7 @@ type ReleaseTogglesProps = {
 const ReleaseToggles = ({ releaseToggles }: ReleaseTogglesProps) => {
   const [isAddNewToggleOpened, setIsAddNewToggleOpened] = useState(false);
 
-  const handleToggleModal = () =>
+  const toggleModalVisibility = () =>
     setIsAddNewToggleOpened(prevState => !prevState);
 
   const handleAddToggle = ({ name, description }: OnSubmitParams) => {
@@ -32,23 +36,38 @@ const ReleaseToggles = ({ releaseToggles }: ReleaseTogglesProps) => {
       userId: 1,
     });
 
-    handleToggleModal();
+    toggleModalVisibility();
   };
 
   console.log(releaseToggles);
 
   return (
     <Container>
-      {/* <Paper withBorder shadow="md" p={30} mt={30} radius="md"> */}
-      <Button variant="filled" onClick={() => setIsAddNewToggleOpened(true)}>
-        Add release toggle
-      </Button>
+      <Flex justify="end">
+        <Button variant="filled" onClick={toggleModalVisibility}>
+          Add release toggle
+        </Button>
+      </Flex>
 
       <ReleaseToggleModal
         isVisible={isAddNewToggleOpened}
-        onClose={handleToggleModal}
+        onClose={toggleModalVisibility}
         onSubmit={handleAddToggle}
       />
+
+      <Paper withBorder shadow="md" p={30} mt={30} radius="md">
+        {releaseToggles.map(toggle => (
+          <Fragment key={toggle.id}>
+            <Flex justify={"space-between"} align="center" m={"md"}>
+              <Link to={"#"}>
+                <Title fz="xl">{toggle.name}</Title>
+              </Link>
+              <Switch color="teal" onLabel="On" offLabel="Off" size="lg" />
+            </Flex>
+            <Divider />
+          </Fragment>
+        ))}
+      </Paper>
     </Container>
   );
 };
