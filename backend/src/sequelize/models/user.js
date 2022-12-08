@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.ReleaseToggle, {
         foreignKey: 'userId'
       });
+      this.hasMany(models.Segment, {
+        foreignKey: 'userId'
+      });
     }
   }
   User.init({
