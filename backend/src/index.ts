@@ -3,6 +3,7 @@ import * as dotenv from "dotenv";
 import { router as releaseToggleRouter } from "./routes/releaseToggles";
 import { router as authRouter } from "./routes/auth";
 import * as Auth from "./middlewares/auth.middleware";
+import { router as siteRouter } from "./routes/sites";
 import compression from "compression";
 import helmet from "helmet";
 import bodyParser from "body-parser";
@@ -21,8 +22,9 @@ app.use(bodyParser.json()); // parse incoming request body and append data to `r
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
-app.use(Auth.authorize()); // JWT authorize accessTypes
+// app.use(Auth.authorize()); // JWT authorize accessTypes
 app.use("/api/v1/release-toggles", releaseToggleRouter);
+app.use("/api/v1/sites", siteRouter);
 app.use("/api/v1/auth", authRouter);
 
 app.listen(process.env.PORT, () => {

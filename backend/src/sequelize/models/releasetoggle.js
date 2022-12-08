@@ -15,7 +15,8 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'userId'
       });
       this.belongsToMany(models.Segment, {
-        through: 'SegmentReleaseToggles'
+        through: 'SegmentReleaseToggles',
+        foreignKey: 'releaseToggleId'
       })
     }
   }

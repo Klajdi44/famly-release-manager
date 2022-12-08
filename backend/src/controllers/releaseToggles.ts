@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 // const { sequelize } = require("../sequelize/models");
-const { ReleaseToggle, User } = require("../sequelize/models");
+const { ReleaseToggle, User, Segment } = require("../sequelize/models");
 
 export const getAllReleaseToggles = async (req: Request, res: Response) => {
   // TODO: Validate req: user
@@ -8,7 +8,8 @@ export const getAllReleaseToggles = async (req: Request, res: Response) => {
   console.log("** Running controller: getAllReleaseToggles");
 
   try {
-    const releaseToggles = await ReleaseToggle.findAll({ include: User });
+    const releaseToggles = await ReleaseToggle.findAll();
+    // const releaseToggles = await ReleaseToggle.findAll({ include: [User, Segment] });
     return res.status(200).json(releaseToggles);
   } catch (error) {
     return res
@@ -24,9 +25,7 @@ export const getOneReleaseToggle = async (req: Request, res: Response) => {
   // Make sure to check if it is an INT / NUMBER
 
   try {
-    const releaseToggle = await ReleaseToggle.findByPk(req.params.id, {
-      include: User,
-    });
+    const releaseToggle = await ReleaseToggle.findByPk(req.params.id, { include: [User, Segment] });
 
     if (releaseToggle === null) {
       return res
@@ -79,9 +78,6 @@ export const updateOneReleaseToggle = async (req: Request, res: Response) => {
   console.log("** Req body: ", req.body);
 
   // Data payload for update
-  // let payload = {};
-  // payload: { [key: string]: string } = {};
-  // payload: any = {};
   interface Payload {
     name?: string;
     description?: string;

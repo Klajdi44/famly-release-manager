@@ -12,11 +12,23 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsToMany(models.Site, {
-        through: 'SiteSegments'
-      })
-      this.belongsToMany(models.ReleaseToggle, {
-        through: 'SegmentReleaseToggles'
-      })
+        through: 'SiteSegments',
+        foreignKey: 'segmentId'
+      });
+
+      // Works
+      // this.belongsToMany(models.ReleaseToggle, {
+      //   through: 'SegmentReleaseToggles',
+      //   foreignKey: 'segmentId'
+      // });
+
+      // Experimental
+      this.hasMany(models.SiteSegment, {
+        foreignKey: 'segmentId'
+      });
+      // this.hasMany(models.SiteSegment, {
+      //   foreignKey: 'segmentId',
+      // });
     }
   }
   Segment.init({

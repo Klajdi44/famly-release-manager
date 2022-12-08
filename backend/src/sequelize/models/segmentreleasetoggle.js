@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   SegmentReleaseToggle.init({
-    test: DataTypes.STRING
+    // test: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'SegmentReleaseToggle',
