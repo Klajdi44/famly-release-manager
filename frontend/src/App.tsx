@@ -9,6 +9,7 @@ import ReleaseToggles from "./pages/release-toggles/release-toggles";
 import PageNotFound from "./components/404/404";
 import PersistLogin from "./components/persist-login/persist-login";
 import ApplicationShell from "./components/application-shell/application-shell";
+import SingleReleaseToggle from "./pages/release-toggles/single-release-toggle/single-release-toggle";
 
 function App() {
   const [state, dispatch] = useReducer(reducer, DEFAULT_STATE);
@@ -26,6 +27,7 @@ function App() {
           <Routes>
             <Route element={<PersistLogin />}>
               <Route path="/" element={<ReleaseToggles />} />
+              <Route path="/preview" element={<SingleReleaseToggle />}></Route>
             </Route>
             <Route path="/login" element={<Login />} />
             <Route path="*" element={<PageNotFound />} />

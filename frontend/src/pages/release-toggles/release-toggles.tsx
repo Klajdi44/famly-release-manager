@@ -1,10 +1,8 @@
 import {
   Button,
-  Center,
   Container,
   Divider,
   Flex,
-  Loader,
   Paper,
   Switch,
   Title,
@@ -12,6 +10,7 @@ import {
 import { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 
+import CenteredLoader from "../../components/centered-loader/centered-loader";
 import { useFetch } from "../../hooks/use-fetch/use-fetch";
 import jwtAxios from "../../util/axios/axiosInstance";
 import { ReleaseToggle } from "../types/release-toggle/apitypes";
@@ -39,11 +38,9 @@ const ReleaseToggles = ({ releaseToggles }: ReleaseTogglesProps) => {
     toggleModalVisibility();
   };
 
-  console.log(releaseToggles);
-
   return (
     <Container>
-      {/* Button that opens the add  toggle modal */}
+      {/* Button that opens the add toggle modal */}
       <Flex justify="end">
         <Button variant="filled" onClick={toggleModalVisibility}>
           Add release toggle
@@ -57,12 +54,17 @@ const ReleaseToggles = ({ releaseToggles }: ReleaseTogglesProps) => {
         onSubmit={handleAddToggle}
       />
 
-      {/* Release toggle modals */}
+      {/* Release toggles */}
       <Paper withBorder shadow="md" p={30} mt={30} radius="md">
         {releaseToggles.map(toggle => (
           <Fragment key={toggle.id}>
             <Flex justify={"space-between"} align="center" m={"md"}>
-              <Link to={"#"}>
+              <Link
+                to={{
+                  pathname: "/preview",
+                  search: `?toggle-id=${toggle.id}`,
+                }}
+              >
                 <Title fz="xl">{toggle.name}</Title>
               </Link>
               <Switch color="teal" onLabel="On" offLabel="Off" size="lg" />
@@ -81,11 +83,7 @@ const DataLoader = () => {
   });
 
   if (isLoading) {
-    return (
-      <Center h={"80%"}>
-        <Loader />
-      </Center>
-    );
+    return <CenteredLoader />;
   }
 
   if ((error && error !== "canceled") || data === null) {
