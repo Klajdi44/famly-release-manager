@@ -27,8 +27,10 @@ const login = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "Invalid credentials" });
   }
 
-  const accessToken = jwt.generateToken();
-  const refreshToken = jwt.generateToken("refresh");
+  const userWithoutPassword = { ...user.dataValues, password: null };
+
+  const accessToken = jwt.generateToken("access", userWithoutPassword);
+  const refreshToken = jwt.generateToken("refresh", userWithoutPassword);
 
   try {
     await redisClient.set(refreshToken, user.id);
@@ -39,9 +41,7 @@ const login = async (req: Request, res: Response) => {
 
   return res.send({
     user: {
-      email: "1234",
-      name: "1234",
-      id: user.id,
+      ...userWithoutPassword,
       token: {
         access: accessToken,
         refresh: refreshToken,
