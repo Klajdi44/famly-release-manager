@@ -4,11 +4,6 @@ const {
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Subscription extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
       // define association here
       this.hasMany(models.Site, {
@@ -19,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
   Subscription.init({
     title: DataTypes.STRING
   }, {
+    name: {
+      singular: 'subscription',
+      plural: 'subscriptions',
+    },
     sequelize,
     modelName: 'Subscription',
   });

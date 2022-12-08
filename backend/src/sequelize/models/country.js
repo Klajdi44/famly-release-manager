@@ -12,13 +12,17 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.hasMany(models.Site, {
-        foreignKey: 'countryId'
+        foreignKey: 'countryId',
       });
     }
   }
   Country.init({
     name: DataTypes.STRING
   }, {
+    name: {
+      singular: 'country',
+      plural: 'countries',
+    },
     sequelize,
     modelName: 'Country',
   });

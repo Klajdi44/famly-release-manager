@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 // const { sequelize } = require("../sequelize/models");
-const { Site, Subscription, Country, Segment, SiteSegment } = require("../sequelize/models");
+const { Site, Subscription, Country, Segment, SiteSegment, releaseToggle } = require("../sequelize/models");
 
 
 export const getAllSegments = async (req: Request, res: Response) => {
   console.log('** Running controller: getAllSegments');
   try {
-    const segments = await Segment.findAll();
+    const segments = await Segment.findAll({include: ['_sites', 'user']});
     return res.status(200).json(segments);
   } catch (error) {
-    return res.status(500).json({error: 'Server error - could not find release toggles...'});
+    return res.status(500).json({error: 'Server error - could not find segments...'});
   }
 };
 
@@ -20,7 +20,7 @@ export const getOneSegment = async (req: Request, res: Response) => {
   if (!Number(req.params.id)) { return res.json({error: 'ID is not a number'}); }
 
   try {
-    const segment = await Segment.findByPk(req.params.id);
+    const segment = await Segment.findByPk(req.params.id, {include: ['releases', 'sites', {model: Site, as: '_sites'}]});
 
     // Check if there is data with the provided ID
     if (segment === null) { return res.status(404).json({message: 'This segment does not exist...'}); }
@@ -94,7 +94,6 @@ export const deleteOneSegment = async (req: Request, res: Response) => {
         id: req.params.id,
       }
     });
-    console.log('** return segment val: ', segment);
     if (segment === 0) { return res.status(404).json({failed: 'No segment matching this ID - Nothing deleted'}); }
     return res.status(200).json(segment);
   } catch (error) {
