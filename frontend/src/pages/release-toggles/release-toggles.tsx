@@ -43,18 +43,21 @@ const ReleaseToggles = ({ releaseToggles }: ReleaseTogglesProps) => {
 
   return (
     <Container>
+      {/* Button that opens the add  toggle modal */}
       <Flex justify="end">
         <Button variant="filled" onClick={toggleModalVisibility}>
           Add release toggle
         </Button>
       </Flex>
 
+      {/*Add new toggle modal */}
       <ReleaseToggleModal
         isVisible={isAddNewToggleOpened}
         onClose={toggleModalVisibility}
         onSubmit={handleAddToggle}
       />
 
+      {/* Release toggle modals */}
       <Paper withBorder shadow="md" p={30} mt={30} radius="md">
         {releaseToggles.map(toggle => (
           <Fragment key={toggle.id}>
