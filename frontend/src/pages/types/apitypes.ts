@@ -21,6 +21,7 @@ type User = {
 
 type Segments = {
   id: string;
+  title: string;
   description: string;
 };
 
