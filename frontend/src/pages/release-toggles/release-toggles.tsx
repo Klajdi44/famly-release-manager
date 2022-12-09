@@ -14,7 +14,7 @@ import CenteredLoader from "../../components/centered-loader/centered-loader";
 import { useFetch } from "../../hooks/use-fetch/use-fetch";
 import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
 import jwtAxios from "../../util/axios/axiosInstance";
-import { ReleaseToggle } from "../types/release-toggle/apitypes";
+import { ReleaseToggle } from "../types/apitypes";
 import ReleaseToggleModal, { OnSubmitParams } from "./modal/modal";
 
 const realeseTogglesUrl = "/v1/release-toggles";
