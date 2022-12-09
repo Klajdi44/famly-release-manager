@@ -63,7 +63,7 @@ const ReleaseToggles = ({ releaseToggles }: ReleaseTogglesProps) => {
             <Flex justify={"space-between"} align="center" m={"md"}>
               <Link
                 to={{
-                  pathname: "/preview",
+                  pathname: "/release-toggle",
                   search: `?toggle-id=${toggle.id}`,
                 }}
               >

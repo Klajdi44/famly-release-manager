@@ -2,16 +2,16 @@ import { Text } from "@mantine/core";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../components/centered-loader/centered-loader";
 import { useFetch } from "../../../hooks/use-fetch/use-fetch";
-import { ReleaseToggle } from "../../types/release-toggle/apitypes";
+import * as ReleaseToggleApiTypes from "../../types/release-toggle/apitypes";
 
 const TOGGLE_ID = "toggle-id";
-const SINGLE_TOGGLE_URL = "/v1/release-toggles";
+const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 
-type SingleReleaseToggleProps = {
-  releaseToggle: ReleaseToggle;
+type ReleaseToggleProps = {
+  releaseToggle: ReleaseToggleApiTypes.ReleaseToggle;
 };
 
-const SingleReleaseToggle = ({ releaseToggle }: SingleReleaseToggleProps) => {
+const ReleaseToggle = ({ releaseToggle }: ReleaseToggleProps) => {
   return (
     <div>
       <Text>Id: {releaseToggle.id}</Text>
@@ -21,14 +21,15 @@ const SingleReleaseToggle = ({ releaseToggle }: SingleReleaseToggleProps) => {
   );
 };
 
-type DataLoaderProps = {
+type ReleaseToggleLoaderProps = {
   toggleId: string;
 };
 
-const DataLoader = ({ toggleId }: DataLoaderProps) => {
-  const { data, error, isLoading } = useFetch<ReleaseToggle>({
-    url: `${SINGLE_TOGGLE_URL}/${toggleId}`,
-  });
+const ReleaseToggleLoader = ({ toggleId }: ReleaseToggleLoaderProps) => {
+  const { data, error, isLoading } =
+    useFetch<ReleaseToggleApiTypes.ReleaseToggle>({
+      url: `${RELEASE_TOGGLE_URL}/${toggleId}`,
+    });
 
   if (isLoading) {
     return <CenteredLoader />;
@@ -42,7 +43,7 @@ const DataLoader = ({ toggleId }: DataLoaderProps) => {
     return <Text>No release toggle with id: {toggleId} was found!</Text>;
   }
 
-  return <SingleReleaseToggle releaseToggle={data} />;
+  return <ReleaseToggle releaseToggle={data} />;
 };
 
 const CheckParamsForToggleId = () => {
@@ -53,7 +54,7 @@ const CheckParamsForToggleId = () => {
     return <Text>Error: toggle Id missing from URL</Text>;
   }
 
-  return <DataLoader toggleId={toggleId} />;
+  return <ReleaseToggleLoader toggleId={toggleId} />;
 };
 
 export default CheckParamsForToggleId;
