@@ -22,7 +22,7 @@ const SegmentsModal = ({ onClose, onSubmit, isVisible }: Props) => {
   };
 
   return (
-    <Modal opened={isVisible} onClose={onClose} title="New Release Toggle">
+    <Modal opened={isVisible} onClose={onClose} title="Add new segment">
       <TextInput
         label="Title"
         name="title"

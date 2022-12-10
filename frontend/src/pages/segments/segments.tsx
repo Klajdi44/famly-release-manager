@@ -8,7 +8,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { Link, Outlet } from "react-router-dom";
+import { Link } from "react-router-dom";
 import CenteredLoader from "../../components/centered-loader/centered-loader";
 import { useFetch } from "../../hooks/use-fetch/use-fetch";
 import * as ApiTypes from "../types/apitypes";
@@ -19,7 +19,7 @@ import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
 const SEGMENTS_URL = "v1/segments";
 
 type SegmentsProps = {
-  segments: ApiTypes.Segments[];
+  segments: ApiTypes.Segment[];
 };
 
 const Segments = ({ segments }: SegmentsProps) => {
@@ -81,7 +81,7 @@ const Segments = ({ segments }: SegmentsProps) => {
 };
 
 const Loader = () => {
-  const { data, error, isLoading } = useFetch<ApiTypes.Segments[]>({
+  const { data, error, isLoading } = useFetch<ApiTypes.Segment[]>({
     url: SEGMENTS_URL,
   });
 
