@@ -8,7 +8,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { Link } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import CenteredLoader from "../../components/centered-loader/centered-loader";
 import { useFetch } from "../../hooks/use-fetch/use-fetch";
 import * as ApiTypes from "../types/apitypes";
@@ -63,7 +63,7 @@ const Segments = ({ segments }: SegmentsProps) => {
             <Flex justify={"space-between"} align="center" m={"md"}>
               <Link
                 to={{
-                  pathname: "/segments",
+                  pathname: "/segment",
                   search: `?id=${segment.id}`,
                 }}
               >
