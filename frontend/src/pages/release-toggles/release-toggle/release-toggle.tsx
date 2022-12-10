@@ -45,7 +45,7 @@ const ReleaseToggleLoader = ({ toggleId }: ReleaseToggleLoaderProps) => {
   return <ReleaseToggle releaseToggle={data} />;
 };
 
-const CheckParamsForToggleId = () => {
+const WithUrlParams = () => {
   const [params] = useSearchParams();
   const toggleId = params.get(TOGGLE_ID);
 
@@ -56,4 +56,4 @@ const CheckParamsForToggleId = () => {
   return <ReleaseToggleLoader toggleId={toggleId} />;
 };
 
-export default CheckParamsForToggleId;
+export default WithUrlParams;
