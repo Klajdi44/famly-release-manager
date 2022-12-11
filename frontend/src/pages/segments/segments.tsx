@@ -52,8 +52,8 @@ const Segments = ({ segments }: SegmentsProps) => {
     []
   );
 
-  return hasSegments ? (
-    <Container>
+  return (
+    <>
       <Flex align="center" justify="space-between">
         <Title>Segments</Title>
         <Button onClick={toggleAddSegmentModalVisibility}>Add segment</Button>
@@ -66,32 +66,36 @@ const Segments = ({ segments }: SegmentsProps) => {
         onClose={toggleAddSegmentModalVisibility}
       />
 
-      {/* segments */}
-      <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-        {segments.map(segment => (
-          <Fragment key={segment.id}>
-            <Flex justify={"space-between"} align="center" m={"md"}>
-              <Link
-                to={{
-                  pathname: "/segment",
-                  search: `?id=${segment.id}`,
-                }}
-              >
-                <Title fz="xl">{segment.title}</Title>
-              </Link>
-              <Tooltip label="Delete segment" position="bottom-start">
-                <Text>
-                  <IconTrash onClick={handleDeleteSegment(segment.id)} />
-                </Text>
-              </Tooltip>
-            </Flex>
-            <Divider />
-          </Fragment>
-        ))}
-      </Paper>
-    </Container>
-  ) : (
-    <Text>No segments found</Text>
+      {hasSegments ? (
+        <Container>
+          {/* segments */}
+          <Paper withBorder shadow="md" p={30} mt={30} radius="md">
+            {segments.map(segment => (
+              <Fragment key={segment.id}>
+                <Flex justify={"space-between"} align="center" m={"md"}>
+                  <Link
+                    to={{
+                      pathname: "/segment",
+                      search: `?id=${segment.id}`,
+                    }}
+                  >
+                    <Title fz="xl">{segment.title}</Title>
+                  </Link>
+                  <Tooltip label="Delete segment" position="bottom-start">
+                    <Text>
+                      <IconTrash onClick={handleDeleteSegment(segment.id)} />
+                    </Text>
+                  </Tooltip>
+                </Flex>
+                <Divider />
+              </Fragment>
+            ))}
+          </Paper>
+        </Container>
+      ) : (
+        <Text>No segments found</Text>
+      )}
+    </>
   );
 };
 
@@ -104,12 +108,10 @@ const Loader = () => {
     return <CenteredLoader />;
   }
 
-  if ((error && error !== "canceled") || data === null) {
-    return <Text>Error: Something went wrong... please try again</Text>;
-  }
-
-  if (isLoading === false && data === null) {
-    return <Text>Error: Could not fetch segments</Text>;
+  if (data === null) {
+    return isLoading === false && error ? (
+      <Text>Error: Could not fetch segments</Text>
+    ) : null;
   }
 
   return <Segments segments={data} />;

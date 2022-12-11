@@ -111,8 +111,14 @@ const DataLoader = () => {
     return <CenteredLoader />;
   }
 
-  if ((error && error !== "canceled") || data === null) {
+  if (isLoading === false && error) {
     return <div>Something went wrong... please try again</div>;
+  }
+
+  if (data === null) {
+    return isLoading === false && error ? (
+      <Text>Error: Could not fetch segments</Text>
+    ) : null;
   }
 
   return <ReleaseToggles releaseToggles={data} />;

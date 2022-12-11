@@ -40,12 +40,14 @@ const useFetch = <T,>({ url, method = "get", body }: Props) => {
         }
       } catch (error) {
         if (error instanceof Error) {
-          if (error.name === "AbortError") {
+          if (error.name === "AbortError" || error.name === "CanceledError") {
             console.log("fetch canceled");
+          } else {
+            setError(error.message);
           }
-          setIsLoading(false);
-          setError(error.message);
         }
+      } finally {
+        setIsLoading(false);
       }
     })();
 
