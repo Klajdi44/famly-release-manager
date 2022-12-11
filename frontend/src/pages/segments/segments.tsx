@@ -7,6 +7,7 @@ import {
   Paper,
   Text,
   Title,
+  Tooltip,
 } from "@mantine/core";
 import { Link } from "react-router-dom";
 import CenteredLoader from "../../components/centered-loader/centered-loader";
@@ -15,6 +16,8 @@ import * as ApiTypes from "../types/apitypes";
 import jwtAxios from "../../util/axios/axiosInstance";
 import SegmentsModal, { OnSubmitParams } from "./modal/modal";
 import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
+import { IconTrash } from "@tabler/icons";
+import { useCallback } from "react";
 
 const SEGMENTS_URL = "v1/segments";
 
@@ -41,6 +44,13 @@ const Segments = ({ segments }: SegmentsProps) => {
 
     toggleAddSegmentModalVisibility();
   };
+
+  const handleDeleteSegment = useCallback(
+    (segmentId: ApiTypes.Segment["id"]) => () => {
+      jwtAxios.delete(`${SEGMENTS_URL}/${segmentId}`);
+    },
+    []
+  );
 
   return hasSegments ? (
     <Container>
@@ -69,6 +79,11 @@ const Segments = ({ segments }: SegmentsProps) => {
               >
                 <Title fz="xl">{segment.title}</Title>
               </Link>
+              <Tooltip label="Delete segment" position="bottom-start">
+                <Text>
+                  <IconTrash onClick={handleDeleteSegment(segment.id)} />
+                </Text>
+              </Tooltip>
             </Flex>
             <Divider />
           </Fragment>
