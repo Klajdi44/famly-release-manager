@@ -19,4 +19,10 @@ type User = {
   updatedAt: string;
 };
 
-export type { ReleaseToggle, User };
+type Segment = {
+  id: string;
+  title: string;
+  description: string;
+};
+
+export type { ReleaseToggle, User, Segment };

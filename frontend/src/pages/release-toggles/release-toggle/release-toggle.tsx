@@ -2,13 +2,13 @@ import { Text } from "@mantine/core";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../components/centered-loader/centered-loader";
 import { useFetch } from "../../../hooks/use-fetch/use-fetch";
-import * as ReleaseToggleApiTypes from "../../types/release-toggle/apitypes";
+import * as ApiTypes from "../../types/apitypes";
 
 const TOGGLE_ID = "toggle-id";
 const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 
 type ReleaseToggleProps = {
-  releaseToggle: ReleaseToggleApiTypes.ReleaseToggle;
+  releaseToggle: ApiTypes.ReleaseToggle;
 };
 
 const ReleaseToggle = ({ releaseToggle }: ReleaseToggleProps) => {
@@ -26,10 +26,9 @@ type ReleaseToggleLoaderProps = {
 };
 
 const ReleaseToggleLoader = ({ toggleId }: ReleaseToggleLoaderProps) => {
-  const { data, error, isLoading } =
-    useFetch<ReleaseToggleApiTypes.ReleaseToggle>({
-      url: `${RELEASE_TOGGLE_URL}/${toggleId}`,
-    });
+  const { data, error, isLoading } = useFetch<ApiTypes.ReleaseToggle>({
+    url: `${RELEASE_TOGGLE_URL}/${toggleId}`,
+  });
 
   if (isLoading) {
     return <CenteredLoader />;
@@ -46,7 +45,7 @@ const ReleaseToggleLoader = ({ toggleId }: ReleaseToggleLoaderProps) => {
   return <ReleaseToggle releaseToggle={data} />;
 };
 
-const CheckParamsForToggleId = () => {
+const WithUrlParams = () => {
   const [params] = useSearchParams();
   const toggleId = params.get(TOGGLE_ID);
 
@@ -57,4 +56,4 @@ const CheckParamsForToggleId = () => {
   return <ReleaseToggleLoader toggleId={toggleId} />;
 };
 
-export default CheckParamsForToggleId;
+export default WithUrlParams;

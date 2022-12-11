@@ -10,6 +10,8 @@ import PageNotFound from "./components/404/404";
 import PersistLogin from "./components/persist-login/persist-login";
 import ApplicationShell from "./components/application-shell/application-shell";
 import ReleaseToggle from "./pages/release-toggles/release-toggle/release-toggle";
+import Segments from "./pages/segments/segments";
+import Segment from "./pages/segments/segment/segment";
 
 function App() {
   const [state, dispatch] = useReducer(reducer, DEFAULT_STATE);
@@ -28,6 +30,8 @@ function App() {
             <Route element={<PersistLogin />}>
               <Route path="/" element={<ReleaseToggles />} />
               <Route path="/release-toggle/" element={<ReleaseToggle />} />
+              <Route path="/segments" element={<Segments />} />
+              <Route path="/segment" element={<Segment />} />
             </Route>
             <Route path="/login" element={<Login />} />
             <Route path="*" element={<PageNotFound />} />
