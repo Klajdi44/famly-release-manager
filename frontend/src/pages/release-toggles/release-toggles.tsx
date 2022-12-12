@@ -24,28 +24,38 @@ const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 
 type ReleaseTogglesProps = {
   releaseToggles: ReleaseToggle[];
+  refetch: () => Promise<void>;
 };
 
-const ReleaseToggles = ({ releaseToggles }: ReleaseTogglesProps) => {
+const ReleaseToggles = ({ releaseToggles, refetch }: ReleaseTogglesProps) => {
   const [state] = useGlobalState();
   const [isAddNewToggleOpened, setIsAddNewToggleOpened] = useState(false);
+
+  const { fetchData: createSegment } = useFetch({
+    url: RELEASE_TOGGLE_URL,
+    method: "post",
+    lazy: true,
+  });
 
   const toggleModalVisibility = () =>
     setIsAddNewToggleOpened(prevState => !prevState);
 
-  const handleAddToggle = ({ name, description }: OnSubmitParams) => {
-    jwtAxios.post("/v1/release-toggles", {
+  const handleAddToggle = async ({ name, description }: OnSubmitParams) => {
+    await createSegment({
       name,
       description,
       userId: state.user?.id,
     });
 
+    await refetch();
+
     toggleModalVisibility();
   };
 
   const handleDeleteReleaseToggle = useCallback(
-    (toggleId: ReleaseToggle["id"]) => () => {
-      jwtAxios.delete(`${RELEASE_TOGGLE_URL}/${toggleId}`);
+    (toggleId: ReleaseToggle["id"]) => async () => {
+      await jwtAxios.delete(`${RELEASE_TOGGLE_URL}/${toggleId}`);
+      await refetch();
     },
     []
   );
@@ -103,7 +113,12 @@ const ReleaseToggles = ({ releaseToggles }: ReleaseTogglesProps) => {
 };
 
 const DataLoader = () => {
-  const { data, error, isLoading } = useFetch<ReleaseToggle[]>({
+  const {
+    data,
+    error,
+    isLoading,
+    fetchData: refetch,
+  } = useFetch<ReleaseToggle[]>({
     url: RELEASE_TOGGLE_URL,
   });
 
@@ -121,7 +136,7 @@ const DataLoader = () => {
     ) : null;
   }
 
-  return <ReleaseToggles releaseToggles={data} />;
+  return <ReleaseToggles releaseToggles={data} refetch={refetch} />;
 };
 
 export default DataLoader;
