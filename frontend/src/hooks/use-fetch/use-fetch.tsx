@@ -6,7 +6,7 @@ type Methods = "get" | "post";
 type Props = {
   url: string;
   method?: Methods;
-  variables?: any;
+  variables?: Record<string, unknown>;
   lazy?: boolean;
 };
 
