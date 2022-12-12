@@ -23,31 +23,41 @@ const SEGMENTS_URL = "v1/segments";
 
 type SegmentsProps = {
   segments: ApiTypes.Segment[];
+  refetch: () => Promise<void>;
 };
 
-const Segments = ({ segments }: SegmentsProps) => {
+const Segments = ({ segments, refetch }: SegmentsProps) => {
   const [state] = useGlobalState();
   const [isAddSegmentModalVisible, setIsAddSegmentModalVisible] =
     useState(false);
+
+  const { fetchData: createSegment } = useFetch({
+    url: SEGMENTS_URL,
+    method: "post",
+    lazy: true,
+  });
 
   const hasSegments = segments.length > 0;
 
   const toggleAddSegmentModalVisibility = () =>
     setIsAddSegmentModalVisible(prevState => !prevState);
 
-  const handleAddSegment = ({ title, description }: OnSubmitParams) => {
-    jwtAxios.post(SEGMENTS_URL, {
+  const handleAddSegment = async ({ title, description }: OnSubmitParams) => {
+    await createSegment({
       title,
       description,
       userId: state.user?.id,
     });
 
+    await refetch();
+
     toggleAddSegmentModalVisibility();
   };
 
   const handleDeleteSegment = useCallback(
-    (segmentId: ApiTypes.Segment["id"]) => () => {
-      jwtAxios.delete(`${SEGMENTS_URL}/${segmentId}`);
+    (segmentId: ApiTypes.Segment["id"]) => async () => {
+      await jwtAxios.delete(`${SEGMENTS_URL}/${segmentId}`);
+      refetch();
     },
     []
   );
@@ -100,7 +110,12 @@ const Segments = ({ segments }: SegmentsProps) => {
 };
 
 const Loader = () => {
-  const { data, error, isLoading } = useFetch<ApiTypes.Segment[]>({
+  const {
+    data,
+    error,
+    isLoading,
+    fetchData: refetch,
+  } = useFetch<ApiTypes.Segment[]>({
     url: SEGMENTS_URL,
   });
 
@@ -114,7 +129,7 @@ const Loader = () => {
     ) : null;
   }
 
-  return <Segments segments={data} />;
+  return <Segments segments={data} refetch={refetch} />;
 };
 
 export default Loader;
