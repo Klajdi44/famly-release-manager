@@ -3,9 +3,10 @@ import { Request, Response } from "express";
 const { ReleaseToggle, User, Segment, Site } = require("../sequelize/models");
 
 export const getAllReleaseToggles = async (req: Request, res: Response) => {
-
   try {
-    const releaseToggles = await ReleaseToggle.findAll({ include: ['segments', User]});
+    const releaseToggles = await ReleaseToggle.findAll({
+      include: ["segments", User],
+    });
     return res.status(200).json(releaseToggles);
   } catch (error) {
     return res
@@ -15,12 +16,15 @@ export const getAllReleaseToggles = async (req: Request, res: Response) => {
 };
 
 export const getOneReleaseToggle = async (req: Request, res: Response) => {
-
   // Check if req.params.id is a number
-  if (!Number(req.params.id)) { return res.json({error: 'ID is not a number'}); }
+  if (!Number(req.params.id)) {
+    return res.json({ error: "ID is not a number" });
+  }
 
   try {
-    const releaseToggle = await ReleaseToggle.findByPk(req.params.id, { include: ['segments', User] });
+    const releaseToggle = await ReleaseToggle.findByPk(req.params.id, {
+      include: ["segments", User],
+    });
 
     if (releaseToggle === null) {
       return res
@@ -64,7 +68,9 @@ export const createReleaseToggle = async (req: Request, res: Response) => {
 
 export const updateOneReleaseToggle = async (req: Request, res: Response) => {
   // Check if req.params.id is a number
-  if (!Number(req.params.id)) { return res.json({error: 'ID is not a number'}); }
+  if (!Number(req.params.id)) {
+    return res.json({ error: "ID is not a number" });
+  }
 
   // Data payload for update
   interface Payload {
@@ -99,7 +105,9 @@ export const updateOneReleaseToggle = async (req: Request, res: Response) => {
 
 export const deleteOneReleaseToggle = async (req: Request, res: Response) => {
   // Validate req.params.id
-  if (!Number(req.params.id)) { return res.json({error: 'ID is not a number'}); }
+  if (Number.isNaN(req.params.id)) {
+    return res.json({ error: "ID is not a number" });
+  }
 
   try {
     const releaseToggle = await ReleaseToggle.destroy({
@@ -107,7 +115,13 @@ export const deleteOneReleaseToggle = async (req: Request, res: Response) => {
         id: req.params.id,
       },
     });
-    if (releaseToggle === 0) { return res.status(404).json({failed: 'No segment matching this ID - Nothing deleted'}); }
+
+    if (releaseToggle === 0) {
+      return res
+        .status(404)
+        .json({ failed: "No segment matching this ID - Nothing deleted" });
+    }
+
     return res.status(200).json(releaseToggle);
   } catch (error) {
     return res.status(500).json(error);
