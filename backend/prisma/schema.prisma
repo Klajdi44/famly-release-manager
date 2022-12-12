@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Country {
+  id        Int      @id @default(autoincrement())
+  name      String?  @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sites     Site[]
+}
+
+model ReleaseToggle {
+  id                    Int                     @id @default(autoincrement())
+  name                  String?                 @db.VarChar(255)
+  description           String?
+  releaseAt             DateTime?               @db.Timestamptz(6)
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  userId                Int?
+  user                  User?                  @relation(fields: [userId], references: [id])
+  segmentReleaseToggle  SegmentReleaseToggle[]
+}
+
+model SegmentReleaseToggle {
+  id              Int             @id @default(autoincrement())
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  segmentId       Int?
+  releaseToggleId Int?
+  releaseToggle   ReleaseToggle? @relation(fields: [releaseToggleId], references: [id])
+  segment         Segment?       @relation(fields: [segmentId], references: [id])
+}
+
+model Segment {
+  id                    Int                     @id @default(autoincrement())
+  title                 String?                 @db.VarChar(255)
+  description           String?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  userId                Int?
+  segmentReleaseToggle  SegmentReleaseToggle[]
+  user                  User?                  @relation(fields: [userId], references: [id])
+  siteSegment           SiteSegment[]
+}
+
+model SiteSegment {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  segmentId Int?
+  siteId    Int?
+  segment   Segment? @relation(fields: [segmentId], references: [id])
+  site      Site?    @relation(fields: [siteId], references: [id])
+}
+
+model Site {
+  id             Int            @id @default(autoincrement())
+  name           String?        @db.VarChar(255)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  countryId      Int?
+  subscriptionId Int?
+  siteSegment    SiteSegment[]
+  country        Country?     @relation(fields: [countryId], references: [id])
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  title     String?  @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sites     Site[]
+}
+
+model User {
+  id             Int              @id @default(autoincrement())
+  firstName      String?          @db.VarChar(255)
+  lastName       String?          @db.VarChar(255)
+  email          String?          @db.VarChar(255)
+  password       String?          @db.VarChar(255)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  releaseToggles ReleaseToggle[]
+  segments       Segment[]
+}
