@@ -140,3 +140,4 @@ const DataLoader = () => {
 };
 
 export default DataLoader;
+export { ReleaseToggles };
