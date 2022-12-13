@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "../test-util";
 import Login from "../../../pages/login/login";
 
 describe("Login page", () => {

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "../test-util";
 import { ReleaseToggles } from "../../../pages/release-toggles/release-toggles";
 import * as ApiTypes from "../../../pages/types/apitypes";
 
@@ -20,7 +20,7 @@ describe("Release toggles page", () => {
   it("Should have a button that allows you to add a release toggle", () => {
     render(
       <ReleaseToggles
-        releaseToggles={[releaseToggle, releaseToggle]}
+        releaseToggles={[releaseToggle, { ...releaseToggle, id: 2 }]}
         refetch={refetch}
       />
     );
@@ -31,12 +31,58 @@ describe("Release toggles page", () => {
 
     expect(button).toBeInTheDocument();
     expect(button).toBeEnabled();
+  });
 
-    // fireEvent.change(email, { target: { value: "testEmail" } });
-    // expect(button).toBeDisabled();
+  it("Should render 2 release toggles", () => {
+    render(
+      <ReleaseToggles
+        releaseToggles={[
+          releaseToggle,
+          { ...releaseToggle, id: 2, name: "Release toggle 2" },
+        ]}
+        refetch={refetch}
+      />
+    );
 
-    // fireEvent.change(password, { target: { value: "testPassword" } });
-    // expect(button).toBeEnabled();
+    const releaseToggles = screen.getAllByTestId("toggleName");
+
+    expect(releaseToggles.length).toEqual(2);
+  });
+
+  it("Should be able to render delete buttons", async () => {
+    render(
+      <ReleaseToggles
+        releaseToggles={[
+          releaseToggle,
+          { ...releaseToggle, id: 2, name: "Release toggle 2" },
+        ]}
+        refetch={refetch}
+      />
+    );
+
+    const deleteIcons = screen.getAllByTestId("deleteIcon");
+    expect(deleteIcons.length).toEqual(2);
+  });
+
+  it("Should be able to render and interact with the switch switch buttons", async () => {
+    render(
+      <ReleaseToggles
+        releaseToggles={[
+          releaseToggle,
+          { ...releaseToggle, id: 2, name: "Release toggle 2" },
+        ]}
+        refetch={refetch}
+      />
+    );
+
+    const switches = screen.getAllByTestId("switch");
+    expect(switches.length).toEqual(2);
+
+    const firstSwitchButton = switches[0];
+    expect(firstSwitchButton).not.toBeChecked();
+
+    fireEvent.click(firstSwitchButton);
+    expect(firstSwitchButton).toBeChecked();
   });
 });
 

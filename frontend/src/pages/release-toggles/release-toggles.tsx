@@ -87,10 +87,18 @@ const ReleaseToggles = ({ releaseToggles, refetch }: ReleaseTogglesProps) => {
                   search: `?toggle-id=${toggle.id}`,
                 }}
               >
-                <Title fz="xl">{toggle.name}</Title>
+                <Title data-testid="toggleName" fz="xl">
+                  {toggle.name}
+                </Title>
               </Link>
               <Flex align="end" gap="sm">
-                <Switch color="teal" onLabel="On" offLabel="Off" size="lg" />
+                <Switch
+                  color="teal"
+                  onLabel="On"
+                  offLabel="Off"
+                  size="lg"
+                  data-testid="switch"
+                />
                 <Tooltip
                   label="Delete release toggle"
                   withinPortal
@@ -99,7 +107,7 @@ const ReleaseToggles = ({ releaseToggles, refetch }: ReleaseTogglesProps) => {
                   onClick={handleDeleteReleaseToggle(toggle.id)}
                 >
                   <Text>
-                    <IconTrash />
+                    <IconTrash data-testid="deleteIcon" />
                   </Text>
                 </Tooltip>
               </Flex>
