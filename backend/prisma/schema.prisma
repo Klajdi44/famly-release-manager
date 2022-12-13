@@ -9,7 +9,7 @@ datasource db {
 
 model Country {
   id        Int      @id @default(autoincrement())
-  name      String?  @db.VarChar(255)
+  name      String?  @db.VarChar(255) @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   sites     Site[]
@@ -33,7 +33,7 @@ model ReleaseToggle {
 
 model Segment {
   id             Int             @id @default(autoincrement())
-  title          String?         @db.VarChar(255)
+  title          String?         @db.VarChar(255) @unique
   description    String?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -47,7 +47,7 @@ model Segment {
 
 model Site {
   id             Int           @id @default(autoincrement())
-  name           String?       @db.VarChar(255)
+  name           String?       @db.VarChar(255) @unique
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   countryId      Int?
@@ -61,7 +61,7 @@ model Site {
 
 model Subscription {
   id        Int      @id @default(autoincrement())
-  title     String?  @db.VarChar(255)
+  title     String?  @db.VarChar(255) @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   sites     Site[]
@@ -73,7 +73,7 @@ model User {
   id             Int             @id @default(autoincrement())
   firstName      String?         @db.VarChar(255)
   lastName       String?         @db.VarChar(255)
-  email          String?         @db.VarChar(255)
+  email          String?         @db.VarChar(255) @unique
   password       String?         @db.VarChar(255)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt

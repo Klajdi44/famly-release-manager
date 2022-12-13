@@ -1,13 +1,5 @@
 import express from "express";
 import { xxx } from "../controllers/prisma";
-// import {
-//   xxx,
-//   getAllSegments,
-//   getOneSegment,
-//   createSegment,
-//   updateOneSegment,
-//   deleteOneSegment,
-// } from "../controllers/segments";
 
 // import * as Auth from "../middlewares/auth.middleware";
 

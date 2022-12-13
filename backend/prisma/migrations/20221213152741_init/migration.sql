@@ -81,6 +81,21 @@ CREATE TABLE "_SegmentToSite" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Countries_name_key" ON "Countries"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Segments_title_key" ON "Segments"("title");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Sites_name_key" ON "Sites"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Subscriptions_title_key" ON "Subscriptions"("title");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Users_email_key" ON "Users"("email");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_ReleaseToggleToSegment_AB_unique" ON "_ReleaseToggleToSegment"("A", "B");
 
 -- CreateIndex
