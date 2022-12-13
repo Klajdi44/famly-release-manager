@@ -12,6 +12,20 @@ services:
     volumes:
       - famly_db_dev_data:/var/lib/postgresql/data
 
+  database_prisma:
+    image: postgres:15
+    container_name: famly_prisma_db
+    # expose:
+    #   - "5433"
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=famly_prisma
+      - POSTGRES_PASSWORD=secret_prisma
+      - POSTGRES_DB=db_dev_prisma
+    volumes:
+      - famly_db_dev_data_prisma:/var/lib/postgresql/data
+
   redis:
     image: redis
     container_name: redis
@@ -25,8 +39,10 @@ services:
       - "5000:5000"
     volumes:
       - ./backend:/backend
+      - /backend/node_modules
     depends_on:
       - database
+      - database_prisma
       - redis
     links:
       - redis
@@ -46,3 +62,4 @@ services:
 
 volumes:
   famly_db_dev_data:
+  famly_db_dev_data_prisma:

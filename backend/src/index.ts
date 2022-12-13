@@ -3,6 +3,7 @@ import * as dotenv from "dotenv";
 import { router as releaseToggleRouter } from "./routes/releaseToggles";
 import { router as siteRouter } from "./routes/sites";
 import { router as segmentRouter } from "./routes/segments";
+import { router as prismaRouter } from "./routes/prisma";
 import { router as authRouter } from "./routes/auth";
 import * as Auth from "./middlewares/auth.middleware";
 import compression from "compression";
@@ -27,6 +28,7 @@ app.use(cors());
 app.use("/api/v1/release-toggles", releaseToggleRouter);
 app.use("/api/v1/sites", siteRouter);
 app.use("/api/v1/segments", segmentRouter);
+app.use("/api/v1/prisma", prismaRouter);
 app.use("/api/v1/auth", authRouter);
 
 app.listen(process.env.PORT, () => {

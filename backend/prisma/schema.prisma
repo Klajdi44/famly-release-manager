@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Country {
+  id        Int      @id @default(autoincrement())
+  name      String?  @db.VarChar(255) @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sites     Site[]
+
+  @@map("Countries")
+}
+
+model ReleaseToggle {
+  id          Int       @id @default(autoincrement())
+  name        String?   @db.VarChar(255)
+  description String?
+  releaseAt   DateTime? @db.Timestamptz(6)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      Int?
+  user        User?     @relation(fields: [userId], references: [id])
+  segments    Segment[] @relation("ReleaseToggleToSegment")
+
+  @@map("ReleaseToggles")
+}
+
+model Segment {
+  id             Int             @id @default(autoincrement())
+  title          String?         @db.VarChar(255) @unique
+  description    String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  userId         Int?
+  user           User?           @relation(fields: [userId], references: [id])
+  releaseToggles ReleaseToggle[] @relation("ReleaseToggleToSegment")
+  sites          Site[]          @relation("SegmentToSite")
+
+  @@map("Segments")
+}
+
+model Site {
+  id             Int           @id @default(autoincrement())
+  name           String?       @db.VarChar(255) @unique
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  countryId      Int?
+  subscriptionId Int?
+  country        Country?      @relation(fields: [countryId], references: [id])
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  segments       Segment[]     @relation("SegmentToSite")
+
+  @@map("Sites")
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  title     String?  @db.VarChar(255) @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sites     Site[]
+
+  @@map("Subscriptions")
+}
+
+model User {
+  id             Int             @id @default(autoincrement())
+  firstName      String?         @db.VarChar(255)
+  lastName       String?         @db.VarChar(255)
+  email          String?         @db.VarChar(255) @unique
+  password       String?         @db.VarChar(255)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  releaseToggles ReleaseToggle[]
+  segments       Segment[]
+
+  @@map("Users")
+}
