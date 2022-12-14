@@ -1,14 +1,12 @@
-FROM node:18-alpine
+FROM node:18-slim
 
 WORKDIR /backend
 
-COPY package.json /backend/
+COPY package*.json .
 
-COPY package-lock.json /backend/
+COPY ./ .
 
-COPY ./ /backend/
-
-RUN npm i
+RUN npm install && npm cache clean --force
 
 ENTRYPOINT ["sh","./src/config/init.sh"]
 
