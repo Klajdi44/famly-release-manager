@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-// const { sequelize } = require("../sequelize/models");
+
 const { ReleaseToggle, User, Segment, Site } = require("../sequelize/models");
 import { prisma } from "../prisma";
 
@@ -131,20 +131,14 @@ export const deleteOneReleaseToggle = async (req: Request, res: Response) => {
   }
 
   try {
-    const releaseToggle = await ReleaseToggle.destroy({
+    const releaseToggle = await prisma.releaseToggle.delete({
       where: {
-        id: req.params.id,
+        id: Number(req.params.id),
       },
     });
 
-    if (releaseToggle === 0) {
-      return res
-        .status(404)
-        .json({ failed: "No segment matching this ID - Nothing deleted" });
-    }
-
     return res.status(200).json(releaseToggle);
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).send({ mesage: error.meta.cause });
   }
 };
