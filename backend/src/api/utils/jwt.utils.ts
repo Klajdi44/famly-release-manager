@@ -10,13 +10,13 @@ import { config } from "../../config";
 type TokenType = "access" | "refresh";
 type Payload = {
   email: string;
-  userId: number;
+  id: number;
 };
 const generateToken = (
   type: TokenType = "access",
   payload: Payload = {
     email: "Andrei Mihutoni",
-    userId: 123,
+    id: 123,
   }
 ) => {
   // read private key value

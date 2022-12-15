@@ -3,7 +3,8 @@ import bcrypt from "bcrypt";
 
 import * as jwt from "../api/utils/jwt.utils";
 import { redisClient } from "../redis/index";
-const { User } = require("../sequelize/models");
+import { User } from "@prisma/client";
+import { prisma } from "../prisma";
 
 const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -12,42 +13,51 @@ const login = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "Email and password are required" });
   }
 
-  const user = await User.findOne({
-    where: { email },
-    attributes: ["id", "firstName", "lastName", "email", "password"],
-  });
-
-  if (user === null) {
-    return res.status(400).json({ message: "Invalid credentials" });
-  }
-
-  const isPasswordCorrect = await bcrypt.compare(password, user.password);
-
-  if (isPasswordCorrect === false) {
-    return res.status(400).json({ message: "Invalid credentials" });
-  }
-
-  const userWithoutPassword = { ...user.dataValues, password: null };
-
-  const accessToken = jwt.generateToken("access", userWithoutPassword);
-  const refreshToken = jwt.generateToken("refresh", userWithoutPassword);
-
   try {
-    await redisClient.set(refreshToken, user.id);
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (user === null) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (isPasswordCorrect === false) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const userWithoutPassword: User = { ...user, password: null };
+
+    const accessToken = jwt.generateToken("access", userWithoutPassword);
+    const refreshToken = jwt.generateToken("refresh", userWithoutPassword);
+
+    try {
+      await redisClient.set(refreshToken, user.id);
+    } catch (error) {
+      res
+        .status(500)
+        .send(
+          "Something went wrong while saving token, please try again later"
+        );
+    }
+    console.log({ accessToken });
+
+    return res.send({
+      user: {
+        ...userWithoutPassword,
+        token: {
+          access: accessToken,
+          refresh: refreshToken,
+        },
+      },
+    });
   } catch (error) {
     res.status(500).send("Something went wrong, please try again later");
   }
-  console.log({ accessToken });
-
-  return res.send({
-    user: {
-      ...userWithoutPassword,
-      token: {
-        access: accessToken,
-        refresh: refreshToken,
-      },
-    },
-  });
 };
 
 const refresh = async (req: Request, res: Response) => {
