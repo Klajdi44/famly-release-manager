@@ -10,13 +10,21 @@ const jwtAxios = axios.create({
   baseURL,
 });
 
-jwtAxios.interceptors.request.use(async req => {
+// prevent requests happening twice
+let isRefreshingToken = false;
+
+jwtAxios.interceptors.request.use(async request => {
+  if (isRefreshingToken) {
+    // prevent doing a double request
+    return request;
+  }
+
   const user = getUser();
   // remove TS possibly undefined error
-  req.headers = req.headers ?? {};
+  request.headers = request.headers ?? {};
 
   if (user !== null) {
-    req.headers.authorization = `Bearer ${user.token.access}`;
+    request.headers.authorization = `Bearer ${user.token.access}`;
 
     const decodedToken = jwtDecode<{
       exp: number;
@@ -26,18 +34,21 @@ jwtAxios.interceptors.request.use(async req => {
     console.log({ hasExpired });
 
     if (hasExpired && user !== null) {
-      const newUser = await refresh(user.token.refresh, user.id);
+      isRefreshingToken = true;
+      const response = await refresh(user.token.refresh, user.user.id);
 
-      if (newUser !== undefined) {
-        req.headers["authorization"] = `Bearer ${newUser.token.access}`;
-        localStorage.setItem("user", JSON.stringify(newUser));
+      if (response !== undefined) {
+        request.headers["authorization"] = `Bearer ${response.token.access}`;
+        localStorage.setItem("userTokens", JSON.stringify(response.token));
+        isRefreshingToken = false;
       } else {
-        localStorage.removeItem("user");
+        localStorage.removeItem("userTokens");
+        isRefreshingToken = false;
       }
     }
   }
 
-  return req;
+  return request;
 });
 
 export default jwtAxios;

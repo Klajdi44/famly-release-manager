@@ -111,7 +111,7 @@ const refresh = async (req: Request, res: Response) => {
     redisClient.set(newRefreshToken, user.id);
 
     return res.send({
-      responseUser,
+      user: responseUser,
       token: {
         access: newAccessToken,
         refresh: newRefreshToken,

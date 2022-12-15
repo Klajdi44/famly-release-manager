@@ -1,12 +1,13 @@
-import axios from "axios";
-import { User } from "../../pages/login/types";
+import { showNotification } from "@mantine/notifications";
+import axios, { AxiosError } from "axios";
+import { LoginResponse } from "../../pages/login/types";
 
-type Response = User;
+type Response = LoginResponse;
 
 const refresh = async (
   refreshToken: string | undefined,
   userId: number
-): Promise<User | undefined> => {
+): Promise<Response | undefined> => {
   if (refreshToken === undefined || userId === undefined) {
     return;
     // TODO: throw an error
@@ -29,7 +30,14 @@ const refresh = async (
 
     return undefined;
   } catch (error) {
-    console.error("something went wring while refreshing token");
+    if (error instanceof AxiosError) {
+      showNotification({
+        title: "Something went wrong!",
+        message: error.response?.data.message,
+        color: "red",
+        icon: "x",
+      });
+    }
   }
 };
 

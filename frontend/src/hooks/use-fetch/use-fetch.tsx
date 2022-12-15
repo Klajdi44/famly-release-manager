@@ -22,8 +22,6 @@ const useFetch = <T,>({
   const abortController = useRef<AbortController | null>(null);
 
   const fetchData = async (variables?: Props["variables"]) => {
-    console.log("called with", method);
-
     abortController.current = new AbortController();
     try {
       const response = await jwtAxios[method](url, {
