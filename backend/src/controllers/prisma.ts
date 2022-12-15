@@ -59,7 +59,8 @@ export const test = async (req: Request, res: Response) => {
     console.log('** segment.update ', segmentUpdate)
 
     return res.json(segmentUpdate)
+
   } catch (error) {
-    return res.status(500).json(error)
+    return res.status(500).json(error);
   }
-}
+};

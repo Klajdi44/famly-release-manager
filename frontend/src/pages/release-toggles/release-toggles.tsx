@@ -5,9 +5,12 @@ import {
   Flex,
   Paper,
   Switch,
+  Text,
   Title,
+  Tooltip,
 } from "@mantine/core";
-import { Fragment, useState } from "react";
+import { IconTrash } from "@tabler/icons";
+import { Fragment, useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 
 import CenteredLoader from "../../components/centered-loader/centered-loader";
@@ -17,28 +20,45 @@ import jwtAxios from "../../util/axios/axiosInstance";
 import { ReleaseToggle } from "../types/apitypes";
 import ReleaseToggleModal, { OnSubmitParams } from "./modal/modal";
 
-const realeseTogglesUrl = "/v1/release-toggles";
+const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 
 type ReleaseTogglesProps = {
   releaseToggles: ReleaseToggle[];
+  refetch: () => Promise<void>;
 };
 
-const ReleaseToggles = ({ releaseToggles }: ReleaseTogglesProps) => {
+const ReleaseToggles = ({ releaseToggles, refetch }: ReleaseTogglesProps) => {
   const [state] = useGlobalState();
   const [isAddNewToggleOpened, setIsAddNewToggleOpened] = useState(false);
+
+  const { fetchData: createSegment } = useFetch({
+    url: RELEASE_TOGGLE_URL,
+    method: "post",
+    lazy: true,
+  });
 
   const toggleModalVisibility = () =>
     setIsAddNewToggleOpened(prevState => !prevState);
 
-  const handleAddToggle = ({ name, description }: OnSubmitParams) => {
-    jwtAxios.post("/v1/release-toggles", {
+  const handleAddToggle = async ({ name, description }: OnSubmitParams) => {
+    await createSegment({
       name,
       description,
       userId: state.user?.id,
     });
 
+    await refetch();
+
     toggleModalVisibility();
   };
+
+  const handleDeleteReleaseToggle = useCallback(
+    (toggleId: ReleaseToggle["id"]) => async () => {
+      await jwtAxios.delete(`${RELEASE_TOGGLE_URL}/${toggleId}`);
+      await refetch();
+    },
+    []
+  );
 
   return (
     <Container>
@@ -67,9 +87,30 @@ const ReleaseToggles = ({ releaseToggles }: ReleaseTogglesProps) => {
                   search: `?toggle-id=${toggle.id}`,
                 }}
               >
-                <Title fz="xl">{toggle.name}</Title>
+                <Title data-testid="toggleName" fz="xl">
+                  {toggle.name}
+                </Title>
               </Link>
-              <Switch color="teal" onLabel="On" offLabel="Off" size="lg" />
+              <Flex align="end" gap="sm">
+                <Switch
+                  color="teal"
+                  onLabel="On"
+                  offLabel="Off"
+                  size="lg"
+                  data-testid="switch"
+                />
+                <Tooltip
+                  label="Delete release toggle"
+                  withinPortal
+                  withArrow
+                  position="bottom-start"
+                  onClick={handleDeleteReleaseToggle(toggle.id)}
+                >
+                  <Text>
+                    <IconTrash data-testid="deleteIcon" />
+                  </Text>
+                </Tooltip>
+              </Flex>
             </Flex>
             <Divider />
           </Fragment>
@@ -80,19 +121,31 @@ const ReleaseToggles = ({ releaseToggles }: ReleaseTogglesProps) => {
 };
 
 const DataLoader = () => {
-  const { data, error, isLoading } = useFetch<ReleaseToggle[]>({
-    url: realeseTogglesUrl,
+  const {
+    data,
+    error,
+    isLoading,
+    fetchData: refetch,
+  } = useFetch<ReleaseToggle[]>({
+    url: RELEASE_TOGGLE_URL,
   });
 
   if (isLoading) {
     return <CenteredLoader />;
   }
 
-  if ((error && error !== "canceled") || data === null) {
+  if (isLoading === false && error) {
     return <div>Something went wrong... please try again</div>;
   }
 
-  return <ReleaseToggles releaseToggles={data} />;
+  if (data === null) {
+    return isLoading === false && error ? (
+      <Text>Error: Could not fetch segments</Text>
+    ) : null;
+  }
+
+  return <ReleaseToggles releaseToggles={data} refetch={refetch} />;
 };
 
 export default DataLoader;
+export { ReleaseToggles };
