@@ -1,5 +1,5 @@
 import jwtDecode from "jwt-decode";
-import { LoginResponse, User } from "../../pages/login/types";
+import { UserWithTokens, User } from "../../pages/login/types";
 
 type DecodeJwtReturnValue = {
   exp: number;
@@ -21,7 +21,7 @@ const decodeJwt: DecodeJwt = (token: string): DecodeJwtReturnValue =>
     email: string;
   }>(token);
 
-type GetUserResponse = LoginResponse | null;
+type GetUserResponse = UserWithTokens | null;
 
 const getUser = (): GetUserResponse => {
   // TODO: add type safety to this

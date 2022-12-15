@@ -13,7 +13,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
 import { resetTokens } from "../../util/jwt";
-import { LoginResponse } from "./types";
+import { UserWithTokens } from "./types";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -30,7 +30,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const result = await axios.post<LoginResponse>(
+      const result = await axios.post<UserWithTokens>(
         "http://localhost:5000/api/v1/auth/login/",
         {
           email,

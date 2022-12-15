@@ -10,7 +10,7 @@ type User = {
   email: string;
 };
 
-type LoginResponse = {
+type UserWithTokens = {
   user: User;
   token: Token;
 };
@@ -22,4 +22,4 @@ type Action = {
   payload: User;
 };
 
-export type { Action, User, State, Token, LoginResponse };
+export type { Action, User, State, Token, UserWithTokens };

@@ -1,8 +1,8 @@
 import { showNotification } from "@mantine/notifications";
 import axios, { AxiosError } from "axios";
-import { LoginResponse } from "../../pages/login/types";
+import { UserWithTokens } from "../../pages/login/types";
 
-type Response = LoginResponse;
+type Response = UserWithTokens;
 
 const refresh = async (
   refreshToken: string | undefined,
