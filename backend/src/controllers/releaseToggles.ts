@@ -1,13 +1,23 @@
 import { Request, Response } from "express";
 
-const { ReleaseToggle, User, Segment, Site } = require("../sequelize/models");
 import { prisma } from "../prisma";
 
 export const getAllReleaseToggles = async (req: Request, res: Response) => {
   try {
-    const releaseToggles = await ReleaseToggle.findAll({
-      include: ["segments", User],
+    const releaseToggles = await prisma.releaseToggle.findMany({
+      include: {
+        segments: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
     });
+
     return res.status(200).json(releaseToggles);
   } catch (error) {
     return res
