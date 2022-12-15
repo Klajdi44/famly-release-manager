@@ -26,7 +26,7 @@ jwtAxios.interceptors.request.use(async req => {
     console.log({ hasExpired });
 
     if (hasExpired && user !== null) {
-      const newUser = await refresh(user.token.refresh);
+      const newUser = await refresh(user.token.refresh, user.id);
 
       if (newUser !== undefined) {
         req.headers["authorization"] = `Bearer ${newUser.token.access}`;

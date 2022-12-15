@@ -6,6 +6,8 @@ import { redisClient } from "../redis/index";
 import { User } from "@prisma/client";
 import { prisma } from "../prisma";
 
+type ResponseUser = Omit<User, "password" | "createdAt" | "updatedAt">;
+
 const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
@@ -30,10 +32,15 @@ const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const userWithoutPassword: User = { ...user, password: null };
+    const responseUser: ResponseUser = {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
 
-    const accessToken = jwt.generateToken("access", userWithoutPassword);
-    const refreshToken = jwt.generateToken("refresh", userWithoutPassword);
+    const accessToken = jwt.generateToken("access", responseUser);
+    const refreshToken = jwt.generateToken("refresh", responseUser);
 
     try {
       await redisClient.set(refreshToken, user.id);
@@ -44,11 +51,10 @@ const login = async (req: Request, res: Response) => {
           "Something went wrong while saving token, please try again later"
         );
     }
-    console.log({ accessToken });
 
     return res.send({
       user: {
-        ...userWithoutPassword,
+        ...responseUser,
         token: {
           access: accessToken,
           refresh: refreshToken,
@@ -66,34 +72,59 @@ const refresh = async (req: Request, res: Response) => {
   // TODO: check if refresh token is there and userId as well
   // TODO: check if token has `bearer` in front
   // TODO: grab user from the DB
-  // if (!refreshToken || userId) {
-  //   return res.status(401).send("Not Authorized");
-  // }
+
+  // console.log({ refreshToken, userId });
+
+  if (!refreshToken || !userId) {
+    return res.status(401).send({ message: "Not Authorized" });
+  }
 
   try {
-    const redisRefreshToken = await redisClient.get(refreshToken);
-    if (redisRefreshToken === undefined) {
-      res.status(401).send("Token does not exist");
+    const user = await prisma.user.findUnique({
+      where: {
+        id: Number(userId),
+      },
+    });
+
+    if (user === null) {
+      return res.status(400).json({ message: "Invalid user" });
     }
+
+    const redisRefreshTokenValue = await redisClient.get(refreshToken);
+
+    console.log({ redisRefreshTokenValue });
+
+    if (redisRefreshTokenValue === undefined) {
+      return res.status(401).send({ message: "Token does not exist" });
+    }
+
+    if (Number(redisRefreshTokenValue) !== user.id) {
+      return res.status(401).send({ message: "User Id missmatch" });
+    }
+
     // Delete old refresh token
     redisClient.del(refreshToken);
 
-    const newAccessToken = jwt.generateToken("access");
-    const newRefreshToken = jwt.generateToken("refresh");
-    redisClient.set(newRefreshToken, userId);
+    const responseUser: ResponseUser = {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
 
-    res.send({
-      name: "test",
-      surname: "test",
-      email: "test",
-      id: "1",
+    const newAccessToken = jwt.generateToken("access", responseUser);
+    const newRefreshToken = jwt.generateToken("refresh", responseUser);
+    redisClient.set(newRefreshToken, user.id);
+
+    return res.send({
+      responseUser,
       token: {
         access: newAccessToken,
         refresh: newRefreshToken,
       },
     });
   } catch (error) {
-    res.status(500).send("Failed to get token");
+    res.status(500).send({ message: "Failed to get token" });
   }
 };
 

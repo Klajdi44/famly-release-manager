@@ -4,9 +4,10 @@ import { User } from "../../pages/login/types";
 type Response = User;
 
 const refresh = async (
-  refreshToken: string | undefined
+  refreshToken: string | undefined,
+  userId: number
 ): Promise<User | undefined> => {
-  if (refreshToken === undefined) {
+  if (refreshToken === undefined || userId === undefined) {
     return;
     // TODO: throw an error
   }
@@ -17,7 +18,7 @@ const refresh = async (
       "http://localhost:5000/api/v1/auth/refresh",
       {
         refreshToken,
-        userId: "1",
+        userId,
       }
     );
 
