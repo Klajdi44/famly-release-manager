@@ -50,15 +50,15 @@ const getUser = (): GetUserResponse => {
 };
 
 const isAuthenticated = () => {
-  const { user, token } = getUser() ?? {};
+  const user = getUser();
 
-  if (user === null) {
+  if (user === null || user.token.access === undefined) {
     return false;
   }
 
   const currentDate = Date.now();
 
-  const decodedToken = decodeJwt(token?.access);
+  const decodedToken = decodeJwt(user.token.access);
 
   const hasExpired = currentDate >= decodedToken.exp * 1000;
 
