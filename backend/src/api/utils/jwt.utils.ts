@@ -30,7 +30,7 @@ const generateToken = (
     // to generate the JWT. The client gets a public key to validate the
     // signature
     algorithm: "RS256",
-    expiresIn: type === "access" ? "1000" : "999y",
+    expiresIn: type === "access" ? "10m" : "999y",
     // expiresIn: type === "access" ? (config.isProduction ? "24h" : "15m") : 0,
   };
 
