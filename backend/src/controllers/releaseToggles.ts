@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 // const { sequelize } = require("../sequelize/models");
 const { ReleaseToggle, User, Segment, Site } = require("../sequelize/models");
+import { prisma } from "../prisma";
 
 export const getAllReleaseToggles = async (req: Request, res: Response) => {
   try {
@@ -11,30 +12,46 @@ export const getAllReleaseToggles = async (req: Request, res: Response) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ error: "Server error - could not find release toggles..." });
+      .send({ message: "Server error - could not find release toggles..." });
   }
 };
 
 export const getOneReleaseToggle = async (req: Request, res: Response) => {
   // Check if req.params.id is a number
   if (!Number(req.params.id)) {
-    return res.json({ error: "ID is not a number" });
+    return res.send({ message: "ID is not a number" });
   }
 
   try {
-    const releaseToggle = await ReleaseToggle.findByPk(req.params.id, {
-      include: ["segments", User],
+    // const releaseToggle = await ReleaseToggle.findByPk(req.params.id, {
+    //   include: ["segments", User],
+    // });
+
+    const releaseToggle = await prisma.releaseToggle.findUnique({
+      where: {
+        id: Number(req.params.id),
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
     });
 
     if (releaseToggle === null) {
       return res
         .status(404)
-        .json({ message: "This release toggle does not exist..." });
+        .send({ message: "This release toggle does not exist..." });
     }
 
-    return res.status(200).json(releaseToggle);
+    return res.status(200).send(releaseToggle);
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).send({ message: error });
   }
 };
 
