@@ -1,12 +1,18 @@
+type Token = {
+  access: string;
+  refresh: string;
+};
+
 type User = {
   id: number;
-  name: string;
-  surname: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  token: {
-    access: string;
-    refresh: string;
-  };
+};
+
+type LoginResponse = {
+  user: User;
+  token: Token;
 };
 
 type State = User | null;
@@ -16,4 +22,4 @@ type Action = {
   payload: User;
 };
 
-export type { Action, User, State };
+export type { Action, User, State, Token, LoginResponse };

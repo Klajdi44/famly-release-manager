@@ -13,7 +13,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
 import { resetTokens } from "../../util/jwt";
-import { User } from "./types";
+import { LoginResponse } from "./types";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -30,23 +30,22 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const result = await axios.post<{ user: User }>(
+      const result = await axios.post<LoginResponse>(
         "http://localhost:5000/api/v1/auth/login/",
         {
           email,
           password,
         }
       );
-      // TODO: do we need to check for status with axios?
-      if (result.status === 200) {
-        resetTokens();
-        localStorage.setItem("user", JSON.stringify(result.data.user));
-        dispatch({
-          type: "AUTH_ADD_USER",
-          payload: result.data.user,
-        });
-        navigate("/");
-      }
+
+      resetTokens();
+      localStorage.setItem("userTokens", JSON.stringify(result.data.token));
+      // TODO: decode user and pass it to dispatch
+      dispatch({
+        type: "AUTH_ADD_USER",
+        payload: result.data.user,
+      });
+      navigate("/");
     } catch (error) {
       if (error instanceof AxiosError) {
         showNotification({

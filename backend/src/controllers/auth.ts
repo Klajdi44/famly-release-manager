@@ -55,10 +55,10 @@ const login = async (req: Request, res: Response) => {
     return res.send({
       user: {
         ...responseUser,
-        token: {
-          access: accessToken,
-          refresh: refreshToken,
-        },
+      },
+      token: {
+        access: accessToken,
+        refresh: refreshToken,
       },
     });
   } catch (error) {
@@ -68,12 +68,6 @@ const login = async (req: Request, res: Response) => {
 
 const refresh = async (req: Request, res: Response) => {
   const { refreshToken, userId } = req.body;
-
-  // TODO: check if refresh token is there and userId as well
-  // TODO: check if token has `bearer` in front
-  // TODO: grab user from the DB
-
-  // console.log({ refreshToken, userId });
 
   if (!refreshToken || !userId) {
     return res.status(401).send({ message: "Not Authorized" });
