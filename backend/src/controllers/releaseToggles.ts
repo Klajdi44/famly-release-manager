@@ -23,10 +23,6 @@ export const getOneReleaseToggle = async (req: Request, res: Response) => {
   }
 
   try {
-    // const releaseToggle = await ReleaseToggle.findByPk(req.params.id, {
-    //   include: ["segments", User],
-    // });
-
     const releaseToggle = await prisma.releaseToggle.findUnique({
       where: {
         id: Number(req.params.id),
@@ -58,24 +54,27 @@ export const getOneReleaseToggle = async (req: Request, res: Response) => {
 export const createReleaseToggle = async (req: Request, res: Response) => {
   // Validate Data
   if (!req.body.name) {
-    return res.status(400).json({ error: "Name must be defined.." });
+    return res.status(400).send({ message: "Name must be defined.." });
   }
   if (!req.body.description) {
-    return res.status(400).json({ error: "Description must be defined.." });
+    return res.status(400).send({ message: "Description must be defined.." });
   }
   if (!req.body.userId) {
-    return res.status(400).json({ error: "User ID must be defined.." });
+    return res.status(400).send({ message: "User ID must be defined.." });
   }
 
   try {
-    const releaseToggle = await ReleaseToggle.create({
-      name: req.body.name,
-      description: req.body.description,
-      releaseAt: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      userId: req.body.userId,
+    const releaseToggle = await prisma.releaseToggle.create({
+      data: {
+        name: req.body.name,
+        description: req.body.description,
+        releaseAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userId: Number(req.body.userId),
+      },
     });
+
     return res.status(201).json(releaseToggle);
   } catch (error) {
     console.log(error);
