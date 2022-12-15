@@ -1,5 +1,5 @@
 import express from "express";
-import { xxx } from "../controllers/prisma";
+import { test } from "../controllers/prisma";
 
 // import * as Auth from "../middlewares/auth.middleware";
 
@@ -7,7 +7,7 @@ const router = express.Router();
 
 // route without auth:
 router
-  .get("/", xxx);
+  .get("/", test);
 //  .get("/:id", getOneSegment)
 //  .post("/", createSegment)
 //  .patch("/:id", updateOneSegment)
