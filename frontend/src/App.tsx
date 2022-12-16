@@ -15,6 +15,7 @@ import Segment from "./pages/segments/segment/segment";
 
 function App() {
   const [state, dispatch] = useReducer(reducer, DEFAULT_STATE);
+
   const location = useLocation();
 
   const shouldAppShellRender = useMemo(

@@ -10,13 +10,13 @@ import { config } from "../../config";
 type TokenType = "access" | "refresh";
 type Payload = {
   email: string;
-  userId: number;
+  id: number;
 };
 const generateToken = (
   type: TokenType = "access",
   payload: Payload = {
     email: "Andrei Mihutoni",
-    userId: 123,
+    id: 123,
   }
 ) => {
   // read private key value
@@ -30,7 +30,7 @@ const generateToken = (
     // to generate the JWT. The client gets a public key to validate the
     // signature
     algorithm: "RS256",
-    expiresIn: type === "access" ? "1h" : "999y",
+    expiresIn: type === "access" ? "10m" : "999y",
     // expiresIn: type === "access" ? (config.isProduction ? "24h" : "15m") : 0,
   };
 
