@@ -1,6 +1,6 @@
 import { getUser } from "../../util/auth";
 
-describe("Get user", () => {
+describe("Test behaviour of the function that gets a user from localstorage", () => {
   beforeEach(() => {
     window.localStorage.clear();
   });

@@ -65,4 +65,4 @@ const isAuthenticated = () => {
   return hasExpired === false;
 };
 
-export { isAuthenticated, getUser };
+export { isAuthenticated, getUser, decodeJwt };
