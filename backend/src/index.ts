@@ -5,6 +5,9 @@ import { router as siteRouter } from "./routes/sites";
 import { router as segmentRouter } from "./routes/segments";
 import { router as prismaRouter } from "./routes/prisma";
 import { router as authRouter } from "./routes/auth";
+import { router as countryRouter } from "./routes/country";
+import { router as subscriptionRouter } from "./routes/subscription";
+
 import * as Auth from "./middlewares/auth.middleware";
 import compression from "compression";
 import helmet from "helmet";
@@ -30,6 +33,8 @@ app.use("/api/v1/sites", siteRouter);
 app.use("/api/v1/segments", segmentRouter);
 app.use("/api/v1/prisma", prismaRouter);
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/subscriptions", subscriptionRouter);
+app.use("/api/v1/countries", countryRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(

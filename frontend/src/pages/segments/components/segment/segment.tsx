@@ -7,35 +7,39 @@ import {
   Paper,
   Text,
 } from "@mantine/core";
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../../components/centered-loader/centered-loader";
 import { useFetch } from "../../../../hooks/use-fetch/use-fetch";
 import * as ApiTypes from "../../../types/apitypes";
-import {
-  attributes,
-  operators,
-  Attributes,
-  Operators,
-  countries,
-  packages,
-} from "../../constants";
-
-const SEGMENT_ID_PARAM = "id";
-const SEGMENT_URL = "v1/segments";
+import { attributes, operators, Attributes, Operators } from "../../constants";
 
 type SegmentProps = {
+  countries: ApiTypes.Country[];
   segment: ApiTypes.Segment;
+  subscriptions: ApiTypes.Subscription[];
 };
 
-const Segment = ({ segment }: SegmentProps) => {
+const Segment = ({ countries, segment, subscriptions }: SegmentProps) => {
   const [attribute, setAttribute] = useState<undefined | Attributes>(undefined);
   const [operator, setOperator] = useState<undefined | Operators>(undefined);
+  const [result, setResult] = useState<string[] | undefined>(undefined);
 
-  // if its only 1 we include it inside an array anyway,
-  // if another rule is added then it will automatically be added in the OR object {
-  // OR: []..
-  // }
+  const getData = useCallback(
+    (attribute: Attributes) => {
+      switch (attribute?.id) {
+        case "COUNTRY":
+          return countries.map(country => country.name);
+
+        case "SUBSCRIPTION":
+          return subscriptions.map(subscription => subscription.title);
+
+        default:
+          return [];
+      }
+    },
+    [attribute, countries, subscriptions]
+  );
 
   const handleAttributeChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const selectedAttribute = attributes.find(
@@ -47,6 +51,7 @@ const Segment = ({ segment }: SegmentProps) => {
     }
 
     setAttribute(selectedAttribute);
+    setResult([]);
   };
 
   const handleOperatorChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -61,34 +66,32 @@ const Segment = ({ segment }: SegmentProps) => {
     setOperator(selectedOperator);
   };
 
-  const getData = (attribute: Attributes) => {
-    switch (attribute?.id) {
-      case "COUNTRY":
-        return countries;
-
-      case "PACKAGE":
-        return packages;
-
-      default:
-        return [];
-    }
+  const handleResultChange = (results: string[]) => {
+    setResult(results);
   };
 
-  // const handleSubmit = () => {
-  //   const query = {};
-  //   if (operator?.id === "IS_ONE_OF") {
-  //     query[attribute?.id.toLocaleLowerCase()] = {
-  //       OR: thirdValue.split(",").map(x => ({ [firstValue]: x })),
-  //     };
-  //   } else if (operator?.id === "IS_NOT_ONE_OF") {
-  //     query[firstValue] = {
-  //       NOT: thirdValue.split(",").map(x => ({ [firstValue]: x })),
-  //     };
-  //   }
+  const handleSubmit = async () => {
+    if (attribute === undefined || operator === undefined) {
+      return;
+    }
 
-  //   // Send the query object to the backend here
-  //   console.log(query);
-  // };
+    const query = {};
+
+    if (operator.id === "IS_ONE_OF") {
+      if (attribute.id === "COUNTRY") {
+        query[attribute.label] = {
+          OR: getData(attribute),
+        };
+      }
+    } else if (operator.id === "IS_NOT_ONE_OF") {
+      query[attribute.label] = {
+        NOT: getData(attribute),
+      };
+    }
+
+    // Send the query object to the backend here
+    console.log({ query });
+  };
 
   return (
     <div>
@@ -111,13 +114,15 @@ const Segment = ({ segment }: SegmentProps) => {
             placeholder="Select an operator"
           />
           <MultiSelect
+            value={result}
             data={attribute ? getData(attribute) : []}
             placeholder="Enter some values"
+            onChange={handleResultChange}
           />
         </Flex>
       </Paper>
       <Center>
-        <Button>Save</Button>
+        <Button onClick={handleSubmit}>Save</Button>
       </Center>
     </div>
   );
@@ -129,14 +134,30 @@ type SegmentLoaderProps = {
 
 const SegmentLoader = ({ segmentId }: SegmentLoaderProps) => {
   const { data, error, isLoading } = useFetch<ApiTypes.Segment>({
-    url: `${SEGMENT_URL}/${segmentId}`,
+    url: `v1/segments/${segmentId}`,
   });
 
-  if (isLoading) {
+  const {
+    data: countries,
+    error: countryError,
+    isLoading: isCountriesLoading,
+  } = useFetch<ApiTypes.Country[]>({
+    url: "v1/countries",
+  });
+
+  const {
+    data: subscriptions,
+    error: packageError,
+    isLoading: isSubscriptionsLoading,
+  } = useFetch<ApiTypes.Subscription[]>({
+    url: "v1/subscriptions",
+  });
+
+  if (isLoading || isCountriesLoading || isSubscriptionsLoading) {
     return <CenteredLoader />;
   }
 
-  if (error && error !== "canceled") {
+  if ((error || packageError || countryError) && error !== "canceled") {
     return <Text>Something went wrong while getting the segment</Text>;
   }
 
@@ -144,12 +165,22 @@ const SegmentLoader = ({ segmentId }: SegmentLoaderProps) => {
     return <Text>No segment with id: {segmentId} was found!</Text>;
   }
 
-  return <Segment segment={data} />;
+  if (countries === null || subscriptions === null) {
+    return <Text>Failed to get countries and subscriptions</Text>;
+  }
+
+  return (
+    <Segment
+      segment={data}
+      countries={countries}
+      subscriptions={subscriptions}
+    />
+  );
 };
 
 const WithUrlParams = () => {
   const [params] = useSearchParams();
-  const segmentId = params.get(SEGMENT_ID_PARAM);
+  const segmentId = params.get("id");
 
   if (segmentId === null) {
     return <Text>Error: toggle Id missing from URL</Text>;

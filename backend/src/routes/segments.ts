@@ -1,14 +1,21 @@
 import express from "express";
-import { getAllSegments, getOneSegment, createSegment, updateOneSegment, deleteOneSegment } from "../controllers/segments";
-
-import * as Auth from "../middlewares/auth.middleware";
+import {
+  getAllSegments,
+  getOneSegment,
+  getSegmentConstruction,
+  createSegment,
+  updateOneSegment,
+  deleteOneSegment,
+} from "../controllers/segments";
 
 const router = express.Router();
 
-// route without auth:
-router.get("/", getAllSegments).get("/:id", getOneSegment).post("/", createSegment).patch("/:id", updateOneSegment).delete("/:id", deleteOneSegment);
-
-// route with JWT auth:
-// router.get("/", Auth.authorize(['getAllFeatures']));
+router
+  .get("/segment-construction/", getSegmentConstruction)
+  .get("/", getAllSegments)
+  .get("/:id", getOneSegment)
+  .post("/", createSegment)
+  .patch("/:id", updateOneSegment)
+  .delete("/:id", deleteOneSegment);
 
 export { router };

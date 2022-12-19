@@ -10,9 +10,9 @@ type Attributes =
       id: "SITE_ID";
     }
   | {
-      value: "Package";
-      label: "Package";
-      id: "PACKAGE";
+      value: "Subscription";
+      label: "Subscription";
+      id: "SUBSCRIPTION";
     };
 
 const attributes: Attributes[] = [
@@ -27,9 +27,9 @@ const attributes: Attributes[] = [
     id: "SITE_ID",
   },
   {
-    value: "Package",
-    label: "Package",
-    id: "PACKAGE",
+    value: "Subscription",
+    label: "Subscription",
+    id: "SUBSCRIPTION",
   },
 ];
 
@@ -42,9 +42,5 @@ const operators: Operators[] = [
   { value: "Is not one of", label: "Is not one of", id: "IS_NOT_ONE_OF" },
 ];
 
-const countries = ["UK", "Norway", "USA", "Denmark", "Germany"];
-
-const packages = ["Free", "Starter", "Essentials", "Premium"];
-
-export { attributes, operators, countries, packages };
+export { attributes, operators };
 export type { Attributes, Operators };
