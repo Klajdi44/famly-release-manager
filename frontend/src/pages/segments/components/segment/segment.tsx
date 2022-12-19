@@ -12,6 +12,7 @@ import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../../components/centered-loader/centered-loader";
 import { useFetch } from "../../../../hooks/use-fetch/use-fetch";
 import * as ApiTypes from "../../../types/apitypes";
+import * as SegmentTransformers from "../../transformers";
 import { attributes, operators, Attributes, Operators } from "../../constants";
 
 type SegmentProps = {
@@ -71,21 +72,35 @@ const Segment = ({ countries, segment, subscriptions }: SegmentProps) => {
   };
 
   const handleSubmit = async () => {
-    if (attribute === undefined || operator === undefined) {
+    if (
+      attribute === undefined ||
+      operator === undefined ||
+      result === undefined
+    ) {
       return;
     }
 
-    const query = {};
+    let query = {};
 
     if (operator.id === "IS_ONE_OF") {
       if (attribute.id === "COUNTRY") {
-        query[attribute.label] = {
-          OR: getData(attribute),
+        const apiCountries =
+          SegmentTransformers.transformDomainCountryToApiCountry(
+            result,
+            countries
+          );
+
+        query = {
+          ...query,
+          OR: apiCountries,
         };
       }
-    } else if (operator.id === "IS_NOT_ONE_OF") {
-      query[attribute.label] = {
-        NOT: getData(attribute),
+    }
+
+    if (operator.id === "IS_NOT_ONE_OF") {
+      query = {
+        ...query,
+        NOT: [],
       };
     }
 

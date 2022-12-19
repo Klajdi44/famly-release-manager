@@ -1,33 +1,33 @@
 type Attributes =
   | {
-      value: "Country";
+      value: "country";
       label: "Country";
       id: "COUNTRY";
     }
   | {
-      value: "Site Id";
+      value: "site Id";
       label: "Site Id";
       id: "SITE_ID";
     }
   | {
-      value: "Subscription";
+      value: "subscription";
       label: "Subscription";
       id: "SUBSCRIPTION";
     };
 
 const attributes: Attributes[] = [
   {
-    value: "Country",
+    value: "country",
     label: "Country",
     id: "COUNTRY",
   },
   {
-    value: "Site Id",
+    value: "site Id",
     label: "Site Id",
     id: "SITE_ID",
   },
   {
-    value: "Subscription",
+    value: "subscription",
     label: "Subscription",
     id: "SUBSCRIPTION",
   },
