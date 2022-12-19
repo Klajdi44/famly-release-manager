@@ -14,7 +14,7 @@ import CenteredLoader from "../../components/centered-loader/centered-loader";
 import { useFetch } from "../../hooks/use-fetch/use-fetch";
 import * as ApiTypes from "../types/apitypes";
 import jwtAxios from "../../util/axios/axiosInstance";
-import SegmentsModal, { OnSubmitParams } from "./modal/modal";
+import SegmentsModal, { OnSubmitParams } from "./components/modal/modal";
 import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
 import { IconTrash } from "@tabler/icons";
 import { useCallback } from "react";

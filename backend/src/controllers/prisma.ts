@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../prisma";
 
 export const test = async (req: Request, res: Response) => {
-  console.log('** running prisma test');
+  console.log("** running prisma test");
   try {
     // Adding the sites that belongs to a segment:
 
@@ -14,26 +14,22 @@ export const test = async (req: Request, res: Response) => {
     //      - The return value from sites will be an array of objects with ids, like this:
     //        [ { id: 23 }, { id: 37 }, { id: 43 }, { id: 57 }, { id: 93 } ]
     // *
-      const sites = await prisma.site.findMany({
-        where: {
-          OR: [
-            {countryId: 1},
-            {countryId: 2}
-          ],
-          AND: [
-            {subscriptionId: 3},
-            // {subscriptionId: 4},
-          ],
-          NOT: [
-            {name: "Site #1"},
-          ]
-        },
-        select: {
-          id: true
-        },
-    })
 
-    console.log(sites)
+    const sites = await prisma.site.findMany({
+      where: {
+        OR: [{ countryId: 1 }, { countryId: 2 }],
+        AND: [
+          { subscriptionId: 3 },
+          // {subscriptionId: 4},
+        ],
+        NOT: [{ name: "Site #1" }],
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    console.log(sites);
     // ****** STEP 2: Update segment - with the sites returned from STEP 1.
     //      - Use prisma.model.update()
     //      - Select the segment to update in the where object, based on id
@@ -48,18 +44,17 @@ export const test = async (req: Request, res: Response) => {
       },
       data: {
         sites: {
-          set: sites
-        }
+          set: sites,
+        },
       },
       include: {
-        sites: true
-      }
-    })
+        sites: true,
+      },
+    });
 
-    console.log('** segment.update ', segmentUpdate)
+    console.log("** segment.update ", segmentUpdate);
 
-    return res.json(segmentUpdate)
-
+    return res.json(segmentUpdate);
   } catch (error) {
     return res.status(500).json(error);
   }

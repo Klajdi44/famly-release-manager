@@ -11,7 +11,7 @@ import PersistLogin from "./components/persist-login/persist-login";
 import ApplicationShell from "./components/application-shell/application-shell";
 import ReleaseToggle from "./pages/release-toggles/release-toggle/release-toggle";
 import Segments from "./pages/segments/segments";
-import Segment from "./pages/segments/segment/segment";
+import Segment from "./pages/segments/components/segment/segment";
 
 function App() {
   const [state, dispatch] = useReducer(reducer, DEFAULT_STATE);
