@@ -24,7 +24,7 @@ const rule: Rule = {
 
 export const test = async (req: Request, res: Response) => {
   try {
-    const sites = await prisma.site.findMany({
+    const sitess = await prisma.site.findMany({
       where: {
         OR: [{ countryId: 1 }, { countryId: 3 }],
       },
@@ -65,7 +65,7 @@ export const test = async (req: Request, res: Response) => {
 
     const segmentUpdate = await prisma.segment.update({
       where: {
-        id: 1,
+        id: 2,
       },
       data: {
         sites: {
