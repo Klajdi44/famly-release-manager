@@ -1,81 +1,156 @@
 import { Request, Response } from "express";
+import { where } from "sequelize";
 import { prisma } from "../prisma";
+import { Prisma } from "@prisma/client";
+
+type Attribute = "Country" | "Subscription" | "SiteId";
+
+type Operator = "isOneOf" | "isNotOneOf";
+
+type Rule = {
+  attribute: Attribute;
+  operator: Operator;
+  id: string;
+  values: { name: string; id: number }[];
+};
+
+/**
+ * It takes an array of rules and returns an object with two keys: OR, NOT. Each key has an
+ * array of objects as its value
+ * @param {any[]} DBRules - The rules that are coming from the database.
+ */
+const transformDBRulesToPrismaRules = (DBRules: any[]) => {
+  return DBRules.reduce(
+    (acc, currentRule: Rule) => {
+      if (currentRule.operator === "isOneOf") {
+        if (currentRule.attribute === "Country") {
+          const countryIds = currentRule.values.map(country => ({
+            countryId: country.id,
+          }));
+
+          acc["OR"].push(...countryIds);
+        }
+        if (currentRule.attribute === "Subscription") {
+          const subscriptionIds = currentRule.values.map(subscription => ({
+            subscriptionId: subscription.id,
+          }));
+          acc["OR"].push(...subscriptionIds);
+        }
+      }
+
+      if (currentRule.operator === "isNotOneOf") {
+        if (currentRule.attribute === "Country") {
+          const countryIds = currentRule.values.map(country => ({
+            countryId: country.id,
+          }));
+
+          acc["NOT"].push(...countryIds);
+        }
+        if (currentRule.attribute === "Subscription") {
+          const subscriptionIds = currentRule.values.map(subscription => ({
+            subscriptionId: subscription.id,
+          }));
+          acc["NOT"].push(...subscriptionIds);
+        }
+      }
+
+      return acc;
+    },
+    {
+      OR: [],
+      NOT: [],
+    }
+  );
+};
 
 export const test = async (req: Request, res: Response) => {
-  console.log("** running prisma test");
   try {
-    // Adding the sites that belongs to a segment:
-
-    // ****** STEP 1: Query the sites, that should be part of the segment.
-    //      - Use prisma.model.findMany()
-    //      - Rules are added in the where object:
-    //      - Accepts following operators: OR, AND, NOT
-    //      - Select only id.
-    //      - The return value from sites will be an array of objects with ids, like this:
-    //        [ { id: 23 }, { id: 37 }, { id: 43 }, { id: 57 }, { id: 93 } ]
-    //
-    const sites = await prisma.site.findMany({
-      where: {
-        OR: [{ countryId: 1 }, { countryId: 2 }],
-        AND: [
-          { subscriptionId: 3 },
-          // {subscriptionId: 4},
-        ],
-        NOT: [{ name: "Site #1" }],
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    console.log(sites);
-    // ****** STEP 2: Update segment - with the sites returned from STEP 1.
-    //      - Use prisma.model.update()
-    //      - Select the segment to update in the where object, based on id
-    //      - Add data object to the update method.
-    //      - Specify sites as the property to update.
-    //      - Use set and add the sites from STEP 1.
-    //      - Prisma handles the many-to-many relation and updates the relation_table "_SegmentToSite"
-
-    const segmentUpdate = await prisma.segment.update({
-      where: {
-        id: 2,
-      },
-      data: {
-        sites: {
-          set: sites,
-        },
-      },
-      include: {
-        sites: true,
-      },
-    });
-
-    console.log("** segment.update ", segmentUpdate);
-
-    // Rules object for rules field
     const rulesObject = {
-      OR: [{ countryId: 1 }, { countryId: 2 }],
-      AND: [{ subscriptionId: 3 }],
-      NOT: [{ name: "Site #1" }],
+      attribute: "Country",
+      operator: "isOneOf",
+      id: "1",
+      values: [
+        { name: "Denmark", id: 1 },
+        { name: "USA", id: 3 },
+      ],
     };
-    // const rule = [{ attribute: "country", operator: "in", value: "denmark" }];
 
-    // Update rules field:
-    const segmentUpdateRules = await prisma.segment.update({
+    const rulesObject1 = {
+      attribute: "Subscription",
+      operator: "isNotOneOf",
+      id: "2",
+      values: [{ title: "Starter", id: 2 }],
+    };
+
+    const rulesFromFrontend = [
+      {
+        attribute: "Country",
+        operator: "isOneOf",
+        id: "1",
+        values: [{ name: "Austria", id: 7 }],
+      },
+    ];
+
+    const segmentFromDb = await prisma.segment.findUnique({
       where: {
-        id: 2,
-      },
-      data: {
-        rules: rulesObject,
-      },
-      include: {
-        sites: true,
+        id: 1,
       },
     });
 
-    return res.json({ segment: segmentUpdateRules });
-  } catch (error) {
-    return res.status(500).json(error);
-  }
+    // const rulesFromDb = segmentFromDb?.rules ?? [];
+
+    if (
+      segmentFromDb?.rules &&
+      typeof segmentFromDb?.rules === "object" &&
+      Array.isArray(segmentFromDb?.rules)
+    ) {
+      const segmentRules = segmentFromDb?.rules as Prisma.JsonArray;
+
+      const mergeFrontendSentRulesWithDbRules = [
+        ...segmentRules,
+        ...rulesFromFrontend,
+      ];
+
+      const segmentWithUpdatedRules = await prisma.segment.update({
+        where: {
+          id: 2,
+        },
+        data: {
+          rules: mergeFrontendSentRulesWithDbRules,
+        },
+      });
+
+      // console.log({ segmentWithUpdatedRules });
+
+      const prismaRules = transformDBRulesToPrismaRules([]);
+
+      const sites = await prisma.site.findMany({
+        where: prismaRules,
+        select: {
+          id: true,
+        },
+      });
+
+      // update segment sites
+
+      const newSites = await prisma.segment.update({
+        where: {
+          id: 2,
+        },
+        data: {
+          sites: {
+            set: sites,
+          },
+        },
+        include: {
+          sites: true,
+        },
+      });
+      console.log({ newSites });
+
+      res.send(segmentWithUpdatedRules);
+    }
+
+    res.send([]);
+  } catch {}
 };

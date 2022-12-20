@@ -9,7 +9,9 @@ export const getAllSegments = async (req: Request, res: Response) => {
     const segments = await prisma.segment.findMany();
     return res.status(200).json(segments);
   } catch (error) {
-    return res.status(500).json({ error: "Server error - could not find segments..." });
+    return res
+      .status(500)
+      .json({ error: "Server error - could not find segments..." });
   }
 };
 
@@ -30,7 +32,9 @@ export const getOneSegment = async (req: Request, res: Response) => {
 
     // Check if there is data with the provided ID
     if (segment === null) {
-      return res.status(404).json({ message: "This segment does not exist..." });
+      return res
+        .status(404)
+        .json({ message: "This segment does not exist..." });
     }
 
     return res.status(200).json(segment);
@@ -142,4 +146,25 @@ export const deleteOneSegment = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).json(error);
   }
+};
+
+export const getSegmentConstruction = async (req: Request, res: Response) => {
+  const countries = await prisma.country.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  const packages = await prisma.subscription.findMany({
+    select: {
+      id: true,
+      title: true,
+    },
+  });
+
+  res.send({
+    countries,
+    packages,
+  });
 };

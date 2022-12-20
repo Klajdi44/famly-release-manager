@@ -25,4 +25,14 @@ type Segment = {
   description: string;
 };
 
-export type { ReleaseToggle, User, Segment };
+type Country = {
+  id: string;
+  name: string;
+};
+
+type Subscription = {
+  id: string;
+  title: string;
+};
+
+export type { ReleaseToggle, User, Segment, Subscription, Country };
