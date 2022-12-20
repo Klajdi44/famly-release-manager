@@ -40,8 +40,8 @@ model Segment {
   userId         Int?
   user           User?           @relation(fields: [userId], references: [id])
   releaseToggles ReleaseToggle[] @relation("ReleaseToggleToSegment")
-  sites          Site[]          @relation("SegmentToSite")
   rules          Json?
+  sites          Site[]          @relation("SegmentToSite")
 
   @@map("Segments")
 }
