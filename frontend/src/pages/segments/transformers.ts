@@ -28,4 +28,33 @@ const transformDomainCountryToApiCountry: TransformDomainCountryToApiCountry = (
   });
 };
 
-export { transformDomainCountryToApiCountry };
+type TransformDomainSubscriptionToApiSubscription = (
+  // eslint-disable-next-line no-unused-vars
+  subscriptionsFromResults: string[],
+  // eslint-disable-next-line no-unused-vars
+  subscriptions: ApiTypes.Subscription[]
+) => {
+  subscriptionId: string;
+}[];
+
+const transformDomainSubscriptionToApiSubscription: TransformDomainSubscriptionToApiSubscription =
+  (subscriptionsFromResults, subscriptions) => {
+    return subscriptionsFromResults.flatMap(subscriptionResult => {
+      const foundSubscription = subscriptions.find(
+        subscription => subscription.title === subscriptionResult
+      );
+
+      if (foundSubscription === undefined) {
+        return [];
+      }
+
+      return {
+        subscriptionId: foundSubscription.id,
+      };
+    });
+  };
+
+export {
+  transformDomainCountryToApiCountry,
+  transformDomainSubscriptionToApiSubscription,
+};

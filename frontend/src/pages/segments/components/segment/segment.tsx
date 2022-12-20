@@ -84,24 +84,42 @@ const Segment = ({ countries, segment, subscriptions }: SegmentProps) => {
 
     if (operator.id === "IS_ONE_OF") {
       if (attribute.id === "COUNTRY") {
-        const apiCountries =
-          SegmentTransformers.transformDomainCountryToApiCountry(
-            result,
-            countries
-          );
-
         query = {
           ...query,
-          OR: apiCountries,
+          OR: SegmentTransformers.transformDomainCountryToApiCountry(
+            result,
+            countries
+          ),
+        };
+      } else if (attribute.id === "SUBSCRIPTION") {
+        query = {
+          ...query,
+          OR: SegmentTransformers.transformDomainSubscriptionToApiSubscription(
+            result,
+            subscriptions
+          ),
         };
       }
     }
 
     if (operator.id === "IS_NOT_ONE_OF") {
-      query = {
-        ...query,
-        NOT: [],
-      };
+      if (attribute.id === "COUNTRY") {
+        query = {
+          ...query,
+          NOT: SegmentTransformers.transformDomainCountryToApiCountry(
+            result,
+            countries
+          ),
+        };
+      } else if (attribute.id === "SUBSCRIPTION") {
+        query = {
+          ...query,
+          NOT: SegmentTransformers.transformDomainSubscriptionToApiSubscription(
+            result,
+            subscriptions
+          ),
+        };
+      }
     }
 
     // Send the query object to the backend here
