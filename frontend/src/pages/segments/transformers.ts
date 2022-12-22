@@ -65,7 +65,7 @@ type TransformDomainCountryToApiCountry = (
   // eslint-disable-next-line no-unused-vars
   countries: ApiTypes.Country[]
 ) => {
-  countryId: string;
+  id: string;
 }[];
 
 const transformDomainCountryToApiCountry: TransformDomainCountryToApiCountry = (
@@ -82,7 +82,7 @@ const transformDomainCountryToApiCountry: TransformDomainCountryToApiCountry = (
     }
 
     return {
-      countryId: foundCountry.countryId,
+      id: foundCountry.id,
     };
   });
 };
@@ -93,7 +93,7 @@ type TransformDomainSubscriptionToApiSubscription = (
   // eslint-disable-next-line no-unused-vars
   subscriptions: ApiTypes.Subscription[]
 ) => {
-  subscriptionId: string;
+  id: string;
 }[];
 
 const transformDomainSubscriptionToApiSubscription: TransformDomainSubscriptionToApiSubscription =
@@ -108,7 +108,7 @@ const transformDomainSubscriptionToApiSubscription: TransformDomainSubscriptionT
       }
 
       return {
-        subscriptionId: foundSubscription.subscriptionId,
+        id: foundSubscription.id,
       };
     });
   };

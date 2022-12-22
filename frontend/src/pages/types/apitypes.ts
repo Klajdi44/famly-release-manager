@@ -40,12 +40,12 @@ type Segment = {
 };
 
 type Country = {
-  countryId: string;
+  id: string;
   name: string;
 };
 
 type Subscription = {
-  subscriptionId: string;
+  id: string;
   name: string;
 };
 
