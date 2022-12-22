@@ -69,6 +69,8 @@ const AddRuleModal = ({
       return;
     }
 
+    console.log(selectedAttribute);
+
     setAttribute(selectedAttribute);
     setValues([]);
   };
@@ -190,4 +192,3 @@ const AddRuleModal = ({
 };
 
 export default AddRuleModal;
-// export type { OnSubmitParams };
