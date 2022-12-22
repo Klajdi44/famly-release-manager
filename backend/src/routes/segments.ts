@@ -6,6 +6,7 @@ import {
   createSegment,
   updateOneSegment,
   deleteOneSegment,
+  createSegmentRules,
 } from "../controllers/segments";
 
 const router = express.Router();
@@ -15,6 +16,7 @@ router
   .get("/", getAllSegments)
   .get("/:id", getOneSegment)
   .post("/", createSegment)
+  .post("/:id", createSegmentRules)
   .patch("/:id", updateOneSegment)
   .delete("/:id", deleteOneSegment);
 
