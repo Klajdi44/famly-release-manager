@@ -83,6 +83,7 @@ const transformDomainCountryToApiCountry: TransformDomainCountryToApiCountry = (
 
     return {
       id: foundCountry.id,
+      name: foundCountry.name,
     };
   });
 };
@@ -109,6 +110,7 @@ const transformDomainSubscriptionToApiSubscription: TransformDomainSubscriptionT
 
       return {
         id: foundSubscription.id,
+        name: foundSubscription.name,
       };
     });
   };

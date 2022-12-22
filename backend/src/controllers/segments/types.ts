@@ -6,7 +6,7 @@ type Rule = {
   attribute: Attribute;
   operator: Operator;
   id: string;
-  values: { name: string; id: number }[];
+  values: { name: string; id: number | string }[];
 };
 
 export { Attribute, Operator, Rule };

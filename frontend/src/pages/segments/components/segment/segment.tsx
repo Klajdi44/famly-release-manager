@@ -13,14 +13,22 @@ type SegmentProps = {
   countries: ApiTypes.Country[];
   segment: ApiTypes.Segment;
   subscriptions: ApiTypes.Subscription[];
+  refetchSegment: () => Promise<void>;
 };
 
 const SegmentContainer = ({
   countries,
   segment,
+  refetchSegment,
   subscriptions,
 }: SegmentProps) => {
   const [isAddRuleModalVisible, setIsAddRuleModalVisible] = useState(false);
+
+  const { fetchData: AddNewRule } = useFetch({
+    url: `v1/segments/${segment.id}`,
+    method: "post",
+    lazy: true,
+  });
 
   const getAttribute = useCallback(
     (attribute: ApiTypes.Rule["attribute"]): Attributes | undefined =>
@@ -37,9 +45,11 @@ const SegmentContainer = ({
   const toggleIsAddRuleModalVisible = () =>
     setIsAddRuleModalVisible(prevState => !prevState);
 
-  const handleSubmitNewRule = (rule: ApiTypes.RulesPayload) => {
+  const handleSubmitNewRule = async (rule: ApiTypes.RulesPayload) => {
     console.log(rule);
     toggleIsAddRuleModalVisible();
+    await AddNewRule({ rules: [rule] });
+    refetchSegment();
   };
 
   return (
@@ -80,7 +90,12 @@ type SegmentLoaderProps = {
 };
 
 const SegmentLoader = ({ segmentId }: SegmentLoaderProps) => {
-  const { data, error, isLoading } = useFetch<ApiTypes.Segment>({
+  const {
+    data,
+    error,
+    isLoading,
+    fetchData: refetchSegment,
+  } = useFetch<ApiTypes.Segment>({
     url: `v1/segments/${segmentId}`,
   });
 
@@ -121,6 +136,7 @@ const SegmentLoader = ({ segmentId }: SegmentLoaderProps) => {
       segment={data}
       countries={countries}
       subscriptions={subscriptions}
+      refetchSegment={refetchSegment}
     />
   );
 };
