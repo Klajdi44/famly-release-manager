@@ -1,3 +1,5 @@
+import { Attributes, Operators } from "../segments/constants";
+
 type ReleaseToggle = {
   id: number;
   name: string;
@@ -47,4 +49,19 @@ type Subscription = {
   name: string;
 };
 
-export type { ReleaseToggle, User, Segment, Subscription, Country, Rule };
+type RulesPayload = {
+  id: string;
+  attribute: Attributes["id"];
+  operator: Operators["id"];
+  values: Record<string, string | number>[];
+};
+
+export type {
+  ReleaseToggle,
+  User,
+  Segment,
+  Subscription,
+  Country,
+  Rule,
+  RulesPayload,
+};

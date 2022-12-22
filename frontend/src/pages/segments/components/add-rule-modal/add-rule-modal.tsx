@@ -1,18 +1,27 @@
 import { ChangeEvent, useMemo, useState } from "react";
-import { Button, Flex, Modal, MultiSelect, NativeSelect } from "@mantine/core";
+import {
+  Button,
+  Flex,
+  Modal,
+  MultiSelect,
+  NativeSelect,
+  Radio,
+} from "@mantine/core";
+import { v4 as uuidv4 } from "uuid";
 import { Attributes, attributes, Operators, operators } from "../../constants";
 import * as ApiTypes from "../../../types/apitypes";
 import * as SegmentTransformers from "../../transformers";
 
-// type OnSubmitParams = {
-//   title: string;
-//   description: string;
-// };
+const defaultAttribute = attributes[0];
+const defaultOperator = operators[0];
+
+type OnSubmitParams = ApiTypes.RulesPayload;
 
 type Props = {
   isVisible: boolean;
   onClose: () => void;
-  onSubmit: () => void;
+  // eslint-disable-next-line no-unused-vars
+  onSubmit: (params: OnSubmitParams) => void;
   countries: ApiTypes.Country[];
   subscriptions: ApiTypes.Subscription[];
 };
@@ -25,12 +34,12 @@ const AddRuleModal = ({
   subscriptions,
 }: Props) => {
   const [attribute, setAttribute] = useState<undefined | Attributes>(
-    attributes[0]
+    defaultAttribute
   );
-  const [operator, setOperator] = useState<undefined | Operators>(operators[0]);
+  const [operator, setOperator] = useState<undefined | Operators>(
+    defaultOperator
+  );
   const [values, setValues] = useState<string[] | undefined>(undefined);
-
-  console.log({ attribute, operator });
 
   const memoizedValues = useMemo(() => {
     switch (attribute?.id) {
@@ -44,6 +53,12 @@ const AddRuleModal = ({
         return [];
     }
   }, [countries, subscriptions, attribute, operator]);
+
+  const resetState = () => {
+    setAttribute(defaultAttribute);
+    setOperator(defaultOperator);
+    setValues(undefined);
+  };
 
   const handleAttributeChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const selectedAttribute = attributes.find(
@@ -83,23 +98,65 @@ const AddRuleModal = ({
       return;
     }
 
-    if (attribute.id === "COUNTRY") {
-      SegmentTransformers.transformDomainCountryToApiCountry(values, countries);
-    }
+    const getApiValuePayload = ({
+      attribute,
+      values,
+      countries,
+      subscriptions,
+    }: {
+      attribute: Attributes;
+      values: string[];
+      countries: ApiTypes.Country[];
+      subscriptions: ApiTypes.Subscription[];
+    }) => {
+      switch (attribute.id) {
+        case "COUNTRY":
+          return SegmentTransformers.transformDomainCountryToApiCountry(
+            values,
+            countries
+          );
 
-    if (attribute.id === "SUBSCRIPTION") {
-      console.log(
-        SegmentTransformers.transformDomainSubscriptionToApiSubscription(
-          values,
-          subscriptions
-        )
-      );
-    }
+        case "SUBSCRIPTION":
+          return SegmentTransformers.transformDomainSubscriptionToApiSubscription(
+            values,
+            subscriptions
+          );
+
+        default:
+          return [];
+      }
+    };
+
+    const payload: ApiTypes.RulesPayload = {
+      id: uuidv4(),
+      attribute: attribute.id,
+      operator: operator.id,
+      values: getApiValuePayload({
+        attribute,
+        values,
+        countries,
+        subscriptions,
+      }),
+    };
+
+    onSubmit(payload);
+    resetState();
+  };
+
+  const handleClose = () => {
+    onClose();
+    resetState();
   };
 
   return (
-    <Modal size="70%" opened={isVisible} onClose={onClose} title="Add new rule">
-      <Flex justify="space-between">
+    <Modal
+      size="100%"
+      opened={isVisible}
+      onClose={handleClose}
+      title="Add new rule"
+    >
+      <Flex gap="xl" wrap="wrap" align="center" justify="start">
+        <div>IF</div>
         <NativeSelect
           value={attribute?.value}
           data={attributes}
@@ -120,6 +177,9 @@ const AddRuleModal = ({
           placeholder="Values"
           description="Select matching values"
         />
+        <div>
+          Then include <Radio value="ALL" checked label="all sites" />
+        </div>
       </Flex>
 
       <Button mt={20} variant="filled" onClick={handleSubmit}>

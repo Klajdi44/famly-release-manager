@@ -1,4 +1,4 @@
-import { Button, Text } from "@mantine/core";
+import { Button, Container, Flex, Text } from "@mantine/core";
 import { useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../../components/centered-loader/centered-loader";
@@ -37,15 +37,22 @@ const SegmentContainer = ({
   const toggleIsAddRuleModalVisible = () =>
     setIsAddRuleModalVisible(prevState => !prevState);
 
+  const handleSubmitNewRule = (rule: ApiTypes.RulesPayload) => {
+    console.log(rule);
+    toggleIsAddRuleModalVisible();
+  };
+
   return (
-    <div>
-      <Button onClick={toggleIsAddRuleModalVisible}>Add new rule</Button>
+    <Container>
+      <Flex justify="end">
+        <Button onClick={toggleIsAddRuleModalVisible}>Add new rule</Button>
+      </Flex>
 
       {/* Add new rule modal */}
       <AddRuleModal
         isVisible={isAddRuleModalVisible}
         onClose={toggleIsAddRuleModalVisible}
-        onSubmit={() => {}}
+        onSubmit={handleSubmitNewRule}
         countries={countries}
         subscriptions={subscriptions}
       />
@@ -64,7 +71,7 @@ const SegmentContainer = ({
           isReadOnly={true}
         />
       ))}
-    </div>
+    </Container>
   );
 };
 
