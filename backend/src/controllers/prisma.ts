@@ -3,9 +3,9 @@ import { where } from "sequelize";
 import { prisma } from "../prisma";
 import { Prisma } from "@prisma/client";
 
-type Attribute = "Country" | "Subscription" | "SiteId";
+type Attribute = "COUNTRY" | "SUBSCRIPTION" | "SITE_ID";
 
-type Operator = "isOneOf" | "isNotOneOf";
+type Operator = "IS_ONE_OF" | "IS_NOT_ONE_OF";
 
 type Rule = {
   attribute: Attribute;
@@ -22,15 +22,15 @@ type Rule = {
 const transformDBRulesToPrismaRules = (DBRules: any[]) => {
   return DBRules.reduce(
     (acc, currentRule: Rule) => {
-      if (currentRule.operator === "isOneOf") {
-        if (currentRule.attribute === "Country") {
+      if (currentRule.operator === "IS_ONE_OF") {
+        if (currentRule.attribute === "COUNTRY") {
           const countryIds = currentRule.values.map(country => ({
             countryId: country.id,
           }));
 
           acc["OR"].push(...countryIds);
         }
-        if (currentRule.attribute === "Subscription") {
+        if (currentRule.attribute === "SUBSCRIPTION") {
           const subscriptionIds = currentRule.values.map(subscription => ({
             subscriptionId: subscription.id,
           }));
@@ -38,15 +38,15 @@ const transformDBRulesToPrismaRules = (DBRules: any[]) => {
         }
       }
 
-      if (currentRule.operator === "isNotOneOf") {
-        if (currentRule.attribute === "Country") {
+      if (currentRule.operator === "IS_NOT_ONE_OF") {
+        if (currentRule.attribute === "COUNTRY") {
           const countryIds = currentRule.values.map(country => ({
             countryId: country.id,
           }));
 
           acc["NOT"].push(...countryIds);
         }
-        if (currentRule.attribute === "Subscription") {
+        if (currentRule.attribute === "SUBSCRIPTION") {
           const subscriptionIds = currentRule.values.map(subscription => ({
             subscriptionId: subscription.id,
           }));
@@ -66,8 +66,8 @@ const transformDBRulesToPrismaRules = (DBRules: any[]) => {
 export const test = async (req: Request, res: Response) => {
   try {
     const rulesObject = {
-      attribute: "Country",
-      operator: "isOneOf",
+      attribute: "COUNTRY",
+      operator: "IS_ONE_OF",
       id: "1",
       values: [
         { name: "Denmark", id: 1 },
@@ -76,16 +76,16 @@ export const test = async (req: Request, res: Response) => {
     };
 
     const rulesObject1 = {
-      attribute: "Subscription",
-      operator: "isNotOneOf",
+      attribute: "SUBSCRIPTION",
+      operator: "IS_NOT_ONE_OF",
       id: "2",
       values: [{ title: "Starter", id: 2 }],
     };
 
     const rulesFromFrontend = [
       {
-        attribute: "Country",
-        operator: "isOneOf",
+        attribute: "COUNTRY",
+        operator: "IS_ONE_OF",
         id: "1",
         values: [{ name: "Austria", id: 7 }],
       },

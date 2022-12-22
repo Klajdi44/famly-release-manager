@@ -19,20 +19,32 @@ type User = {
   updatedAt: string;
 };
 
+type Attribute = "COUNTRY" | "SUBSCRIPTION" | "SITE_ID";
+
+type Operator = "isOneOf" | "isNotOneOf";
+
+type Rule = {
+  attribute: Attribute;
+  operator: Operator;
+  id: string;
+  values: Record<string, string>[];
+};
+
 type Segment = {
   id: string;
   title: string;
   description: string;
+  rules: Rule[];
 };
 
 type Country = {
-  id: string;
+  countryId: string;
   name: string;
 };
 
 type Subscription = {
-  id: string;
-  title: string;
+  subscriptionId: string;
+  name: string;
 };
 
-export type { ReleaseToggle, User, Segment, Subscription, Country };
+export type { ReleaseToggle, User, Segment, Subscription, Country, Rule };

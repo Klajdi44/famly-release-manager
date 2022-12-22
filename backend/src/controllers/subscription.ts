@@ -9,5 +9,10 @@ export const getSubscriptions = async (req: Request, res: Response) => {
     },
   });
 
-  res.send(subscriptions);
+  const responseSubscriptions = subscriptions.map(subscription => ({
+    name: subscription.title,
+    subscriptionId: subscription.id,
+  }));
+
+  res.send(responseSubscriptions);
 };
