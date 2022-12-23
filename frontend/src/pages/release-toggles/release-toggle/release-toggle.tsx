@@ -1,8 +1,10 @@
-import { Button, Flex, Text, Title } from "@mantine/core";
+import { Button, Container, Flex, Paper, Text, Title } from "@mantine/core";
+import { IconTrash } from "@tabler/icons";
 import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../components/centered-loader/centered-loader";
 import { useFetch } from "../../../hooks/use-fetch/use-fetch";
+import jwtAxios from "../../../util/axios/axiosInstance";
 import * as ApiTypes from "../../types/apitypes";
 import AddSegmentToReleaseToggleModal, {
   OnSubmitParams,
@@ -25,7 +27,7 @@ const ReleaseToggle = ({
   const [isAddSegmentModalVisible, setIsAddSegmentModalVisible] =
     useState(false);
 
-  console.log(releaseToggle);
+  const hasSegments = releaseToggle.segments.length > 0;
 
   const { fetchData: addSegmentToReleaseToggle } = useFetch({
     url: `v1/release-toggles/add-segment-to-release-toggle/${releaseToggle.id}`,
@@ -48,6 +50,19 @@ const ReleaseToggle = ({
     []
   );
 
+  const handleDelete = (segmentId: ApiTypes.Segment["id"]) => async () => {
+    await jwtAxios.delete(
+      `v1/release-toggles/delete-segment-from-release-toggle/${releaseToggle.id}`,
+      {
+        data: {
+          segment: { id: segmentId },
+        },
+      }
+    );
+
+    refetchReleaseToggle();
+  };
+
   return (
     <div>
       {/* Modal to add segments to site */}
@@ -64,14 +79,36 @@ const ReleaseToggle = ({
             {ReleaseToggle.name} {releaseToggle.id}(ID)
           </Title>
 
-          <Text>
-            {releaseToggle.segments.length
+          <Text mt={hasSegments ? "lg" : "sm"}>
+            {hasSegments
               ? "Applied Segments"
               : "No segments has been applied to this release toggle"}
           </Text>
         </div>
         <Button onClick={toggleAddSegmentModal}>Add segment</Button>
       </Flex>
+      {releaseToggle.segments.length ? (
+        <Paper>
+          {releaseToggle.segments.map(segment => (
+            <Container key={segment.id} p="md">
+              <Flex justify="space-between" wrap="wrap">
+                <Title fz="lg">{segment.title}</Title>
+                <Title fz="lg">{segment.description}</Title>
+                <Title fz="lg">
+                  {new Date(segment.createdAt).toDateString()}
+                </Title>
+                <Button
+                  variant="outline"
+                  color="red"
+                  onClick={handleDelete(segment.id)}
+                >
+                  <IconTrash />
+                </Button>
+              </Flex>
+            </Container>
+          ))}
+        </Paper>
+      ) : null}
     </div>
   );
 };

@@ -6,11 +6,16 @@ import {
   updateOneReleaseToggle,
   deleteOneReleaseToggle,
   addSegmentToReleaseToggle,
+  deleteSegmentFromReleaseToggle,
 } from "../controllers/releaseToggles";
 
 const router = express.Router();
 
 router.post("/add-segment-to-release-toggle/:id", addSegmentToReleaseToggle);
+router.delete(
+  "/delete-segment-from-release-toggle/:id",
+  deleteSegmentFromReleaseToggle
+);
 
 router
   .get("/", getAllReleaseToggles)
