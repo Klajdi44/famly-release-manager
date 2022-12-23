@@ -1,5 +1,5 @@
 import { Button, Flex, Text, Title } from "@mantine/core";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../components/centered-loader/centered-loader";
 import { useFetch } from "../../../hooks/use-fetch/use-fetch";
@@ -14,9 +14,14 @@ const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 type ReleaseToggleProps = {
   releaseToggle: ApiTypes.ReleaseToggle;
   segments: ApiTypes.Segment[];
+  refetchReleaseToggle: () => Promise<void>;
 };
 
-const ReleaseToggle = ({ releaseToggle, segments }: ReleaseToggleProps) => {
+const ReleaseToggle = ({
+  releaseToggle,
+  segments,
+  refetchReleaseToggle,
+}: ReleaseToggleProps) => {
   const [isAddSegmentModalVisible, setIsAddSegmentModalVisible] =
     useState(false);
 
@@ -32,14 +37,16 @@ const ReleaseToggle = ({ releaseToggle, segments }: ReleaseToggleProps) => {
     setIsAddSegmentModalVisible(prevState => !prevState);
   };
 
-  const handleAddSegmentToReleaseToggle = async (
-    segmentIds: OnSubmitParams
-  ) => {
-    await addSegmentToReleaseToggle({
-      segments: segmentIds,
-    });
-    toggleAddSegmentModal();
-  };
+  const handleAddSegmentToReleaseToggle = useCallback(
+    async (segmentIds: OnSubmitParams) => {
+      await addSegmentToReleaseToggle({
+        segments: segmentIds,
+      });
+      toggleAddSegmentModal();
+      await refetchReleaseToggle();
+    },
+    []
+  );
 
   return (
     <div>
@@ -76,7 +83,12 @@ type ReleaseToggleLoaderProps = {
 const WithReleaseToggleAndSegmentData = ({
   toggleId,
 }: ReleaseToggleLoaderProps) => {
-  const { data, error, isLoading } = useFetch<ApiTypes.ReleaseToggle>({
+  const {
+    data,
+    error,
+    isLoading,
+    fetchData: refetchReleaseToggle,
+  } = useFetch<ApiTypes.ReleaseToggle>({
     url: `${RELEASE_TOGGLE_URL}/${toggleId}`,
   });
 
@@ -87,8 +99,6 @@ const WithReleaseToggleAndSegmentData = ({
   } = useFetch<ApiTypes.Segment[]>({
     url: "/v1/segments/",
   });
-
-  console.log({ segments });
 
   if (isLoading || isSegmentsLoading) {
     return <CenteredLoader />;
@@ -109,7 +119,13 @@ const WithReleaseToggleAndSegmentData = ({
     return <Text>No release toggle with id: {toggleId} was found!</Text>;
   }
 
-  return <ReleaseToggle releaseToggle={data} segments={segments ?? []} />;
+  return (
+    <ReleaseToggle
+      releaseToggle={data}
+      segments={segments ?? []}
+      refetchReleaseToggle={refetchReleaseToggle}
+    />
+  );
 };
 
 const WithUrlParams = () => {
