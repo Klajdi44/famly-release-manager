@@ -227,7 +227,7 @@ export const deleteSegmentFromReleaseToggle = async (
       },
       data: {
         segments: {
-          delete: req.body.segment,
+          disconnect: req.body.segment,
         },
       },
       include: {
