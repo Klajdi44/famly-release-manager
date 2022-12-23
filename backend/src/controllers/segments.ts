@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
-import { prisma } from "../prisma";
 import { Prisma } from "@prisma/client";
-// const { sequelize } = require("../sequelize/models");
-// const { Site, Subscription, Country, Segment, SiteSegment, releaseToggle } = require("../sequelize/models");
+import { prisma } from "../prisma";
 
 export const getAllSegments = async (req: Request, res: Response) => {
   console.log("** Running controller: getAllSegments (prisma)");
@@ -166,65 +164,60 @@ export const getSegmentConstruction = async (req: Request, res: Response) => {
   });
 };
 
-const transformFrontendRulesToPrismaRules = (FrontendRules: any[]) => {
-  type Attribute = "Country" | "Subscription" | "SiteId";
+function getCombinations(countries: any = [], subscriptions: any = []) {
+  // This function takes two arrays. An array of countryIds and an array of subscriptionIds
+  // Its returns all possible combinations of the ids provided
+  const combinations = [];
+  for (const countryId of countries) {
+    for (const subscriptionId of subscriptions) {
+      combinations.push({ countryId, subscriptionId });
+    }
+  }
+  return combinations;
+}
 
-  type Operator = "isOneOf" | "isNotOneOf";
-
-  type Rule = {
-    attribute: Attribute;
-    operator: Operator;
-    id: string;
-    values: { name: string; id: number }[];
-  };
-
-  return FrontendRules.reduce(
-    (acc, currentRule) => {
-      // Rewrite values from frontend to match how Prisma expects it
-      currentRule["values"] = currentRule.values.map(function (rule: any) {
-        if (currentRule["attribute"] === "Country") {
-          return { countryId: rule.id };
-        }
-        if (currentRule["attribute"] === "Subscription") {
-          return { subscriptionId: rule.id };
-        }
-        if (currentRule["attribute"] === "SiteId") {
-          return { id: rule.id };
-        }
-      });
-
-      const valuesToPrisma = currentRule["values"];
-      if (currentRule.operator === "isOneOf") {
-        acc["OR"].push(...valuesToPrisma);
-      }
-
-      // Case: Operator isNotOneOf (Goes to NOT array)
-      if (currentRule.operator === "isNotOneOf") {
-        acc["NOT"].push(...valuesToPrisma);
+function sortRulesArrayByOperatorAndAttributes(rulesArray: any) {
+  // This function takes the rules array as it is stored in the database and sorts it based on the operators isOneOf
+  // and isNotOneOf. The return value looks like this object
+  // {
+  //    isOneOf: { Country: [ 1, 2, 3, 7 ], Subscription: [ 1, 2, 3, 4 ] },
+  //    isNotOneOf: { SiteId: [ 5, 8, 17, 90, 87, 41 ] },
+  // }
+  const reducer = rulesArray.reduce(
+    (acc: any, currentRule: any) => {
+      if (acc[currentRule.operator][currentRule.attribute] === undefined) {
+        acc[currentRule.operator][currentRule.attribute] = currentRule.values.map((value: any) => value.id);
+      } else {
+        const values = currentRule.values.map((value: any) => value.id);
+        acc[currentRule.operator][currentRule.attribute].push(...values);
       }
       return acc;
     },
-    {
-      OR: [],
-      NOT: [],
-    }
+    { isOneOf: {}, isNotOneOf: {} }
   );
-};
+  return reducer;
+}
+
+function createPrismaQueryObjects(attribute: string, ids: []) {
+  // This function takes an attribute and an array of ids
+  // It returns an array of query objects in this format:
+  // [ {attribute: id} ] --> [ {countryId: 1}, { countryId: 2} ]
+  const key = attribute === "Country" ? "countryId" : attribute === "Subscription" ? "subscriptionId" : "id";
+  const objects = [];
+  for (const id of ids) {
+    objects.push({ [key]: id });
+  }
+  return objects;
+}
 
 export const createSegmentRules = async (req: Request, res: Response) => {
   // Validate req.params.id - make sure it is a number
   if (!Number(req.params.id)) {
     return res.json({ error: "ID is not a number" });
   }
-  // Expected post body from frontend:
-  //    * An array of rules
-  //    * A rule is an object of type Rule (See below)
-  //    * Post Body: [ {attribute: "Country", operator: "isOneOf", id: '1', values: {name: 'Denmark', id: 1}} ]
 
   // Rules from frontend
   const rulesFromFrontend = req.body.rules;
-
-  // console.log("** Validation", rulesFromFrontend);
 
   type Attribute = "Country" | "Subscription" | "SiteId";
 
@@ -249,94 +242,69 @@ export const createSegmentRules = async (req: Request, res: Response) => {
     }
   });
 
-  // Get segment from DB based on id based in url
+  // Get segment from DB based on id from url
   const segment = await prisma.segment.findUnique({
     where: {
       id: Number(req.params.id),
     },
   });
 
-  // Step 2: Check existing rules for this segment
+  // Get existing rules from database as an array
   const segmentRules = segment.rules as Prisma.JsonArray;
-  const numberOfRules = segmentRules.length;
 
-  // Step 3: Merge rules posted from frontend with existing rules
+  // Merge rules posted from frontend with existing rules
   const mergeRulesFromFrontendWithExistingRulesFromDB = [...segmentRules, ...rulesFromFrontend];
-  console.log(mergeRulesFromFrontendWithExistingRulesFromDB);
 
-  // Step 4: Translate rules into Prisma query -----
-  const convertFrontendRulesToPrismaRules = transformFrontendRulesToPrismaRules(mergeRulesFromFrontendWithExistingRulesFromDB);
+  // Sort rules by operator and attributes:
+  const sortedRules = sortRulesArrayByOperatorAndAttributes(rulesFromFrontend);
 
-  // console.log(mergeRulesFromFrontendWithExistingRulesFromDB);
-  console.log(convertFrontendRulesToPrismaRules);
+  // Initialize query object, like Prisma expects it:
+  let query = {
+    OR: [] as any[],
+    NOT: [] as any[],
+  };
 
-  // Step 5: Update segment with existing rules
-  // segment.update({
-  //   where:{
-  //     id: 1
-  //   },
-  // })
+  // Loop through rules object sorted by operator
+  for (const operator in sortedRules) {
+    // Get keys from object
+    const attributes = Object.keys(sortedRules[operator]);
+
+    // Case where isOneOf does not include both Country and Subscription
+    if (!(operator === "isOneOf" && attributes.includes("Country") && attributes.includes("Subscription"))) {
+      Object.keys(sortedRules[operator]).forEach(key => {
+        const prismaQuery = createPrismaQueryObjects(key, sortedRules[operator][key]);
+        operator === "isNotOneOf" ? query["NOT"].push(...prismaQuery) : operator === "isOneOf" && query["OR"].push(...prismaQuery);
+      });
+    }
+
+    // Case where isOneOf includes both Country and Subscription (we will need to combine the possible combinations for this attributes)
+    if (attributes.includes("Country") && attributes.includes("Subscription") && operator === "isOneOf") {
+      // Get all possible combinations of selected Countries and Subscriptions
+      const combinations = getCombinations(sortedRules[operator]["Country"], sortedRules[operator]["Subscription"]);
+      // Add the combinations to OR array of query object
+      query["OR"].push(...combinations);
+
+      // Remove Country and Subscriptions from keys array
+      const attributesWithoutCountryAndSubscription = attributes.filter(attr => attr !== "Country" && attr !== "Subscription");
+      // Loop through the rest of the attributes and generate query objects
+      attributesWithoutCountryAndSubscription.forEach(attribute => {
+        const prismaQ = createPrismaQueryObjects(attribute, sortedRules[operator][attribute]);
+        return query["OR"].push(...prismaQ);
+      });
+    }
+  }
+
+  // Get all sites that mathces the query generated by the rules
   const sites = await prisma.site.findMany({
-    where: {
-      OR: [
-        {
-          countryId: 1,
-          subscriptionId: 1,
-        },
-        {
-          countryId: 1,
-          subscriptionId: 2,
-        },
-        {
-          countryId: 1,
-          subscriptionId: 3,
-        },
-        {
-          countryId: 2,
-          subscriptionId: 1,
-        },
-        {
-          subscriptionId: 2,
-          countryId: 2,
-        },
-        {
-          subscriptionId: 2,
-          countryId: 3,
-        },
-        {
-          subscriptionId: 3,
-          countryId: 1,
-        },
-        {
-          subscriptionId: 3,
-          countryId: 2,
-        },
-        {
-          subscriptionId: 3,
-          countryId: 3,
-        },
-      ],
-      // NOT: [{ name: "Site #1" }, { name: "Site #15" }, { name: "Site #23" }],
-      NOT: [{ subscriptionId: 1 }],
-      AND: [
-        // {
-        //   subscriptionId: 1,
-        // },
-      ],
-    },
-    // select: {
-    //   id: true,
-    // },
+    where: query,
   });
+
+  console.log(sites);
 
   return res.json({
-    mergeRulesFromFrontendWithExistingRulesFromDB: mergeRulesFromFrontendWithExistingRulesFromDB,
     number: sites.length,
     sites: sites,
-    convertFrontendRulesToPrismaRules: convertFrontendRulesToPrismaRules,
+    numberOfSites: "s.length",
+    q: query,
   });
-  // return res.json({
-  //   mergeRulesFromFrontendWithExistingRulesFromDB: mergeRulesFromFrontendWithExistingRulesFromDB,
-  //   convertFrontendRulesToPrismaRules: convertFrontendRulesToPrismaRules,
-  // });
 };
