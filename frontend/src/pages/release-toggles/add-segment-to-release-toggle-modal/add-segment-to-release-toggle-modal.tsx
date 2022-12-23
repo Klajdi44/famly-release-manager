@@ -1,15 +1,9 @@
-import { ChangeEvent, useMemo, useState } from "react";
-import {
-  Button,
-  Flex,
-  Modal,
-  MultiSelect,
-  NativeSelect,
-  Radio,
-} from "@mantine/core";
+import { useMemo, useState } from "react";
+import { Button, Flex, Modal, MultiSelect } from "@mantine/core";
+import * as ReleaseToggleTransformers from "../transformers";
 import * as ApiTypes from "../../types/apitypes";
 
-type OnSubmitParams = ApiTypes.RulesPayload;
+type OnSubmitParams = { id: ApiTypes.Segment["id"] }[];
 
 type Props = {
   isVisible: boolean;
@@ -27,37 +21,30 @@ const AddSegmentToReleaseToggleModal = ({
 }: Props) => {
   const [appliedSegments, setAppliedSegments] = useState<string[]>([]);
 
-  const segmentNames = useMemo(
+  const segmentTitles = useMemo(
     () => segments.map(segment => segment.title),
     [segments]
   );
-
-  console.log(appliedSegments);
 
   const resetState = () => {
     setAppliedSegments([]);
   };
 
   const handleAppliedSegmentsChange = (appliedSegmentNames: string[]) => {
-    // const selectedSegment = segments.find(
-    //   segment => segment.title === event.target.value
-    // );
-
-    // if (selectedSegment === undefined) {
-    //   return;
-    // }
-
-    // const segment = { id: selectedSegment.id };
-
     setAppliedSegments(appliedSegmentNames);
   };
 
   const handleSubmit = async () => {
-    if (appliedSegments === undefined) {
+    if (appliedSegments.length === 0) {
       return;
     }
 
-    // onSubmit();
+    onSubmit(
+      ReleaseToggleTransformers.transformDomainSegmentsToApiSegments(
+        appliedSegments,
+        segments
+      )
+    );
     resetState();
   };
 
@@ -76,7 +63,7 @@ const AddSegmentToReleaseToggleModal = ({
       <Flex gap="xl" wrap="wrap" align="center" justify="start">
         <MultiSelect
           value={appliedSegments}
-          data={segmentNames}
+          data={segmentTitles}
           onChange={handleAppliedSegmentsChange}
           placeholder="Segments"
           description="Pick segments to add"
@@ -91,3 +78,4 @@ const AddSegmentToReleaseToggleModal = ({
 };
 
 export default AddSegmentToReleaseToggleModal;
+export type { OnSubmitParams };

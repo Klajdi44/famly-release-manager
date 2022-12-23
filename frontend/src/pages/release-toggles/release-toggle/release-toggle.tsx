@@ -4,7 +4,9 @@ import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../components/centered-loader/centered-loader";
 import { useFetch } from "../../../hooks/use-fetch/use-fetch";
 import * as ApiTypes from "../../types/apitypes";
-import AddSegmentToReleaseToggleModal from "../add-segment-to-release-toggle-modal/add-segment-to-release-toggle-modal";
+import AddSegmentToReleaseToggleModal, {
+  OnSubmitParams,
+} from "../add-segment-to-release-toggle-modal/add-segment-to-release-toggle-modal";
 
 const TOGGLE_ID = "toggle-id";
 const RELEASE_TOGGLE_URL = "/v1/release-toggles";
@@ -22,7 +24,10 @@ const ReleaseToggle = ({ releaseToggle, segments }: ReleaseToggleProps) => {
     setIsAddSegmentModalVisible(prevState => !prevState);
   };
 
-  const handleAddSegmentToReleaseToggle = () => {};
+  const handleAddSegmentToReleaseToggle = (segmentIds: OnSubmitParams) => {
+    console.log({ segmentIds });
+    toggleAddSegmentModal();
+  };
 
   return (
     <div>
