@@ -1,8 +1,10 @@
-import { Text } from "@mantine/core";
+import { Button, Flex, Text, Title } from "@mantine/core";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../components/centered-loader/centered-loader";
 import { useFetch } from "../../../hooks/use-fetch/use-fetch";
 import * as ApiTypes from "../../types/apitypes";
+import AddSegmentToReleaseToggleModal from "../add-segment-to-release-toggle-modal/add-segment-to-release-toggle-modal";
 
 const TOGGLE_ID = "toggle-id";
 const RELEASE_TOGGLE_URL = "/v1/release-toggles";
@@ -13,11 +15,39 @@ type ReleaseToggleProps = {
 };
 
 const ReleaseToggle = ({ releaseToggle, segments }: ReleaseToggleProps) => {
+  const [isAddSegmentModalVisible, setIsAddSegmentModalVisible] =
+    useState(false);
+
+  const toggleAddSegmentModal = () => {
+    setIsAddSegmentModalVisible(prevState => !prevState);
+  };
+
+  const handleAddSegmentToReleaseToggle = () => {};
+
   return (
     <div>
-      <Text>Id: {releaseToggle.id}</Text>
-      <Text>Name: {releaseToggle.name}</Text>
-      <Text>Description: {releaseToggle.description}</Text>
+      {/* Modal to add segments to site */}
+      <AddSegmentToReleaseToggleModal
+        isVisible={isAddSegmentModalVisible}
+        segments={segments}
+        onClose={toggleAddSegmentModal}
+        onSubmit={handleAddSegmentToReleaseToggle}
+      />
+
+      <Flex justify="space-between" align="center">
+        <div>
+          <Title>
+            {ReleaseToggle.name} {releaseToggle.id}(ID)
+          </Title>
+
+          <Text>
+            {releaseToggle.segments.length
+              ? "Applied Segments"
+              : "No segments has been applied to this release toggle"}
+          </Text>
+        </div>
+        <Button onClick={toggleAddSegmentModal}>Add segment</Button>
+      </Flex>
     </div>
   );
 };
