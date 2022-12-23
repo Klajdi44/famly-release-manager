@@ -5,11 +5,13 @@ import {
   createReleaseToggle,
   updateOneReleaseToggle,
   deleteOneReleaseToggle,
+  addSegmentToReleaseToggle,
 } from "../controllers/releaseToggles";
 
 const router = express.Router();
 
-// route without auth:
+router.post("/add-segment-to-release-toggle/:id", addSegmentToReleaseToggle);
+
 router
   .get("/", getAllReleaseToggles)
   .get("/:id", getOneReleaseToggle)

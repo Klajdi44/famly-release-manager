@@ -159,3 +159,45 @@ export const deleteOneReleaseToggle = async (req: Request, res: Response) => {
     return res.status(500).send({ mesage: error.meta.cause });
   }
 };
+
+export const addSegmentToReleaseToggle = async (
+  req: Request,
+  res: Response
+) => {
+  if (Number.isNaN(req.params.id)) {
+    return res.json({ error: "ID is not a number" });
+  }
+
+  try {
+    const releaseToggle = await prisma.releaseToggle.findUnique({
+      where: {
+        id: Number(req.params.id),
+      },
+      include: {
+        segments: true,
+      },
+    });
+
+    const segmentIds = releaseToggle.segments.map(segment => ({
+      id: segment.id,
+    }));
+
+    const updatedReleaseToggle = await prisma.releaseToggle.update({
+      where: {
+        id: Number(req.params.id),
+      },
+      data: {
+        segments: {
+          set: [...segmentIds, ...req.body.segments],
+        },
+      },
+      include: {
+        segments: true,
+      },
+    });
+
+    return res.status(200).json(updatedReleaseToggle);
+  } catch (error) {
+    return res.status(500).send({ mesage: error.meta.cause });
+  }
+};

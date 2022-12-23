@@ -20,12 +20,24 @@ const ReleaseToggle = ({ releaseToggle, segments }: ReleaseToggleProps) => {
   const [isAddSegmentModalVisible, setIsAddSegmentModalVisible] =
     useState(false);
 
+  console.log(releaseToggle);
+
+  const { fetchData: addSegmentToReleaseToggle } = useFetch({
+    url: `v1/release-toggles/add-segment-to-release-toggle/${releaseToggle.id}`,
+    lazy: true,
+    method: "post",
+  });
+
   const toggleAddSegmentModal = () => {
     setIsAddSegmentModalVisible(prevState => !prevState);
   };
 
-  const handleAddSegmentToReleaseToggle = (segmentIds: OnSubmitParams) => {
-    console.log({ segmentIds });
+  const handleAddSegmentToReleaseToggle = async (
+    segmentIds: OnSubmitParams
+  ) => {
+    await addSegmentToReleaseToggle({
+      segments: segmentIds,
+    });
     toggleAddSegmentModal();
   };
 
