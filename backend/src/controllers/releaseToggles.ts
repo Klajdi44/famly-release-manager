@@ -169,9 +169,9 @@ export const addSegmentToReleaseToggle = async (
     return res.status(400).send({ message: "ID is not a number" });
   }
 
-  const segmentIds: { id: number }[] = req.body.segments;
+  const requestSegmentIds: { id: number }[] = req.body.segments;
 
-  if (!segmentIds || !segmentIds.length) {
+  if (!requestSegmentIds || !requestSegmentIds.length) {
     return res.status(400).send({ message: "Segment Ids are required" });
   }
 
@@ -201,7 +201,7 @@ export const addSegmentToReleaseToggle = async (
       },
       data: {
         segments: {
-          set: [...segmentIds, ...segmentIds],
+          set: [...segmentIds, ...requestSegmentIds],
         },
       },
       include: {
