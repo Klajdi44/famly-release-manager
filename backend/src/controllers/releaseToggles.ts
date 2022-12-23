@@ -166,7 +166,13 @@ export const addSegmentToReleaseToggle = async (
   res: Response
 ) => {
   if (Number.isNaN(req.params.id)) {
-    return res.json({ error: "ID is not a number" });
+    return res.status(400).send({ message: "ID is not a number" });
+  }
+
+  const segmentIds: { id: number }[] = req.body.segments;
+
+  if (!segmentIds || !segmentIds.length) {
+    return res.status(400).send({ message: "Segment Ids are required" });
   }
 
   try {
@@ -178,6 +184,12 @@ export const addSegmentToReleaseToggle = async (
         segments: true,
       },
     });
+
+    if (releaseToggle === null) {
+      return res.status(400).send({
+        message: `No release toggle was found with ID:${req.params.id}`,
+      });
+    }
 
     const segmentIds = releaseToggle.segments.map(segment => ({
       id: segment.id,
@@ -189,7 +201,7 @@ export const addSegmentToReleaseToggle = async (
       },
       data: {
         segments: {
-          set: [...segmentIds, ...req.body.segments],
+          set: [...segmentIds, ...segmentIds],
         },
       },
       include: {
@@ -197,9 +209,11 @@ export const addSegmentToReleaseToggle = async (
       },
     });
 
-    return res.status(200).json(updatedReleaseToggle);
+    return res.send(updatedReleaseToggle);
   } catch (error) {
-    return res.status(500).send({ mesage: error.meta.cause });
+    res
+      .status(500)
+      .send({ mesage: "Something went terribly wrong! please try again" });
   }
 };
 
@@ -208,7 +222,13 @@ export const deleteSegmentFromReleaseToggle = async (
   res: Response
 ) => {
   if (Number.isNaN(req.params.id)) {
-    return res.json({ error: "ID is not a number" });
+    return res.status(400).send({ message: "ID is not a number" });
+  }
+
+  const segmentId: { id: number } = req.body.segment;
+
+  if (!segmentId) {
+    return res.status(400).send({ message: "Segment ID is required" });
   }
 
   try {
@@ -221,13 +241,19 @@ export const deleteSegmentFromReleaseToggle = async (
       },
     });
 
+    if (releaseToggle === null) {
+      return res.status(400).send({
+        message: `No release toggle was found with ID:${req.params.id}`,
+      });
+    }
+
     const updatedReleaseToggle = await prisma.releaseToggle.update({
       where: {
         id: Number(req.params.id),
       },
       data: {
         segments: {
-          disconnect: req.body.segment,
+          disconnect: segmentId,
         },
       },
       include: {
@@ -235,8 +261,10 @@ export const deleteSegmentFromReleaseToggle = async (
       },
     });
 
-    return res.status(200).json(updatedReleaseToggle);
+    return res.send(updatedReleaseToggle);
   } catch (error) {
-    return res.status(500).send({ mesage: error.meta.cause });
+    return res
+      .status(500)
+      .send({ mesage: "Something went terribly wrong! please try again" });
   }
 };
