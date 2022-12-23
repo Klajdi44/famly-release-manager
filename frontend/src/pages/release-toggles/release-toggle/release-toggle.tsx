@@ -9,11 +9,10 @@ const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 
 type ReleaseToggleProps = {
   releaseToggle: ApiTypes.ReleaseToggle;
+  segments: ApiTypes.Segment[];
 };
 
-const ReleaseToggle = ({ releaseToggle }: ReleaseToggleProps) => {
-  console.log(releaseToggle);
-
+const ReleaseToggle = ({ releaseToggle, segments }: ReleaseToggleProps) => {
   return (
     <div>
       <Text>Id: {releaseToggle.id}</Text>
@@ -27,24 +26,43 @@ type ReleaseToggleLoaderProps = {
   toggleId: string;
 };
 
-const ReleaseToggleLoader = ({ toggleId }: ReleaseToggleLoaderProps) => {
+const WithReleaseToggleAndSegmentData = ({
+  toggleId,
+}: ReleaseToggleLoaderProps) => {
   const { data, error, isLoading } = useFetch<ApiTypes.ReleaseToggle>({
     url: `${RELEASE_TOGGLE_URL}/${toggleId}`,
   });
 
-  if (isLoading) {
+  const {
+    data: segments,
+    error: segmentError,
+    isLoading: isSegmentsLoading,
+  } = useFetch<ApiTypes.Segment[]>({
+    url: "/v1/segments/",
+  });
+
+  console.log({ segments });
+
+  if (isLoading || isSegmentsLoading) {
     return <CenteredLoader />;
   }
 
-  if (error && error !== "canceled") {
-    return <Text>Something went wrong while getting the release toggle</Text>;
+  if (
+    (error && error !== "canceled") ||
+    (segmentError && segmentError !== "canceled")
+  ) {
+    return (
+      <Text>
+        Something went wrong while getting the release toggle or segment
+      </Text>
+    );
   }
 
   if (data === null) {
     return <Text>No release toggle with id: {toggleId} was found!</Text>;
   }
 
-  return <ReleaseToggle releaseToggle={data} />;
+  return <ReleaseToggle releaseToggle={data} segments={segments ?? []} />;
 };
 
 const WithUrlParams = () => {
@@ -55,7 +73,7 @@ const WithUrlParams = () => {
     return <Text>Error: toggle Id missing from URL</Text>;
   }
 
-  return <ReleaseToggleLoader toggleId={toggleId} />;
+  return <WithReleaseToggleAndSegmentData toggleId={toggleId} />;
 };
 
 export default WithUrlParams;
