@@ -12,6 +12,8 @@ type ReleaseToggleProps = {
 };
 
 const ReleaseToggle = ({ releaseToggle }: ReleaseToggleProps) => {
+  console.log(releaseToggle);
+
   return (
     <div>
       <Text>Id: {releaseToggle.id}</Text>

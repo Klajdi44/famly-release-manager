@@ -46,6 +46,13 @@ export const getOneReleaseToggle = async (req: Request, res: Response) => {
             lastName: true,
           },
         },
+        segments: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+          },
+        },
       },
     });
 
