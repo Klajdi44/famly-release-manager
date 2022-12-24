@@ -7,15 +7,15 @@ const transformFrontendRulesToPrismaRules = (
     (acc, currentRule) => {
       // Rewrite values from frontend to match how Prisma expects it
       const currentRuleValue = currentRule.values.map(
-        (rule: Record<string, string | number>) => {
+        (value: Record<string, string | number>) => {
           if (currentRule["attribute"] === "COUNTRY") {
-            return { countryId: rule.id };
+            return { countryId: value.id };
           }
           if (currentRule["attribute"] === "SUBSCRIPTION") {
-            return { subscriptionId: rule.id };
+            return { subscriptionId: value.id };
           }
           if (currentRule["attribute"] === "SITE_ID") {
-            return { id: rule.id };
+            return { id: value.id };
           }
         }
       );

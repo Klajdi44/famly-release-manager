@@ -11,7 +11,7 @@ const getCountries = async (req: Request, res: Response) => {
 
   const responseCountries = countries.map(country => ({
     name: country.name,
-    countryId: country.id,
+    id: country.id,
   }));
 
   res.send(responseCountries);

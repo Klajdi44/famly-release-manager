@@ -11,7 +11,7 @@ export const getSubscriptions = async (req: Request, res: Response) => {
 
   const responseSubscriptions = subscriptions.map(subscription => ({
     name: subscription.title,
-    subscriptionId: subscription.id,
+    id: subscription.id,
   }));
 
   res.send(responseSubscriptions);
