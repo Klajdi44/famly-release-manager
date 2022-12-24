@@ -1,163 +1,87 @@
-import {
-  Button,
-  Center,
-  Flex,
-  MultiSelect,
-  NativeSelect,
-  Paper,
-  Text,
-} from "@mantine/core";
-import { useState, ChangeEvent, useCallback } from "react";
+import { Button, Container, Flex, Text } from "@mantine/core";
+import { useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../../components/centered-loader/centered-loader";
 import { useFetch } from "../../../../hooks/use-fetch/use-fetch";
 import * as ApiTypes from "../../../types/apitypes";
 import * as SegmentTransformers from "../../transformers";
-import { attributes, operators, Attributes, Operators } from "../../constants";
+import { Attributes, Operators } from "../../constants";
+import { Rule } from "../rule/rule";
+import AddRuleModal from "../add-rule-modal/add-rule-modal";
 
 type SegmentProps = {
   countries: ApiTypes.Country[];
   segment: ApiTypes.Segment;
   subscriptions: ApiTypes.Subscription[];
+  refetchSegment: () => Promise<void>;
 };
 
-const Segment = ({ countries, segment, subscriptions }: SegmentProps) => {
-  const [attribute, setAttribute] = useState<undefined | Attributes>(undefined);
-  const [operator, setOperator] = useState<undefined | Operators>(undefined);
-  const [result, setResult] = useState<string[] | undefined>(undefined);
+const SegmentContainer = ({
+  countries,
+  segment,
+  refetchSegment,
+  subscriptions,
+}: SegmentProps) => {
+  const [isAddRuleModalVisible, setIsAddRuleModalVisible] = useState(false);
 
-  const getData = useCallback(
-    (attribute: Attributes) => {
-      switch (attribute?.id) {
-        case "COUNTRY":
-          return countries.map(country => country.name);
+  const { fetchData: AddNewRule } = useFetch({
+    url: `v1/segments/${segment.id}`,
+    method: "post",
+    lazy: true,
+  });
 
-        case "SUBSCRIPTION":
-          return subscriptions.map(subscription => subscription.title);
-
-        default:
-          return [];
-      }
-    },
-    [attribute, countries, subscriptions]
+  const getAttribute = useCallback(
+    (attribute: ApiTypes.Rule["attribute"]): Attributes | undefined =>
+      SegmentTransformers.transformApiAttributeToDomainAttribute(attribute),
+    [segment.rules]
   );
 
-  const handleAttributeChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const selectedAttribute = attributes.find(
-      attribute => attribute.value === event.target.value
-    );
+  const getOperator = useCallback(
+    (operator: ApiTypes.Rule["operator"]): Operators | undefined =>
+      SegmentTransformers.transformApiOperatorToDomainAttribute(operator),
+    [segment.rules]
+  );
 
-    if (selectedAttribute === undefined) {
-      return;
-    }
+  const toggleIsAddRuleModalVisible = () =>
+    setIsAddRuleModalVisible(prevState => !prevState);
 
-    setAttribute(selectedAttribute);
-    setResult([]);
-  };
-
-  const handleOperatorChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const selectedOperator = operators.find(
-      operator => operator.value === event.target.value
-    );
-
-    if (selectedOperator === undefined) {
-      return;
-    }
-
-    setOperator(selectedOperator);
-  };
-
-  const handleResultChange = (results: string[]) => {
-    setResult(results);
-  };
-
-  const handleSubmit = async () => {
-    if (
-      attribute === undefined ||
-      operator === undefined ||
-      result === undefined
-    ) {
-      return;
-    }
-
-    let query = {};
-
-    if (operator.id === "IS_ONE_OF") {
-      if (attribute.id === "COUNTRY") {
-        query = {
-          ...query,
-          OR: SegmentTransformers.transformDomainCountryToApiCountry(
-            result,
-            countries
-          ),
-        };
-      } else if (attribute.id === "SUBSCRIPTION") {
-        query = {
-          ...query,
-          OR: SegmentTransformers.transformDomainSubscriptionToApiSubscription(
-            result,
-            subscriptions
-          ),
-        };
-      }
-    }
-
-    if (operator.id === "IS_NOT_ONE_OF") {
-      if (attribute.id === "COUNTRY") {
-        query = {
-          ...query,
-          NOT: SegmentTransformers.transformDomainCountryToApiCountry(
-            result,
-            countries
-          ),
-        };
-      } else if (attribute.id === "SUBSCRIPTION") {
-        query = {
-          ...query,
-          NOT: SegmentTransformers.transformDomainSubscriptionToApiSubscription(
-            result,
-            subscriptions
-          ),
-        };
-      }
-    }
-
-    // Send the query object to the backend here
-    console.log({ query });
+  const handleSubmitNewRule = async (rule: ApiTypes.RulesPayload) => {
+    console.log(rule);
+    toggleIsAddRuleModalVisible();
+    await AddNewRule({ rules: [rule] });
+    refetchSegment();
   };
 
   return (
-    <div>
-      {/* <Text>Id: {segment.id}</Text> */}
+    <Container>
+      <Flex justify="end">
+        <Button onClick={toggleIsAddRuleModalVisible}>Add new rule</Button>
+      </Flex>
+
+      {/* Add new rule modal */}
+      <AddRuleModal
+        isVisible={isAddRuleModalVisible}
+        onClose={toggleIsAddRuleModalVisible}
+        onSubmit={handleSubmitNewRule}
+        countries={countries}
+        subscriptions={subscriptions}
+      />
+
       <Text size="xl" fw="bold">
-        Include Sites who match these rules
+        {/* Include Sites who match these rules */}
+        Applied rules
       </Text>
-      <Paper p="lg" m="md">
-        <Flex justify="space-around">
-          <NativeSelect
-            value={attribute?.value}
-            data={attributes}
-            placeholder="Select an attribute"
-            onChange={handleAttributeChange}
-          />
-          <NativeSelect
-            data={operators}
-            value={operator?.value}
-            onChange={handleOperatorChange}
-            placeholder="Select an operator"
-          />
-          <MultiSelect
-            value={result}
-            data={attribute ? getData(attribute) : []}
-            placeholder="Enter some values"
-            onChange={handleResultChange}
-          />
-        </Flex>
-      </Paper>
-      <Center>
-        <Button onClick={handleSubmit}>Save</Button>
-      </Center>
-    </div>
+
+      {segment.rules.map((rule, i) => (
+        <Rule
+          key={rule.id + i}
+          attribute={getAttribute(rule.attribute)}
+          operator={getOperator(rule.operator)}
+          values={rule.values.map(value => value.name)}
+          isReadOnly={true}
+        />
+      ))}
+    </Container>
   );
 };
 
@@ -166,7 +90,12 @@ type SegmentLoaderProps = {
 };
 
 const SegmentLoader = ({ segmentId }: SegmentLoaderProps) => {
-  const { data, error, isLoading } = useFetch<ApiTypes.Segment>({
+  const {
+    data,
+    error,
+    isLoading,
+    fetchData: refetchSegment,
+  } = useFetch<ApiTypes.Segment>({
     url: `v1/segments/${segmentId}`,
   });
 
@@ -203,10 +132,11 @@ const SegmentLoader = ({ segmentId }: SegmentLoaderProps) => {
   }
 
   return (
-    <Segment
+    <SegmentContainer
       segment={data}
       countries={countries}
       subscriptions={subscriptions}
+      refetchSegment={refetchSegment}
     />
   );
 };

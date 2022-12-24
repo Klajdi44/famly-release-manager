@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { prisma } from "../prisma";
+import { prisma } from "../../prisma";
 import { Prisma } from "@prisma/client";
-// const { sequelize } = require("../sequelize/models");
-// const { Site, Subscription, Country, Segment, SiteSegment, releaseToggle } = require("../sequelize/models");
+import * as SegmentTransformers from "./transformers";
+import * as SegmentTypes from "./types";
 
 export const getAllSegments = async (req: Request, res: Response) => {
   console.log("** Running controller: getAllSegments (prisma)");
@@ -10,7 +10,9 @@ export const getAllSegments = async (req: Request, res: Response) => {
     const segments = await prisma.segment.findMany();
     return res.status(200).json(segments);
   } catch (error) {
-    return res.status(500).json({ error: "Server error - could not find segments..." });
+    return res
+      .status(500)
+      .json({ error: "Server error - could not find segments..." });
   }
 };
 
@@ -31,7 +33,9 @@ export const getOneSegment = async (req: Request, res: Response) => {
 
     // Check if there is data with the provided ID
     if (segment === null) {
-      return res.status(404).json({ message: "This segment does not exist..." });
+      return res
+        .status(404)
+        .json({ message: "This segment does not exist..." });
     }
 
     return res.status(200).json(segment);
@@ -145,76 +149,10 @@ export const deleteOneSegment = async (req: Request, res: Response) => {
   }
 };
 
-export const getSegmentConstruction = async (req: Request, res: Response) => {
-  const countries = await prisma.country.findMany({
-    select: {
-      id: true,
-      name: true,
-    },
-  });
-
-  const packages = await prisma.subscription.findMany({
-    select: {
-      id: true,
-      title: true,
-    },
-  });
-
-  res.send({
-    countries,
-    packages,
-  });
-};
-
-const transformFrontendRulesToPrismaRules = (FrontendRules: any[]) => {
-  type Attribute = "Country" | "Subscription" | "SiteId";
-
-  type Operator = "isOneOf" | "isNotOneOf";
-
-  type Rule = {
-    attribute: Attribute;
-    operator: Operator;
-    id: string;
-    values: { name: string; id: number }[];
-  };
-
-  return FrontendRules.reduce(
-    (acc, currentRule) => {
-      // Rewrite values from frontend to match how Prisma expects it
-      currentRule["values"] = currentRule.values.map(function (rule: any) {
-        if (currentRule["attribute"] === "Country") {
-          return { countryId: rule.id };
-        }
-        if (currentRule["attribute"] === "Subscription") {
-          return { subscriptionId: rule.id };
-        }
-        if (currentRule["attribute"] === "SiteId") {
-          return { id: rule.id };
-        }
-      });
-
-      const valuesToPrisma = currentRule["values"];
-      if (currentRule.operator === "isOneOf") {
-        acc["OR"].push(...valuesToPrisma);
-      }
-
-      // Case: Operator isNotOneOf (Goes to NOT array)
-      if (currentRule.operator === "isNotOneOf") {
-        acc["NOT"].push(...valuesToPrisma);
-      }
-      return acc;
-    },
-    {
-      OR: [],
-      NOT: [],
-    }
-  );
-};
-
 export const createSegmentRules = async (req: Request, res: Response) => {
   // Validate req.params.id - make sure it is a number
   if (!Number(req.params.id)) {
-    return res.json({ error: "ID is not a number" });
+    return res.json({ message: "ID is not a number" });
   }
   // Expected post body from frontend:
   //    * An array of rules
@@ -224,28 +162,39 @@ export const createSegmentRules = async (req: Request, res: Response) => {
   // Rules from frontend
   const rulesFromFrontend = req.body.rules;
 
+  if (rulesFromFrontend === undefined || rulesFromFrontend?.length === 0) {
+    return res.status(400).send({
+      message: "Rule was not sent with the request, rule is required",
+    });
+  }
+
   // console.log("** Validation", rulesFromFrontend);
 
-  type Attribute = "Country" | "Subscription" | "SiteId";
-
-  type Operator = "isOneOf" | "isNotOneOf";
-
-  type Rule = {
-    attribute: Attribute;
-    operator: Operator;
-    id: string;
-    values: { name: string; id: number }[];
-  };
-
   // Validate data:
-  rulesFromFrontend.forEach(function (rule: Rule) {
+  rulesFromFrontend.forEach((rule: SegmentTypes.Rule) => {
+    if (!rule.id) {
+      return res.status(400).send({ message: "Rule ID is missing" });
+    }
+
     // Validate attribute
-    if (!(rule.attribute === "Country" || rule.attribute === "Subscription" || rule.attribute === "SiteId")) {
-      return res.status(400).send({ status: "wrong attribute" });
+    if (
+      !(
+        rule.attribute === "COUNTRY" ||
+        rule.attribute === "SUBSCRIPTION" ||
+        rule.attribute === "SITE_ID"
+      )
+    ) {
+      return res.status(400).send({ message: "wrong attribute" });
     }
     // Validate operator
-    if (!(rule.operator === "isOneOf" || rule.operator === "isNotOneOf")) {
-      return res.status(400).send({ status: "wrong operator" });
+    if (!(rule.operator === "IS_ONE_OF" || rule.operator === "IS_NOT_ONE_OF")) {
+      return res
+        .status(400)
+        .send({ status: "Operator is missing or wrong operator was sent" });
+    }
+
+    if (rule.values === undefined || rule.values?.length === 0) {
+      return res.status(400).send({ message: "Values are missing" });
     }
   });
 
@@ -256,19 +205,26 @@ export const createSegmentRules = async (req: Request, res: Response) => {
     },
   });
 
+  if (!segment) {
+    return res.status(400).send({ message: "Values are missing" });
+  }
+
   // Step 2: Check existing rules for this segment
   const segmentRules = segment.rules as Prisma.JsonArray;
   const numberOfRules = segmentRules.length;
 
   // Step 3: Merge rules posted from frontend with existing rules
-  const mergeRulesFromFrontendWithExistingRulesFromDB = [...segmentRules, ...rulesFromFrontend];
-  console.log(mergeRulesFromFrontendWithExistingRulesFromDB);
+  const mergeRulesFromFrontendWithExistingRulesFromDB = [
+    ...segmentRules,
+    ...rulesFromFrontend,
+  ];
+  // console.log(mergeRulesFromFrontendWithExistingRulesFromDB);
 
   // Step 4: Translate rules into Prisma query -----
-  const convertFrontendRulesToPrismaRules = transformFrontendRulesToPrismaRules(mergeRulesFromFrontendWithExistingRulesFromDB);
-
-  // console.log(mergeRulesFromFrontendWithExistingRulesFromDB);
-  console.log(convertFrontendRulesToPrismaRules);
+  const convertFrontendRulesToPrismaRules =
+    SegmentTransformers.transformFrontendRulesToPrismaRules(
+      mergeRulesFromFrontendWithExistingRulesFromDB
+    );
 
   // Step 5: Update segment with existing rules
   // segment.update({
@@ -276,65 +232,35 @@ export const createSegmentRules = async (req: Request, res: Response) => {
   //     id: 1
   //   },
   // })
+
   const sites = await prisma.site.findMany({
-    where: {
-      OR: [
-        {
-          countryId: 1,
-          subscriptionId: 1,
-        },
-        {
-          countryId: 1,
-          subscriptionId: 2,
-        },
-        {
-          countryId: 1,
-          subscriptionId: 3,
-        },
-        {
-          countryId: 2,
-          subscriptionId: 1,
-        },
-        {
-          subscriptionId: 2,
-          countryId: 2,
-        },
-        {
-          subscriptionId: 2,
-          countryId: 3,
-        },
-        {
-          subscriptionId: 3,
-          countryId: 1,
-        },
-        {
-          subscriptionId: 3,
-          countryId: 2,
-        },
-        {
-          subscriptionId: 3,
-          countryId: 3,
-        },
-      ],
-      // NOT: [{ name: "Site #1" }, { name: "Site #15" }, { name: "Site #23" }],
-      NOT: [{ subscriptionId: 1 }],
-      AND: [
-        // {
-        //   subscriptionId: 1,
-        // },
-      ],
+    where: convertFrontendRulesToPrismaRules,
+    select: {
+      id: true,
     },
-    // select: {
-    //   id: true,
-    // },
   });
 
-  return res.json({
-    mergeRulesFromFrontendWithExistingRulesFromDB: mergeRulesFromFrontendWithExistingRulesFromDB,
-    number: sites.length,
-    sites: sites,
-    convertFrontendRulesToPrismaRules: convertFrontendRulesToPrismaRules,
+  const updatedSegment = await prisma.segment.update({
+    where: {
+      id: Number(req.params.id),
+    },
+    data: {
+      sites: {
+        set: sites,
+      },
+      rules: mergeRulesFromFrontendWithExistingRulesFromDB,
+    },
   });
+
+  return res.send(updatedSegment);
+
+  // return res.json({
+  //   mergeRulesFromFrontendWithExistingRulesFromDB:
+  //     mergeRulesFromFrontendWithExistingRulesFromDB,
+  //   number: sites.length,
+  //   sites: sites,
+  //   convertFrontendRulesToPrismaRules: convertFrontendRulesToPrismaRules,
+  // });
   // return res.json({
   //   mergeRulesFromFrontendWithExistingRulesFromDB: mergeRulesFromFrontendWithExistingRulesFromDB,
   //   convertFrontendRulesToPrismaRules: convertFrontendRulesToPrismaRules,

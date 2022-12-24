@@ -1,3 +1,5 @@
+import { Attributes, Operators } from "../segments/constants";
+
 type ReleaseToggle = {
   id: number;
   name: string;
@@ -19,10 +21,22 @@ type User = {
   updatedAt: string;
 };
 
+type Attribute = "COUNTRY" | "SUBSCRIPTION" | "SITE_ID";
+
+type Operator = "isOneOf" | "isNotOneOf";
+
+type Rule = {
+  attribute: Attribute;
+  operator: Operator;
+  id: string;
+  values: Record<string, string>[];
+};
+
 type Segment = {
   id: string;
   title: string;
   description: string;
+  rules: Rule[];
 };
 
 type Country = {
@@ -32,7 +46,22 @@ type Country = {
 
 type Subscription = {
   id: string;
-  title: string;
+  name: string;
 };
 
-export type { ReleaseToggle, User, Segment, Subscription, Country };
+type RulesPayload = {
+  id: string;
+  attribute: Attributes["id"];
+  operator: Operators["id"];
+  values: Record<string, string | number>[];
+};
+
+export type {
+  ReleaseToggle,
+  User,
+  Segment,
+  Subscription,
+  Country,
+  Rule,
+  RulesPayload,
+};

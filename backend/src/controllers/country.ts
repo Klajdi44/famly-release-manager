@@ -9,7 +9,12 @@ const getCountries = async (req: Request, res: Response) => {
     },
   });
 
-  res.send(countries);
+  const responseCountries = countries.map(country => ({
+    name: country.name,
+    countryId: country.id,
+  }));
+
+  res.send(responseCountries);
 };
 
 export { getCountries };
