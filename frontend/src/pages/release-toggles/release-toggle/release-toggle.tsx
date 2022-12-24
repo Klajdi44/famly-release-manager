@@ -10,7 +10,6 @@ import AddSegmentToReleaseToggleModal, {
   OnSubmitParams,
 } from "../add-segment-to-release-toggle-modal/add-segment-to-release-toggle-modal";
 
-const TOGGLE_ID = "toggle-id";
 const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 
 type ReleaseToggleProps = {
@@ -167,7 +166,7 @@ const WithReleaseToggleAndSegmentData = ({
 
 const WithUrlParams = () => {
   const [params] = useSearchParams();
-  const toggleId = params.get(TOGGLE_ID);
+  const toggleId = params.get("toggle-id");
 
   if (toggleId === null) {
     return <Text>Error: toggle Id missing from URL</Text>;
