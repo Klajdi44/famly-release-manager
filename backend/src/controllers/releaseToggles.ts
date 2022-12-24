@@ -46,6 +46,14 @@ export const getOneReleaseToggle = async (req: Request, res: Response) => {
             lastName: true,
           },
         },
+        segments: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            createdAt: true,
+          },
+        },
       },
     });
 
@@ -150,5 +158,113 @@ export const deleteOneReleaseToggle = async (req: Request, res: Response) => {
     return res.status(200).json(releaseToggle);
   } catch (error) {
     return res.status(500).send({ mesage: error.meta.cause });
+  }
+};
+
+export const addSegmentToReleaseToggle = async (
+  req: Request,
+  res: Response
+) => {
+  if (Number.isNaN(req.params.id)) {
+    return res.status(400).send({ message: "ID is not a number" });
+  }
+
+  const requestSegmentIds: { id: number }[] = req.body.segments;
+
+  if (!requestSegmentIds || !requestSegmentIds.length) {
+    return res.status(400).send({ message: "Segment Ids are required" });
+  }
+
+  try {
+    const releaseToggle = await prisma.releaseToggle.findUnique({
+      where: {
+        id: Number(req.params.id),
+      },
+      include: {
+        segments: true,
+      },
+    });
+
+    if (releaseToggle === null) {
+      return res.status(400).send({
+        message: `No release toggle was found with ID:${req.params.id}`,
+      });
+    }
+
+    const segmentIds = releaseToggle.segments.map(segment => ({
+      id: segment.id,
+    }));
+
+    const updatedReleaseToggle = await prisma.releaseToggle.update({
+      where: {
+        id: Number(req.params.id),
+      },
+      data: {
+        segments: {
+          set: [...segmentIds, ...requestSegmentIds],
+        },
+      },
+      include: {
+        segments: true,
+      },
+    });
+
+    return res.send(updatedReleaseToggle);
+  } catch (error) {
+    res
+      .status(500)
+      .send({ mesage: "Something went terribly wrong! please try again" });
+  }
+};
+
+export const deleteSegmentFromReleaseToggle = async (
+  req: Request,
+  res: Response
+) => {
+  if (Number.isNaN(req.params.id)) {
+    return res.status(400).send({ message: "ID is not a number" });
+  }
+
+  const segmentId: { id: number } = req.body.segment;
+
+  if (!segmentId) {
+    return res.status(400).send({ message: "Segment ID is required" });
+  }
+
+  try {
+    const releaseToggle = await prisma.releaseToggle.findUnique({
+      where: {
+        id: Number(req.params.id),
+      },
+      include: {
+        segments: true,
+      },
+    });
+
+    if (releaseToggle === null) {
+      return res.status(400).send({
+        message: `No release toggle was found with ID:${req.params.id}`,
+      });
+    }
+
+    const updatedReleaseToggle = await prisma.releaseToggle.update({
+      where: {
+        id: Number(req.params.id),
+      },
+      data: {
+        segments: {
+          disconnect: segmentId,
+        },
+      },
+      include: {
+        segments: true,
+      },
+    });
+
+    return res.send(updatedReleaseToggle);
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ mesage: "Something went terribly wrong! please try again" });
   }
 };

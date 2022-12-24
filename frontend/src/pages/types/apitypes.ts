@@ -1,5 +1,13 @@
 import { Attributes, Operators } from "../segments/constants";
 
+type Segment = {
+  id: string;
+  title: string;
+  description: string;
+  rules: Rule[];
+  createdAt: Date;
+};
+
 type ReleaseToggle = {
   id: number;
   name: string;
@@ -8,7 +16,7 @@ type ReleaseToggle = {
   createdAt: string;
   updatedAt: string;
   userId: number | null;
-  segments: [];
+  segments: Segment[];
   user: User | null;
 };
 
@@ -30,13 +38,6 @@ type Rule = {
   operator: Operator;
   id: string;
   values: Record<string, string>[];
-};
-
-type Segment = {
-  id: string;
-  title: string;
-  description: string;
-  rules: Rule[];
 };
 
 type Country = {

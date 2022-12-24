@@ -1,22 +1,114 @@
-import { Text } from "@mantine/core";
+import { Button, Container, Flex, Paper, Text, Title } from "@mantine/core";
+import { IconTrash } from "@tabler/icons";
+import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../components/centered-loader/centered-loader";
 import { useFetch } from "../../../hooks/use-fetch/use-fetch";
+import jwtAxios from "../../../util/axios/axiosInstance";
 import * as ApiTypes from "../../types/apitypes";
+import AddSegmentToReleaseToggleModal, {
+  OnSubmitParams,
+} from "../add-segment-to-release-toggle-modal/add-segment-to-release-toggle-modal";
 
 const TOGGLE_ID = "toggle-id";
 const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 
 type ReleaseToggleProps = {
   releaseToggle: ApiTypes.ReleaseToggle;
+  segments: ApiTypes.Segment[];
+  refetchReleaseToggle: () => Promise<void>;
 };
 
-const ReleaseToggle = ({ releaseToggle }: ReleaseToggleProps) => {
+const ReleaseToggle = ({
+  releaseToggle,
+  segments,
+  refetchReleaseToggle,
+}: ReleaseToggleProps) => {
+  const [isAddSegmentModalVisible, setIsAddSegmentModalVisible] =
+    useState(false);
+
+  const hasSegments = releaseToggle.segments.length > 0;
+
+  const { fetchData: addSegmentToReleaseToggle } = useFetch({
+    url: `v1/release-toggles/add-segment-to-release-toggle/${releaseToggle.id}`,
+    lazy: true,
+    method: "post",
+  });
+
+  const toggleAddSegmentModal = () => {
+    setIsAddSegmentModalVisible(prevState => !prevState);
+  };
+
+  const handleAddSegmentToReleaseToggle = useCallback(
+    async (segmentIds: OnSubmitParams) => {
+      await addSegmentToReleaseToggle({
+        segments: segmentIds,
+      });
+      toggleAddSegmentModal();
+      await refetchReleaseToggle();
+    },
+    []
+  );
+
+  const handleDelete = (segmentId: ApiTypes.Segment["id"]) => async () => {
+    await jwtAxios.delete(
+      `v1/release-toggles/delete-segment-from-release-toggle/${releaseToggle.id}`,
+      {
+        data: {
+          segment: { id: segmentId },
+        },
+      }
+    );
+
+    refetchReleaseToggle();
+  };
+
   return (
     <div>
-      <Text>Id: {releaseToggle.id}</Text>
-      <Text>Name: {releaseToggle.name}</Text>
-      <Text>Description: {releaseToggle.description}</Text>
+      {/* Modal to add segments to site */}
+      <AddSegmentToReleaseToggleModal
+        isVisible={isAddSegmentModalVisible}
+        segments={segments}
+        onClose={toggleAddSegmentModal}
+        onSubmit={handleAddSegmentToReleaseToggle}
+      />
+
+      <Flex justify="space-between" align="center">
+        <div>
+          <Title>
+            {ReleaseToggle.name} {releaseToggle.id}(ID)
+          </Title>
+
+          <Text mt={hasSegments ? "lg" : "sm"}>
+            {hasSegments
+              ? "Applied Segments"
+              : "No segments has been applied to this release toggle"}
+          </Text>
+        </div>
+        <Button onClick={toggleAddSegmentModal}>Add segment</Button>
+      </Flex>
+      {releaseToggle.segments.length ? (
+        <Paper>
+          {releaseToggle.segments.map(segment => (
+            <Container key={segment.id} p="md">
+              <Flex justify="space-between" wrap="wrap">
+                <Title fz="lg">{segment.title}</Title>
+                <Title fz="lg">{segment.description}</Title>
+                <Title fz="lg">
+                  {new Date(segment.createdAt).toDateString()}
+                </Title>
+                <Button
+                  variant="outline"
+                  color="red"
+                  onClick={handleDelete(segment.id)}
+                >
+                  <IconTrash />
+                </Button>
+              </Flex>
+            </Container>
+          ))}
+        </Paper>
+      ) : null}
     </div>
   );
 };
@@ -25,24 +117,52 @@ type ReleaseToggleLoaderProps = {
   toggleId: string;
 };
 
-const ReleaseToggleLoader = ({ toggleId }: ReleaseToggleLoaderProps) => {
-  const { data, error, isLoading } = useFetch<ApiTypes.ReleaseToggle>({
+const WithReleaseToggleAndSegmentData = ({
+  toggleId,
+}: ReleaseToggleLoaderProps) => {
+  const {
+    data,
+    error,
+    isLoading,
+    fetchData: refetchReleaseToggle,
+  } = useFetch<ApiTypes.ReleaseToggle>({
     url: `${RELEASE_TOGGLE_URL}/${toggleId}`,
   });
 
-  if (isLoading) {
+  const {
+    data: segments,
+    error: segmentError,
+    isLoading: isSegmentsLoading,
+  } = useFetch<ApiTypes.Segment[]>({
+    url: "/v1/segments/",
+  });
+
+  if (isLoading || isSegmentsLoading) {
     return <CenteredLoader />;
   }
 
-  if (error && error !== "canceled") {
-    return <Text>Something went wrong while getting the release toggle</Text>;
+  if (
+    (error && error !== "canceled") ||
+    (segmentError && segmentError !== "canceled")
+  ) {
+    return (
+      <Text>
+        Something went wrong while getting the release toggle or segment
+      </Text>
+    );
   }
 
   if (data === null) {
     return <Text>No release toggle with id: {toggleId} was found!</Text>;
   }
 
-  return <ReleaseToggle releaseToggle={data} />;
+  return (
+    <ReleaseToggle
+      releaseToggle={data}
+      segments={segments ?? []}
+      refetchReleaseToggle={refetchReleaseToggle}
+    />
+  );
 };
 
 const WithUrlParams = () => {
@@ -53,7 +173,7 @@ const WithUrlParams = () => {
     return <Text>Error: toggle Id missing from URL</Text>;
   }
 
-  return <ReleaseToggleLoader toggleId={toggleId} />;
+  return <WithReleaseToggleAndSegmentData toggleId={toggleId} />;
 };
 
 export default WithUrlParams;
