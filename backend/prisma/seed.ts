@@ -239,7 +239,7 @@ async function main() {
         updatedAt: new Date(),
         description: "Lorem",
         userId: 1,
-        isActive: false,
+        isActive: true,
       },
       {
         name: "Release Toggle #2",
@@ -248,7 +248,7 @@ async function main() {
         updatedAt: new Date(),
         description: "Lorem",
         userId: 2,
-        isActive: false,
+        isActive: true,
       },
       {
         name: "Release Toggle #3",
@@ -257,7 +257,7 @@ async function main() {
         updatedAt: new Date(),
         description: "Lorem",
         userId: 3,
-        isActive: false,
+        isActive: true,
       },
       {
         name: "Release Toggle #4",
@@ -266,7 +266,6 @@ async function main() {
         updatedAt: new Date(),
         description: "Lorem",
         userId: 1,
-        isActive: false,
       },
       {
         name: "Release Toggle #5",
@@ -275,7 +274,7 @@ async function main() {
         updatedAt: new Date(),
         description: "Lorem",
         userId: 2,
-        isActive: false,
+        isActive: true,
       },
       {
         name: "Release Toggle #6",
@@ -284,7 +283,6 @@ async function main() {
         updatedAt: new Date(),
         description: "Lorem",
         userId: 3,
-        isActive: false,
       },
       {
         name: "Release Toggle #7",
@@ -293,7 +291,7 @@ async function main() {
         updatedAt: new Date(),
         description: "Lorem",
         userId: 1,
-        isActive: false,
+        isActive: true,
       },
       {
         name: "Release Toggle #8",
@@ -302,7 +300,6 @@ async function main() {
         updatedAt: new Date(),
         description: "Lorem",
         userId: 2,
-        isActive: false,
       },
       {
         name: "Release Toggle #9",
@@ -311,7 +308,7 @@ async function main() {
         updatedAt: new Date(),
         description: "Lorem",
         userId: 3,
-        isActive: false,
+        isActive: true,
       },
       {
         name: "Release Toggle #10",
@@ -320,7 +317,6 @@ async function main() {
         updatedAt: new Date(),
         description: "Lorem",
         userId: 1,
-        isActive: false,
       },
       {
         name: "Release Toggle #11",
@@ -329,7 +325,7 @@ async function main() {
         updatedAt: new Date(),
         description: "Lorem",
         userId: 2,
-        isActive: false,
+        isActive: true,
       },
       {
         name: "Release Toggle #12",
@@ -338,7 +334,7 @@ async function main() {
         updatedAt: new Date(),
         description: "Lorem",
         userId: 3,
-        isActive: false,
+        isActive: true,
       },
     ],
     skipDuplicates: true,
