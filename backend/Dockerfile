@@ -1,6 +1,6 @@
 FROM node:18-slim
 
-WORKDIR /backend
+WORKDIR /app
 
 COPY package*.json .
 
