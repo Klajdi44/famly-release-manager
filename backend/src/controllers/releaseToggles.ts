@@ -18,7 +18,7 @@ export const getAllReleaseToggles = async (req: Request, res: Response) => {
       },
     });
 
-    return res.status(200).json(releaseToggles);
+    return res.send(releaseToggles);
   } catch (error) {
     return res
       .status(500)
@@ -29,7 +29,7 @@ export const getAllReleaseToggles = async (req: Request, res: Response) => {
 export const getOneReleaseToggle = async (req: Request, res: Response) => {
   // Check if req.params.id is a number
   if (!Number(req.params.id)) {
-    return res.send({ message: "ID is not a number" });
+    return res.status(400).send({ message: "ID is not a number" });
   }
 
   try {
@@ -63,7 +63,7 @@ export const getOneReleaseToggle = async (req: Request, res: Response) => {
         .send({ message: "This release toggle does not exist..." });
     }
 
-    return res.status(200).send(releaseToggle);
+    return res.send(releaseToggle);
   } catch (error) {
     return res.status(500).send({ message: error });
   }
@@ -93,17 +93,16 @@ export const createReleaseToggle = async (req: Request, res: Response) => {
       },
     });
 
-    return res.status(201).json(releaseToggle);
+    return res.status(201).send(releaseToggle);
   } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
+    return res.status(500).send({ message: error });
   }
 };
 
 export const updateOneReleaseToggle = async (req: Request, res: Response) => {
   // Check if req.params.id is a number
   if (!Number(req.params.id)) {
-    return res.send({ message: "ID is not a number" });
+    return res.status(400).send({ message: "ID is not a number" });
   }
   console.log(req.params, req.body);
 
@@ -136,16 +135,16 @@ export const updateOneReleaseToggle = async (req: Request, res: Response) => {
       data: payload,
     });
 
-    return res.status(200).send(releaseToggle); // Research which status code should be used. 200 / 204 / or another?
+    return res.send(releaseToggle); // Research which status code should be used. 200 / 204 / or another?
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ message: error });
   }
 };
 
 export const deleteOneReleaseToggle = async (req: Request, res: Response) => {
   // Validate req.params.id
   if (Number.isNaN(req.params.id)) {
-    return res.json({ error: "ID is not a number" });
+    return res.status(400).send({ message: "ID is not a number" });
   }
 
   try {
@@ -157,7 +156,7 @@ export const deleteOneReleaseToggle = async (req: Request, res: Response) => {
 
     return res.status(200).json(releaseToggle);
   } catch (error) {
-    return res.status(500).send({ mesage: error.meta.cause });
+    return res.status(500).send({ mesage: error });
   }
 };
 

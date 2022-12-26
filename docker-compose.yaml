@@ -41,7 +41,6 @@ services:
       - ./backend:/backend
       - /backend/node_modules
     depends_on:
-      - database
       - database_prisma
       - redis
     links:

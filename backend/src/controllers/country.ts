@@ -2,19 +2,23 @@ import { Request, Response } from "express";
 import { prisma } from "../prisma";
 
 const getCountries = async (req: Request, res: Response) => {
-  const countries = await prisma.country.findMany({
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+  try {
+    const countries = await prisma.country.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
 
-  const responseCountries = countries.map(country => ({
-    name: country.name,
-    id: country.id,
-  }));
+    const responseCountries = countries.map(country => ({
+      name: country.name,
+      id: country.id,
+    }));
 
-  res.send(responseCountries);
+    res.send(responseCountries);
+  } catch (error) {
+    res.send({ message: "Something went wrong while getting countries" });
+  }
 };
 
 export { getCountries };
