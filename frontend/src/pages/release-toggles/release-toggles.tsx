@@ -19,6 +19,7 @@ import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
 import jwtAxios from "../../util/axios/axiosInstance";
 import { ReleaseToggle } from "../types/apitypes";
 import ReleaseToggleModal, { OnSubmitParams } from "./components/modal/modal";
+import ReleaseToggleLink from "./components/release-toggle-link/release-toggle-link";
 
 const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 
@@ -60,6 +61,13 @@ const ReleaseToggles = ({ releaseToggles, refetch }: ReleaseTogglesProps) => {
     []
   );
 
+  const handleReleaseToggleChange = useCallback(
+    (toggleId: ReleaseToggle["id"]) => async (isActive: boolean) => {
+      console.log({ isActive, toggleId });
+    },
+    []
+  );
+
   return (
     <Container>
       {/* Button that opens the add toggle modal */}
@@ -80,39 +88,11 @@ const ReleaseToggles = ({ releaseToggles, refetch }: ReleaseTogglesProps) => {
       <Paper withBorder shadow="md" p={30} mt={30} radius="md">
         {releaseToggles.map(toggle => (
           <Fragment key={toggle.id}>
-            <Flex justify={"space-between"} align="center" m={"md"}>
-              <Link
-                to={{
-                  pathname: "/release-toggle",
-                  search: `?toggle-id=${toggle.id}`,
-                }}
-              >
-                <Title data-testid="toggleName" fz="xl">
-                  {toggle.name}
-                </Title>
-              </Link>
-              <Flex align="end" gap="sm">
-                <Switch
-                  checked={toggle.isActive}
-                  color="teal"
-                  onLabel="On"
-                  offLabel="Off"
-                  size="lg"
-                  data-testid="switch"
-                />
-                <Tooltip
-                  label="Delete release toggle"
-                  withinPortal
-                  withArrow
-                  position="bottom-start"
-                  onClick={handleDeleteReleaseToggle(toggle.id)}
-                >
-                  <Text>
-                    <IconTrash data-testid="deleteIcon" />
-                  </Text>
-                </Tooltip>
-              </Flex>
-            </Flex>
+            <ReleaseToggleLink
+              toggle={toggle}
+              onDelete={handleDeleteReleaseToggle}
+              onChange={handleReleaseToggleChange(toggle.id)}
+            />
             <Divider />
           </Fragment>
         ))}
