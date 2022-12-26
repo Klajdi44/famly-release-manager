@@ -1,5 +1,9 @@
 generator client {
   provider = "prisma-client-js"
+  // needs to be added in order to solve this bug: 
+  // https://github.com/prisma/prisma/issues/13672
+  // output = "../../../node_modules/prisma/client"
+
 }
 
 datasource db {
