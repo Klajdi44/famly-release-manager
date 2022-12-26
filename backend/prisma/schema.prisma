@@ -25,6 +25,7 @@ model ReleaseToggle {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   userId      Int?
+  isActive    Boolean   @default(false)
   user        User?     @relation(fields: [userId], references: [id])
   segments    Segment[] @relation("ReleaseToggleToSegment")
 
