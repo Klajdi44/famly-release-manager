@@ -95,6 +95,7 @@ const ReleaseToggles = ({ releaseToggles, refetch }: ReleaseTogglesProps) => {
               </Link>
               <Flex align="end" gap="sm">
                 <Switch
+                  checked={toggle.isActive}
                   color="teal"
                   onLabel="On"
                   offLabel="Off"
