@@ -18,7 +18,7 @@ import { useFetch } from "../../hooks/use-fetch/use-fetch";
 import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
 import jwtAxios from "../../util/axios/axiosInstance";
 import { ReleaseToggle } from "../types/apitypes";
-import ReleaseToggleModal, { OnSubmitParams } from "./modal/modal";
+import ReleaseToggleModal, { OnSubmitParams } from "./components/modal/modal";
 
 const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 

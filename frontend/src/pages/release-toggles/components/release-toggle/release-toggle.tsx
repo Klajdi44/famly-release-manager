@@ -2,10 +2,10 @@ import { Button, Container, Flex, Paper, Text, Title } from "@mantine/core";
 import { IconTrash } from "@tabler/icons";
 import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import CenteredLoader from "../../../components/centered-loader/centered-loader";
-import { useFetch } from "../../../hooks/use-fetch/use-fetch";
-import jwtAxios from "../../../util/axios/axiosInstance";
-import * as ApiTypes from "../../types/apitypes";
+import CenteredLoader from "../../../../components/centered-loader/centered-loader";
+import { useFetch } from "../../../../hooks/use-fetch/use-fetch";
+import jwtAxios from "../../../../util/axios/axiosInstance";
+import * as ApiTypes from "../../../types/apitypes";
 import AddSegmentToReleaseToggleModal, {
   OnSubmitParams,
 } from "../add-segment-to-release-toggle-modal/add-segment-to-release-toggle-modal";
