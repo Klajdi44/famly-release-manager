@@ -13,6 +13,7 @@ describe("Release toggles page", () => {
     userId: null,
     segments: [],
     user: null,
+    isActive: false,
   };
 
   const refetch = jest.fn();
