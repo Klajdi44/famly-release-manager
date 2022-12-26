@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Button, Flex, Modal, MultiSelect } from "@mantine/core";
-import * as ReleaseToggleTransformers from "../transformers";
-import * as ApiTypes from "../../types/apitypes";
+import * as ReleaseToggleTransformers from "../../transformers";
+import * as ApiTypes from "../../../types/apitypes";
 
 type OnSubmitParams = { id: ApiTypes.Segment["id"] }[];
 

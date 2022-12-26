@@ -10,6 +10,7 @@ type Segment = {
 
 type ReleaseToggle = {
   id: number;
+  isActive: boolean;
   name: string;
   description: string;
   releaseAt: string;
