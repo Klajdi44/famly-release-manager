@@ -1,14 +1,14 @@
 FROM node:18-alpine
 
-WORKDIR /frontend
+WORKDIR /app
 
-COPY package.json /frontend/
+COPY package.json .
 
-COPY package-lock.json /frontend/
+COPY package-lock.json  .
 
 RUN npm install
 
-COPY ./ /frontend/
+COPY ./ .
 
 RUN npm rebuild esbuild
 
