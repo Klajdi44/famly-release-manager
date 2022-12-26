@@ -28,6 +28,8 @@ type ReleaseTogglesProps = {
 };
 
 const ReleaseToggles = ({ releaseToggles, refetch }: ReleaseTogglesProps) => {
+  console.log(releaseToggles);
+
   const [state] = useGlobalState();
   const [isAddNewToggleOpened, setIsAddNewToggleOpened] = useState(false);
 

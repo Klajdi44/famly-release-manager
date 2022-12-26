@@ -18,6 +18,7 @@ type ReleaseToggle = {
   userId: number | null;
   segments: Segment[];
   user: User | null;
+  isActive: boolean;
 };
 
 type User = {
