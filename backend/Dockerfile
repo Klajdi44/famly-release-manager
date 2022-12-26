@@ -6,7 +6,5 @@ COPY package*.json .
 
 COPY ./ .
 
-RUN npm install && npm cache clean --force
-
-ENTRYPOINT ["sh","./src/config/init.sh"]
+ENTRYPOINT ["sh","./entrypoint.sh"]
 
