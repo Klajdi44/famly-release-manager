@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import jwtAxios from "../../util/axios/axiosInstance";
 
-type Methods = "get" | "post";
+type Methods = "get" | "post" | "patch" | "put";
 
 type Props = {
   url: string;

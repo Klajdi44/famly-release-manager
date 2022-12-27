@@ -65,11 +65,11 @@ describe("Release toggles page", () => {
     expect(deleteIcons.length).toEqual(2);
   });
 
-  it("Should be able to render and interact with the switch switch buttons", async () => {
+  it("Should be able to render and interact switch buttons", async () => {
     render(
       <ReleaseToggles
         releaseToggles={[
-          releaseToggle,
+          { ...releaseToggle, isActive: true },
           { ...releaseToggle, id: 2, name: "Release toggle 2" },
         ]}
         refetch={refetch}
@@ -80,10 +80,10 @@ describe("Release toggles page", () => {
     expect(switches.length).toEqual(2);
 
     const firstSwitchButton = switches[0];
-    expect(firstSwitchButton).not.toBeChecked();
+    const secondSwitchButton = switches[1];
 
-    fireEvent.click(firstSwitchButton);
     expect(firstSwitchButton).toBeChecked();
+    expect(secondSwitchButton).not.toBeChecked();
   });
 });
 
