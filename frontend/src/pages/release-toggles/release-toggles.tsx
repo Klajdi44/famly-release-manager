@@ -1,17 +1,5 @@
-import {
-  Button,
-  Container,
-  Divider,
-  Flex,
-  Paper,
-  Switch,
-  Text,
-  Title,
-  Tooltip,
-} from "@mantine/core";
-import { IconTrash } from "@tabler/icons";
+import { Button, Container, Divider, Flex, Paper, Text } from "@mantine/core";
 import { Fragment, useCallback, useState } from "react";
-import { Link } from "react-router-dom";
 
 import CenteredLoader from "../../components/centered-loader/centered-loader";
 import { useFetch } from "../../hooks/use-fetch/use-fetch";
@@ -35,6 +23,12 @@ const ReleaseToggles = ({ releaseToggles, refetch }: ReleaseTogglesProps) => {
   const { fetchData: createSegment } = useFetch({
     url: RELEASE_TOGGLE_URL,
     method: "post",
+    lazy: true,
+  });
+
+  const { fetchData: toggleReleaseToggle } = useFetch({
+    url: `${RELEASE_TOGGLE_URL}/toggle-release-toggle`,
+    method: "patch",
     lazy: true,
   });
 
@@ -64,8 +58,14 @@ const ReleaseToggles = ({ releaseToggles, refetch }: ReleaseTogglesProps) => {
   const handleReleaseToggleChange = useCallback(
     (toggleId: ReleaseToggle["id"]) => async (isActive: boolean) => {
       console.log({ isActive, toggleId });
+      await toggleReleaseToggle({
+        id: toggleId,
+        isActive,
+      });
+
+      refetch();
     },
-    []
+    [toggleReleaseToggle, refetch]
   );
 
   return (

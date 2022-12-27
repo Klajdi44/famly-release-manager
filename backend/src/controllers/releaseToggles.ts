@@ -16,6 +16,7 @@ export const getAllReleaseToggles = async (req: Request, res: Response) => {
           },
         },
       },
+      orderBy: { createdAt: "desc" },
     });
 
     return res.send(releaseToggles);
@@ -265,5 +266,44 @@ export const deleteSegmentFromReleaseToggle = async (
     return res
       .status(500)
       .send({ mesage: "Something went terribly wrong! please try again" });
+  }
+};
+
+export const toggleReleaseToggle = async (req: Request, res: Response) => {
+  try {
+    const { id, isActive } = req.body;
+
+    if (id === undefined || isActive === undefined) {
+      res.status(400).send({
+        message: "Release toggle ID or isActiver property are required!",
+      });
+    }
+
+    const releaseToggle = await prisma.releaseToggle.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+
+    if (!releaseToggle) {
+      res.status(400).send({
+        message: `Release toggle with ID or ${id} was not found`,
+      });
+    }
+
+    const updatedReleaseToggle = await prisma.releaseToggle.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        isActive,
+      },
+    });
+
+    res.send(updatedReleaseToggle);
+  } catch (error) {
+    res.status(500).send({
+      message: error,
+    });
   }
 };
