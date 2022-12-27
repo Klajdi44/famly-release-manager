@@ -99,17 +99,10 @@ export const test = async (req: Request, res: Response) => {
 
     // const rulesFromDb = segmentFromDb?.rules ?? [];
 
-    if (
-      segmentFromDb?.rules &&
-      typeof segmentFromDb?.rules === "object" &&
-      Array.isArray(segmentFromDb?.rules)
-    ) {
+    if (segmentFromDb?.rules && typeof segmentFromDb?.rules === "object" && Array.isArray(segmentFromDb?.rules)) {
       const segmentRules = segmentFromDb?.rules as Prisma.JsonArray;
 
-      const mergeFrontendSentRulesWithDbRules = [
-        ...segmentRules,
-        ...rulesFromFrontend,
-      ];
+      const mergeFrontendSentRulesWithDbRules = [...segmentRules, ...rulesFromFrontend];
 
       const segmentWithUpdatedRules = await prisma.segment.update({
         where: {

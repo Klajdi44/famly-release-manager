@@ -10,9 +10,7 @@ export const getAllSegments = async (req: Request, res: Response) => {
     const segments = await prisma.segment.findMany();
     return res.status(200).json(segments);
   } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "Server error - could not find segments..." });
+    return res.status(500).json({ error: "Server error - could not find segments..." });
   }
 };
 
@@ -33,9 +31,7 @@ export const getOneSegment = async (req: Request, res: Response) => {
 
     // Check if there is data with the provided ID
     if (segment === null) {
-      return res
-        .status(404)
-        .json({ message: "This segment does not exist..." });
+      return res.status(404).json({ message: "This segment does not exist..." });
     }
 
     return res.status(200).json(segment);
@@ -149,15 +145,44 @@ export const deleteOneSegment = async (req: Request, res: Response) => {
   }
 };
 
+export const getSegmentConstruction = async (req: Request, res: Response) => {
+  const countries = await prisma.country.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  const packages = await prisma.subscription.findMany({
+    select: {
+      id: true,
+      title: true,
+    },
+  });
+
+  res.send({
+    countries,
+    packages,
+  });
+};
+
+function createPrismaQueryObjects(attribute: string, ids: []) {
+  // This function takes an attribute and an array of ids
+  // It returns an array of query objects in this format:
+  // [ {attribute: id} ] --> [ {countryId: 1}, { countryId: 2} ]
+  const key = attribute === "Country" ? "countryId" : attribute === "Subscription" ? "subscriptionId" : "id";
+  const objects = [];
+  for (const id of ids) {
+    objects.push({ [key]: id });
+  }
+  return objects;
+}
+
 export const createSegmentRules = async (req: Request, res: Response) => {
   // Validate req.params.id - make sure it is a number
   if (!Number(req.params.id)) {
     return res.json({ message: "ID is not a number" });
   }
-  // Expected post body from frontend:
-  //    * An array of rules
-  //    * A rule is an object of type Rule (See below)
-  //    * Post Body: [ {attribute: "Country", operator: "isOneOf", id: '1', values: {name: 'Denmark', id: 1}} ]
 
   // Rules from frontend
   const rulesFromFrontend = req.body.rules;
@@ -177,20 +202,12 @@ export const createSegmentRules = async (req: Request, res: Response) => {
     }
 
     // Validate attribute
-    if (
-      !(
-        rule.attribute === "COUNTRY" ||
-        rule.attribute === "SUBSCRIPTION" ||
-        rule.attribute === "SITE_ID"
-      )
-    ) {
+    if (!(rule.attribute === "COUNTRY" || rule.attribute === "SUBSCRIPTION" || rule.attribute === "SITE_ID")) {
       return res.status(400).send({ message: "wrong attribute" });
     }
     // Validate operator
     if (!(rule.operator === "IS_ONE_OF" || rule.operator === "IS_NOT_ONE_OF")) {
-      return res
-        .status(400)
-        .send({ status: "Operator is missing or wrong operator was sent" });
+      return res.status(400).send({ status: "Operator is missing or wrong operator was sent" });
     }
 
     if (rule.values === undefined || rule.values?.length === 0) {
@@ -198,7 +215,7 @@ export const createSegmentRules = async (req: Request, res: Response) => {
     }
   });
 
-  // Get segment from DB based on id based in url
+  // Get segment from DB based on id from url
   const segment = await prisma.segment.findUnique({
     where: {
       id: Number(req.params.id),
@@ -211,58 +228,60 @@ export const createSegmentRules = async (req: Request, res: Response) => {
 
   // Step 2: Check existing rules for this segment
   const segmentRules = segment.rules as Prisma.JsonArray;
-  const numberOfRules = segmentRules.length;
 
-  // Step 3: Merge rules posted from frontend with existing rules
-  const mergeRulesFromFrontendWithExistingRulesFromDB = [
-    ...segmentRules,
-    ...rulesFromFrontend,
-  ];
-  // console.log(mergeRulesFromFrontendWithExistingRulesFromDB);
+  // Merge rules posted from frontend with existing rules
+  const mergeRulesFromFrontendWithExistingRulesFromDB = [...segmentRules, ...rulesFromFrontend];
 
-  // Step 4: Translate rules into Prisma query -----
-  const convertFrontendRulesToPrismaRules =
-    SegmentTransformers.transformFrontendRulesToPrismaRules(
-      mergeRulesFromFrontendWithExistingRulesFromDB
-    );
+  // Sort rules by operator and attributes:
+  const sortedRules = SegmentTransformers.sortRulesArrayByOperatorAndAttributes(mergeRulesFromFrontendWithExistingRulesFromDB);
 
-  // Step 5: Update segment with existing rules
-  // segment.update({
-  //   where:{
-  //     id: 1
-  //   },
-  // })
+  // Initialize query object, like Prisma expects it:
+  let query = {
+    OR: [] as any[],
+    NOT: [] as any[],
+  };
 
+  // Loop through rules object sorted by operator
+  for (const operator in sortedRules) {
+    // Get keys from object
+    const attributes = Object.keys(sortedRules[operator]);
+
+    // Case where isOneOf does not include both Country and Subscription
+    if (!(operator === "isOneOf" && attributes.includes("Country") && attributes.includes("Subscription"))) {
+      Object.keys(sortedRules[operator]).forEach(key => {
+        const prismaQuery = createPrismaQueryObjects(key, sortedRules[operator][key]);
+        operator === "isNotOneOf" ? query["NOT"].push(...prismaQuery) : operator === "isOneOf" && query["OR"].push(...prismaQuery);
+      });
+    }
+
+    // Case where isOneOf includes both Country and Subscription (we will need to combine the possible combinations for this attributes)
+    if (attributes.includes("Country") && attributes.includes("Subscription") && operator === "isOneOf") {
+      // Get all possible combinations of selected Countries and Subscriptions
+      const combinations = SegmentTransformers.getCombinations(sortedRules[operator]["Country"], sortedRules[operator]["Subscription"]);
+      // Add the combinations to OR array of query object
+      query["OR"].push(...combinations);
+
+      // Remove Country and Subscriptions from keys array
+      const attributesWithoutCountryAndSubscription = attributes.filter(attr => attr !== "Country" && attr !== "Subscription");
+      // Loop through the rest of the attributes and generate query objects
+      attributesWithoutCountryAndSubscription.forEach(attribute => {
+        const prismaQ = createPrismaQueryObjects(attribute, sortedRules[operator][attribute]);
+        return query["OR"].push(...prismaQ);
+      });
+    }
+  }
+
+  // Get all sites that mathces the query generated by the rules
   const sites = await prisma.site.findMany({
-    where: convertFrontendRulesToPrismaRules,
-    select: {
-      id: true,
-    },
+    where: query,
   });
 
-  const updatedSegment = await prisma.segment.update({
-    where: {
-      id: Number(req.params.id),
-    },
-    data: {
-      sites: {
-        set: sites,
-      },
-      rules: mergeRulesFromFrontendWithExistingRulesFromDB,
-    },
+  console.log(sites);
+
+  return res.json({
+    number: sites.length,
+    sites: sites,
+    numberOfSites: "s.length",
+    q: query,
   });
-
-  return res.send(updatedSegment);
-
-  // return res.json({
-  //   mergeRulesFromFrontendWithExistingRulesFromDB:
-  //     mergeRulesFromFrontendWithExistingRulesFromDB,
-  //   number: sites.length,
-  //   sites: sites,
-  //   convertFrontendRulesToPrismaRules: convertFrontendRulesToPrismaRules,
-  // });
-  // return res.json({
-  //   mergeRulesFromFrontendWithExistingRulesFromDB: mergeRulesFromFrontendWithExistingRulesFromDB,
-  //   convertFrontendRulesToPrismaRules: convertFrontendRulesToPrismaRules,
-  // });
 };
