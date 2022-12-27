@@ -1,17 +1,13 @@
 FROM node:18-alpine
 
-WORKDIR /frontend
+WORKDIR /app
 
-COPY package.json /frontend/
+COPY package.json .
 
-COPY package-lock.json /frontend/
+COPY package-lock.json .
 
-RUN npm install
+COPY ./ .
 
-COPY ./ /frontend/
+ENTRYPOINT ["sh","entrypoint.sh"]
 
-RUN npm rebuild esbuild
 
-RUN exec "$@"
-
-CMD ["npm", "run", "docker-dev"]
