@@ -5,7 +5,7 @@ import { router as siteRouter } from "./routes/sites";
 import { router as segmentRouter } from "./routes/segments";
 import { router as prismaRouter } from "./routes/prisma";
 import { router as authRouter } from "./routes/auth";
-import { router as countryRouter } from "./routes/country";
+// import { router as countryRouter } from "./routes/country";
 import { router as subscriptionRouter } from "./routes/subscription";
 
 import * as Auth from "./middlewares/auth.middleware";
@@ -17,7 +17,7 @@ import { config } from "./config";
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 
 app.use(express.json());
 app.set("trust proxy", 1);
@@ -34,10 +34,13 @@ app.use("/api/v1/segments", segmentRouter);
 app.use("/api/v1/prisma", prismaRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/subscriptions", subscriptionRouter);
-app.use("/api/v1/countries", countryRouter);
+// app.use("/api/v1/countries", countryRouter);
 
-app.listen(process.env.PORT, () => {
-  console.log(
-    `### The app is listening at http://localhost:${process.env.PORT} ###`
-  );
+// app.listen(process.env.PORT, () => {
+//   console.log(`### The app is listening at http://localhost:${process.env.PORT} ###`);
+// });
+
+app.listen(5000, () => {
+  console.log(`### The app is listening at http://localhost:5000 ###`);
 });
+export default app;

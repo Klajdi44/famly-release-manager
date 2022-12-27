@@ -1,8 +1,8 @@
-import express from "express";
-import { getCountries } from "../controllers/country";
+// import express from "express";
+// import { getCountries } from "../controllers/country";
 
-const router = express.Router();
+// const router = express.Router();
 
-router.get("/", getCountries);
+// router.get("/", getCountries);
 
-export { router };
+// export { router };
