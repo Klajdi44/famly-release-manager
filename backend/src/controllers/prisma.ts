@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { where } from "sequelize";
 import { prisma } from "../prisma";
 import { Prisma } from "@prisma/client";
 

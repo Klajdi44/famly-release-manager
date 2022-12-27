@@ -5,9 +5,11 @@ export const getAllSites = async (req: Request, res: Response) => {
   console.log("** Running controller: getAllSites (prisma)");
   try {
     const sites = await prisma.site.findMany();
-    return res.status(200).json(sites);
+    return res.send(sites);
   } catch (error) {
-    return res.status(500).json({ error: "Server error - could not find release toggles..." });
+    return res
+      .status(500)
+      .send({ message: "Server error - could not find release toggles..." });
   }
 };
 
@@ -16,7 +18,7 @@ export const getOneSite = async (req: Request, res: Response) => {
 
   // Check if req.params.id is a number
   if (!Number(req.params.id)) {
-    return res.json({ error: "ID is not a number" });
+    return res.status(400).send({ message: "ID is not a number" });
   }
 
   try {
@@ -28,24 +30,27 @@ export const getOneSite = async (req: Request, res: Response) => {
 
     // Check if there is data with the provided ID
     if (site === null) {
-      return res.status(404).json({ message: "This site does not exist..." });
+      return res.status(404).send({ message: "This site does not exist..." });
     }
-    return res.status(200).json(site);
+
+    return res.send(site);
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).send({ message: error });
   }
 };
 
 export const createSite = async (req: Request, res: Response) => {
   // Validate Data
   if (!req.body.name) {
-    return res.status(400).json({ error: "Name must be defined.." });
+    return res.status(400).send({ message: "Name must be defined.." });
   }
   if (!req.body.countryId) {
-    return res.status(400).json({ error: "countryId must be defined.." });
+    return res.status(400).send({ message: "countryId must be defined.." });
   }
   if (!req.body.subscriptionId) {
-    return res.status(400).json({ error: "subscriptionId must be defined.." });
+    return res
+      .status(400)
+      .send({ message: "subscriptionId must be defined.." });
   }
 
   try {
@@ -58,17 +63,16 @@ export const createSite = async (req: Request, res: Response) => {
         subscriptionId: req.body.subscriptionId,
       },
     });
-    return res.status(201).json(site);
+    return res.status(201).send(site);
   } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
+    return res.status(500).send({ message: error });
   }
 };
 
 export const updateOneSite = async (req: Request, res: Response) => {
   // Check if req.params.id is a number
   if (!Number(req.params.id)) {
-    return res.json({ error: "ID is not a number" });
+    return res.status(400).send({ message: "ID is not a number" });
   }
 
   interface Payload {
@@ -95,7 +99,7 @@ export const updateOneSite = async (req: Request, res: Response) => {
       },
     });
     if (getSite === null) {
-      return res.status(404).json({ failed: "No site matching this ID" });
+      return res.status(404).send({ message: "No site matching this ID" });
     }
 
     const site = await prisma.site.update({
@@ -105,16 +109,16 @@ export const updateOneSite = async (req: Request, res: Response) => {
       data: payload,
     });
 
-    return res.status(204).json(site); // Research which status code should be used. 200 / 204 / or another?
+    return res.status(204).send(site); // Research which status code should be used. 200 / 204 / or another?
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).send({ message: error });
   }
 };
 
 export const deleteOneSite = async (req: Request, res: Response) => {
   // Validate req.params.id
   if (!Number(req.params.id)) {
-    return res.json({ error: "ID is not a number" });
+    return res.status(400).send({ message: "ID is not a number" });
   }
 
   try {
@@ -126,7 +130,7 @@ export const deleteOneSite = async (req: Request, res: Response) => {
     });
 
     if (getSite === null) {
-      return res.status(404).json({ failed: "No site matching this ID" });
+      return res.status(404).send({ message: "No site matching this ID" });
     }
     // Delete site
     const site = await prisma.site.delete({
@@ -135,8 +139,8 @@ export const deleteOneSite = async (req: Request, res: Response) => {
       },
     });
 
-    return res.status(200).json(site);
+    return res.send(site);
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).send({ message: error });
   }
 };

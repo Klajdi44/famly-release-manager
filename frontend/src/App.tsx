@@ -9,7 +9,7 @@ import ReleaseToggles from "./pages/release-toggles/release-toggles";
 import PageNotFound from "./components/404/404";
 import PersistLogin from "./components/persist-login/persist-login";
 import ApplicationShell from "./components/application-shell/application-shell";
-import ReleaseToggle from "./pages/release-toggles/release-toggle/release-toggle";
+import ReleaseToggle from "./pages/release-toggles/components/release-toggle/release-toggle";
 import Segments from "./pages/segments/segments";
 import Segment from "./pages/segments/components/segment/segment";
 

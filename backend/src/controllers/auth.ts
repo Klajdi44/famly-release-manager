@@ -12,7 +12,7 @@ const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ message: "Email and password are required" });
+    return res.status(400).send({ message: "Email and password are required" });
   }
 
   try {
@@ -23,13 +23,13 @@ const login = async (req: Request, res: Response) => {
     });
 
     if (user === null) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).send({ message: "Invalid credentials" });
     }
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
     if (isPasswordCorrect === false) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).send({ message: "Invalid credentials" });
     }
 
     const responseUser: ResponseUser = {
@@ -45,11 +45,10 @@ const login = async (req: Request, res: Response) => {
     try {
       await redisClient.set(refreshToken, user.id);
     } catch (error) {
-      res
-        .status(500)
-        .send(
-          "Something went wrong while saving token, please try again later"
-        );
+      res.status(500).send({
+        message:
+          "Something went wrong while saving token, please try again later",
+      });
     }
 
     return res.send({
@@ -62,7 +61,9 @@ const login = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    res.status(500).send("Something went wrong, please try again later");
+    res
+      .status(500)
+      .send({ message: "Something went wrong, please try again later" });
   }
 };
 
@@ -81,7 +82,7 @@ const refresh = async (req: Request, res: Response) => {
     });
 
     if (user === null) {
-      return res.status(400).json({ message: "Invalid user" });
+      return res.status(400).send({ message: "Invalid user" });
     }
 
     const redisRefreshTokenValue = await redisClient.get(refreshToken);
