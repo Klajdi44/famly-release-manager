@@ -233,7 +233,7 @@ export const createSegmentRules = async (req: Request, res: Response) => {
   const mergeRulesFromFrontendWithExistingRulesFromDB = [...segmentRules, ...rulesFromFrontend];
 
   // Sort rules by operator and attributes:
-  const sortedRules = SegmentTransformers.sortRulesArrayByOperatorAndAttributes(rulesFromFrontend);
+  const sortedRules = SegmentTransformers.sortRulesArrayByOperatorAndAttributes(mergeRulesFromFrontendWithExistingRulesFromDB);
 
   // Initialize query object, like Prisma expects it:
   let query = {
