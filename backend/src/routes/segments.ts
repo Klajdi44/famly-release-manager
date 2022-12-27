@@ -2,17 +2,15 @@ import express from "express";
 import {
   getAllSegments,
   getOneSegment,
-  getSegmentConstruction,
   createSegment,
   updateOneSegment,
   deleteOneSegment,
   createSegmentRules,
-} from "../controllers/segments";
+} from "../controllers/segments/segments";
 
 const router = express.Router();
 
 router
-  .get("/segment-construction/", getSegmentConstruction)
   .get("/", getAllSegments)
   .get("/:id", getOneSegment)
   .post("/", createSegment)

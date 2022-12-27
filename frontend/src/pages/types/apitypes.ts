@@ -1,3 +1,13 @@
+import { Attributes, Operators } from "../segments/constants";
+
+type Segment = {
+  id: string;
+  title: string;
+  description: string;
+  rules: Rule[];
+  createdAt: Date;
+};
+
 type ReleaseToggle = {
   id: number;
   name: string;
@@ -6,7 +16,7 @@ type ReleaseToggle = {
   createdAt: string;
   updatedAt: string;
   userId: number | null;
-  segments: [];
+  segments: Segment[];
   user: User | null;
 };
 
@@ -19,10 +29,15 @@ type User = {
   updatedAt: string;
 };
 
-type Segment = {
+type Attribute = "COUNTRY" | "SUBSCRIPTION" | "SITE_ID";
+
+type Operator = "isOneOf" | "isNotOneOf";
+
+type Rule = {
+  attribute: Attribute;
+  operator: Operator;
   id: string;
-  title: string;
-  description: string;
+  values: Record<string, string>[];
 };
 
 type Country = {
@@ -32,7 +47,22 @@ type Country = {
 
 type Subscription = {
   id: string;
-  title: string;
+  name: string;
 };
 
-export type { ReleaseToggle, User, Segment, Subscription, Country };
+type RulesPayload = {
+  id: string;
+  attribute: Attributes["id"];
+  operator: Operators["id"];
+  values: Record<string, string | number>[];
+};
+
+export type {
+  ReleaseToggle,
+  User,
+  Segment,
+  Subscription,
+  Country,
+  Rule,
+  RulesPayload,
+};

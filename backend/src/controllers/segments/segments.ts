@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
+import { prisma } from "../../prisma";
 import { Prisma } from "@prisma/client";
-import { prisma } from "../prisma";
+import * as SegmentTransformers from "./transformers";
+import * as SegmentTypes from "./types";
 
 export const getAllSegments = async (req: Request, res: Response) => {
   console.log("** Running controller: getAllSegments (prisma)");
@@ -164,40 +166,6 @@ export const getSegmentConstruction = async (req: Request, res: Response) => {
   });
 };
 
-function getCombinations(countries: any = [], subscriptions: any = []) {
-  // This function takes two arrays. An array of countryIds and an array of subscriptionIds
-  // Its returns all possible combinations of the ids provided
-  const combinations = [];
-  for (const countryId of countries) {
-    for (const subscriptionId of subscriptions) {
-      combinations.push({ countryId, subscriptionId });
-    }
-  }
-  return combinations;
-}
-
-function sortRulesArrayByOperatorAndAttributes(rulesArray: any) {
-  // This function takes the rules array as it is stored in the database and sorts it based on the operators isOneOf
-  // and isNotOneOf. The return value looks like this object
-  // {
-  //    isOneOf: { Country: [ 1, 2, 3, 7 ], Subscription: [ 1, 2, 3, 4 ] },
-  //    isNotOneOf: { SiteId: [ 5, 8, 17, 90, 87, 41 ] },
-  // }
-  const reducer = rulesArray.reduce(
-    (acc: any, currentRule: any) => {
-      if (acc[currentRule.operator][currentRule.attribute] === undefined) {
-        acc[currentRule.operator][currentRule.attribute] = currentRule.values.map((value: any) => value.id);
-      } else {
-        const values = currentRule.values.map((value: any) => value.id);
-        acc[currentRule.operator][currentRule.attribute].push(...values);
-      }
-      return acc;
-    },
-    { isOneOf: {}, isNotOneOf: {} }
-  );
-  return reducer;
-}
-
 function createPrismaQueryObjects(attribute: string, ids: []) {
   // This function takes an attribute and an array of ids
   // It returns an array of query objects in this format:
@@ -213,32 +181,37 @@ function createPrismaQueryObjects(attribute: string, ids: []) {
 export const createSegmentRules = async (req: Request, res: Response) => {
   // Validate req.params.id - make sure it is a number
   if (!Number(req.params.id)) {
-    return res.json({ error: "ID is not a number" });
+    return res.json({ message: "ID is not a number" });
   }
 
   // Rules from frontend
   const rulesFromFrontend = req.body.rules;
 
-  type Attribute = "Country" | "Subscription" | "SiteId";
+  if (rulesFromFrontend === undefined || rulesFromFrontend?.length === 0) {
+    return res.status(400).send({
+      message: "Rule was not sent with the request, rule is required",
+    });
+  }
 
-  type Operator = "isOneOf" | "isNotOneOf";
-
-  type Rule = {
-    attribute: Attribute;
-    operator: Operator;
-    id: string;
-    values: { name: string; id: number }[];
-  };
+  // console.log("** Validation", rulesFromFrontend);
 
   // Validate data:
-  rulesFromFrontend.forEach(function (rule: Rule) {
+  rulesFromFrontend.forEach((rule: SegmentTypes.Rule) => {
+    if (!rule.id) {
+      return res.status(400).send({ message: "Rule ID is missing" });
+    }
+
     // Validate attribute
-    if (!(rule.attribute === "Country" || rule.attribute === "Subscription" || rule.attribute === "SiteId")) {
-      return res.status(400).send({ status: "wrong attribute" });
+    if (!(rule.attribute === "COUNTRY" || rule.attribute === "SUBSCRIPTION" || rule.attribute === "SITE_ID")) {
+      return res.status(400).send({ message: "wrong attribute" });
     }
     // Validate operator
-    if (!(rule.operator === "isOneOf" || rule.operator === "isNotOneOf")) {
-      return res.status(400).send({ status: "wrong operator" });
+    if (!(rule.operator === "IS_ONE_OF" || rule.operator === "IS_NOT_ONE_OF")) {
+      return res.status(400).send({ status: "Operator is missing or wrong operator was sent" });
+    }
+
+    if (rule.values === undefined || rule.values?.length === 0) {
+      return res.status(400).send({ message: "Values are missing" });
     }
   });
 
@@ -249,14 +222,18 @@ export const createSegmentRules = async (req: Request, res: Response) => {
     },
   });
 
-  // Get existing rules from database as an array
+  if (!segment) {
+    return res.status(400).send({ message: "Values are missing" });
+  }
+
+  // Step 2: Check existing rules for this segment
   const segmentRules = segment.rules as Prisma.JsonArray;
 
   // Merge rules posted from frontend with existing rules
   const mergeRulesFromFrontendWithExistingRulesFromDB = [...segmentRules, ...rulesFromFrontend];
 
   // Sort rules by operator and attributes:
-  const sortedRules = sortRulesArrayByOperatorAndAttributes(rulesFromFrontend);
+  const sortedRules = SegmentTransformers.sortRulesArrayByOperatorAndAttributes(rulesFromFrontend);
 
   // Initialize query object, like Prisma expects it:
   let query = {
@@ -280,7 +257,7 @@ export const createSegmentRules = async (req: Request, res: Response) => {
     // Case where isOneOf includes both Country and Subscription (we will need to combine the possible combinations for this attributes)
     if (attributes.includes("Country") && attributes.includes("Subscription") && operator === "isOneOf") {
       // Get all possible combinations of selected Countries and Subscriptions
-      const combinations = getCombinations(sortedRules[operator]["Country"], sortedRules[operator]["Subscription"]);
+      const combinations = SegmentTransformers.getCombinations(sortedRules[operator]["Country"], sortedRules[operator]["Subscription"]);
       // Add the combinations to OR array of query object
       query["OR"].push(...combinations);
 

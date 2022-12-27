@@ -5,7 +5,7 @@ type Attributes =
       id: "COUNTRY";
     }
   | {
-      value: "site Id";
+      value: "siteId";
       label: "Site Id";
       id: "SITE_ID";
     }
@@ -22,7 +22,7 @@ const attributes: Attributes[] = [
     id: "COUNTRY",
   },
   {
-    value: "site Id",
+    value: "siteId",
     label: "Site Id",
     id: "SITE_ID",
   },
@@ -34,12 +34,12 @@ const attributes: Attributes[] = [
 ];
 
 type Operators =
-  | { value: "Is one of"; label: "Is one of"; id: "IS_ONE_OF" }
-  | { value: "Is not one of"; label: "Is not one of"; id: "IS_NOT_ONE_OF" };
+  | { value: "isOneOf"; label: "Is one of"; id: "IS_ONE_OF" }
+  | { value: "isNotOneOf"; label: "Is not one of"; id: "IS_NOT_ONE_OF" };
 
 const operators: Operators[] = [
-  { value: "Is one of", label: "Is one of", id: "IS_ONE_OF" },
-  { value: "Is not one of", label: "Is not one of", id: "IS_NOT_ONE_OF" },
+  { value: "isOneOf", label: "Is one of", id: "IS_ONE_OF" },
+  { value: "isNotOneOf", label: "Is not one of", id: "IS_NOT_ONE_OF" },
 ];
 
 export { attributes, operators };
