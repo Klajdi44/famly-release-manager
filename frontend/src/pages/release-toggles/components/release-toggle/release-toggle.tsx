@@ -78,6 +78,10 @@ const ReleaseToggle = ({
             {ReleaseToggle.name} {releaseToggle.id}(ID)
           </Title>
 
+          <Paper>
+            <Text>{releaseToggle.description}</Text>
+          </Paper>
+
           <Text mt={hasSegments ? "lg" : "sm"}>
             {hasSegments
               ? "Applied Segments"
