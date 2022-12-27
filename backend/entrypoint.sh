@@ -1,11 +1,6 @@
 #!/bin/bash
-# the bcrypt node modules are different for macOS and Linux OS, and other OS so it is necessary to unistall what was installed 
-# from the host OS and re-install it in the container (Linux)
-# uninstall the current bcrypt modules
-npm uninstall bcrypt
 
-# install the bcrypt modules for the machine
-npm install bcrypt
+npm install && npm cache clean --force
 
 # add keys needed for jwt
 apt-get update && apt-get install -y openssl && \

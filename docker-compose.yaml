@@ -1,17 +1,5 @@
 version: "3.8"
 services:
-  database:
-    image: postgres:15
-    container_name: famly_db
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=famly
-      - POSTGRES_PASSWORD=secret
-      - POSTGRES_DB=db_dev
-    volumes:
-      - famly_db_dev_data:/var/lib/postgresql/data
-
   database_prisma:
     image: postgres:15
     container_name: famly_prisma_db
@@ -38,8 +26,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./backend:/backend
-      - /backend/node_modules
+      - ./backend:/app
     depends_on:
       - database_prisma
       - redis
@@ -54,11 +41,9 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/frontend
-      - /frontend/node_modules
+      - ./frontend:/app
     stdin_open: true
     tty: true
 
 volumes:
-  famly_db_dev_data:
   famly_db_dev_data_prisma:

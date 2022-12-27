@@ -60,7 +60,7 @@ const Login = () => {
 
   return (
     <Container size={420} my={40}>
-      <Title align="center">Famly RM</Title>
+      <Title align="center">Famly Release Manager</Title>
 
       <Paper withBorder shadow="md" p={30} mt={30} radius="md">
         <TextInput
