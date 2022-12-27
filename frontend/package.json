@@ -7,7 +7,7 @@
     "dev": "vite",
     "docker-dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
-    "test": "jest",
+    "test": "jest --watch",
     "preview": "vite preview",
     "lint": "eslint . --ext .ts",
     "prepare": "cd .. && husky install frontend/.husky",
