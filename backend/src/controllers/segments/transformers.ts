@@ -47,10 +47,11 @@ function getCombinations(countries: any = [], subscriptions: any = []) {
 }
 
 function sortRulesArrayByOperatorAndAttributes(rulesArray: any) {
+  console.log("** Running sortRules: ", rulesArray);
   // This function takes the rules array as it is stored in the database and sorts it based on the operators isOneOf
   // and isNotOneOf. The return value looks like this object
   // {
-  //    isOneOf: { Country: [ 1, 2, 3, 7 ], Subscription: [ 1, 2, 3, 4 ] },
+  //    isOneOf: { Country: [ 1, 2, 3, 7 ], Subscription: [ 1, 2, 3, 4 ], SiteId: [1,2,3,] },
   //    isNotOneOf: { SiteId: [ 5, 8, 17, 90, 87, 41 ] },
   // }
   const reducer = rulesArray.reduce(
@@ -63,9 +64,21 @@ function sortRulesArrayByOperatorAndAttributes(rulesArray: any) {
       }
       return acc;
     },
-    { isOneOf: {}, isNotOneOf: {} }
+    { IS_ONE_OF: {}, IS_NOT_ONE_OF: {} }
   );
   return reducer;
 }
 
-export { transformFrontendRulesToPrismaRules, getCombinations, sortRulesArrayByOperatorAndAttributes };
+function createPrismaQueryObjects(attribute: string, ids: []) {
+  // This function takes an attribute and an array of ids
+  // It returns an array of query objects in this format:
+  // [ {attribute: id} ] --> [ {countryId: 1}, { countryId: 2} ]
+  const key = attribute === "COUNTRY" ? "countryId" : attribute === "SUBSCRIPTION" ? "subscriptionId" : "id";
+  const objects = [];
+  for (const id of ids) {
+    objects.push({ [key]: id });
+  }
+  return objects;
+}
+
+export { transformFrontendRulesToPrismaRules, getCombinations, sortRulesArrayByOperatorAndAttributes, createPrismaQueryObjects };
