@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../prisma";
 import { Prisma } from "@prisma/client";
+import cron from "node-schedule";
 
 type Attribute = "COUNTRY" | "SUBSCRIPTION" | "SITE_ID";
 
@@ -98,10 +99,17 @@ export const test = async (req: Request, res: Response) => {
 
     // const rulesFromDb = segmentFromDb?.rules ?? [];
 
-    if (segmentFromDb?.rules && typeof segmentFromDb?.rules === "object" && Array.isArray(segmentFromDb?.rules)) {
+    if (
+      segmentFromDb?.rules &&
+      typeof segmentFromDb?.rules === "object" &&
+      Array.isArray(segmentFromDb?.rules)
+    ) {
       const segmentRules = segmentFromDb?.rules as Prisma.JsonArray;
 
-      const mergeFrontendSentRulesWithDbRules = [...segmentRules, ...rulesFromFrontend];
+      const mergeFrontendSentRulesWithDbRules = [
+        ...segmentRules,
+        ...rulesFromFrontend,
+      ];
 
       const segmentWithUpdatedRules = await prisma.segment.update({
         where: {
@@ -145,4 +153,58 @@ export const test = async (req: Request, res: Response) => {
 
     res.send([]);
   } catch {}
+};
+
+export const scheduleReleaseToggle = async (req: Request, res: Response) => {
+  try {
+    const { id, date }: { id: number; date: string } = req.body;
+
+    if (id === undefined || date === undefined) {
+      return res
+        .status(400)
+        .send({ message: "Release toggle ID and Date are required" });
+    }
+
+    if (Number.isNaN(id)) {
+      return res
+        .status(400)
+        .send({ message: "Release toggle ID must be a number" });
+    }
+
+    const releaseToggle = await prisma.releaseToggle.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (releaseToggle === null) {
+      return res.status(404).send({ message: "Release toggle not found" });
+    }
+
+    const job = cron.scheduleJob(new Date(date), async function () {
+      console.log("----- cron run", "ReleaseToggleId:", id);
+
+      await prisma.releaseToggle.update({
+        where: {
+          id: id,
+        },
+        data: {
+          isActive: true,
+        },
+      });
+    });
+
+    const releaseToggleWithCronRef = await prisma.releaseToggle.update({
+      where: {
+        id: id,
+      },
+      data: {
+        cronJobRef: job.name,
+      },
+    });
+
+    res.send(releaseToggleWithCronRef);
+  } catch (error) {
+    res.status(500).send({ message: error });
+  }
 };

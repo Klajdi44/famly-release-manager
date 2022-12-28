@@ -1,13 +1,12 @@
 import express from "express";
-import { test } from "../controllers/prisma";
+import { test, scheduleReleaseToggle } from "../controllers/prisma";
 
 // import * as Auth from "../middlewares/auth.middleware";
 
 const router = express.Router();
 
 // route without auth:
-router
-  .get("/", test);
+router.get("/", test).post("/", scheduleReleaseToggle);
 //  .get("/:id", getOneSegment)
 //  .post("/", createSegment)
 //  .patch("/:id", updateOneSegment)
