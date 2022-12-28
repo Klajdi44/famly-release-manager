@@ -1,5 +1,5 @@
-import { Button, Container, Flex, Text } from "@mantine/core";
-import { useState, useCallback } from "react";
+import { Button, Container, Flex, Paper, Text } from "@mantine/core";
+import { useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../../components/centered-loader/centered-loader";
 import { useFetch } from "../../../../hooks/use-fetch/use-fetch";
@@ -54,12 +54,16 @@ const SegmentContainer = ({
     refetchSegment();
   };
 
+  const { hasSites, sitesLength, hasRules } = useMemo(() => {
+    return {
+      hasSites: segment.sites.length > 0,
+      sitesLength: segment.sites.length,
+      hasRules: segment.rules.length > 0,
+    };
+  }, [segment]);
+
   return (
     <Container>
-      <Flex justify="end">
-        <Button onClick={toggleIsAddRuleModalVisible}>Add new rule</Button>
-      </Flex>
-
       {/* Add new rule modal */}
       <AddRuleModal
         isVisible={isAddRuleModalVisible}
@@ -70,9 +74,28 @@ const SegmentContainer = ({
         sites={sites}
       />
 
+      <Flex justify="end">
+        <Button onClick={toggleIsAddRuleModalVisible}>Add new rule</Button>
+      </Flex>
+
       <Text size="xl" fw="bold">
-        {/* Include Sites who match these rules */}
-        Applied rules
+        {hasSites
+          ? `This segment includes ${sitesLength} ${
+              sitesLength > 1 ? "sites" : "site"
+            }`
+          : "This segment does not include any sites!"}
+      </Text>
+
+      {hasSites && (
+        <Paper p="md" m="md">
+          {segment.sites.map(site => (
+            <Text key={site.id}>{site.name}</Text>
+          ))}
+        </Paper>
+      )}
+
+      <Text size="xl" fw="bold">
+        {hasRules ? "Applied rules" : "No rules applied to this Segment!"}
       </Text>
 
       {segment.rules.map((rule, i) => (

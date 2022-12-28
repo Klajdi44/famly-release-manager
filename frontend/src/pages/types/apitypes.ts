@@ -1,11 +1,17 @@
 import { Attributes, Operators } from "../segments/constants";
 
+type Site = {
+  id: number;
+  name: string;
+};
+
 type Segment = {
   id: string;
   title: string;
   description: string;
   rules: Rule[];
   createdAt: Date;
+  sites: Site[];
 };
 
 type ReleaseToggle = {
@@ -48,11 +54,6 @@ type Country = {
 
 type Subscription = {
   id: string;
-  name: string;
-};
-
-type Site = {
-  id: number;
   name: string;
 };
 

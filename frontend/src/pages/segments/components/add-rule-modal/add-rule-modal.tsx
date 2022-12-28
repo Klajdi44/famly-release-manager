@@ -168,7 +168,7 @@ const AddRuleModal = ({
       size="100%"
       opened={isVisible}
       onClose={handleClose}
-      title="Add new rule"
+      title=" Include Sites that match the rules below"
     >
       <Flex gap="xl" wrap="wrap" align="center" justify="start">
         <div>IF</div>
