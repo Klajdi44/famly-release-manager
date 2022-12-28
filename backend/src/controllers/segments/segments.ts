@@ -9,8 +9,11 @@ export const getAllSegments = async (req: Request, res: Response) => {
   try {
     const segments = await prisma.segment.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        sites: true,
+      },
     });
-    return res.status(200).send(segments);
+    return res.send(segments);
   } catch (error) {
     return res
       .status(500)
@@ -23,7 +26,7 @@ export const getOneSegment = async (req: Request, res: Response) => {
 
   // Check if req.params.id is a number
   if (!Number(req.params.id)) {
-    return res.json({ error: "ID is not a number" });
+    return res.status(400).send({ error: "ID is not a number" });
   }
 
   try {
@@ -31,18 +34,21 @@ export const getOneSegment = async (req: Request, res: Response) => {
       where: {
         id: Number(req.params.id),
       },
+      include: {
+        sites: true,
+      },
     });
 
     // Check if there is data with the provided ID
     if (segment === null) {
       return res
         .status(404)
-        .json({ message: "This segment does not exist..." });
+        .send({ message: "This segment does not exist..." });
     }
 
-    return res.status(200).json(segment);
+    return res.send(segment);
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).send(error);
   }
 };
 
@@ -50,13 +56,13 @@ export const createSegment = async (req: Request, res: Response) => {
   console.log("** Running post method: prisma");
   // Validate data attrs from req body
   if (!req.body.title) {
-    return res.status(400).json({ error: "Title must be defined.." });
+    return res.status(400).send({ error: "Title must be defined.." });
   }
   if (!req.body.description) {
-    return res.status(400).json({ error: "description must be defined.." });
+    return res.status(400).send({ error: "description must be defined.." });
   }
   if (!req.body.userId) {
-    return res.status(400).json({ error: "userId must be defined.." });
+    return res.status(400).send({ error: "userId must be defined.." });
   }
 
   try {
@@ -69,10 +75,10 @@ export const createSegment = async (req: Request, res: Response) => {
         userId: req.body.userId,
       },
     });
-    return res.status(201).json(segment);
+    return res.status(201).send(segment);
   } catch (error) {
     console.log(error);
-    return res.status(500).json(error);
+    return res.status(500).send(error);
   }
 };
 
@@ -108,7 +114,7 @@ export const updateOneSegment = async (req: Request, res: Response) => {
     });
     // return res.status(201).json(getSegment);
     if (getSegment === null) {
-      return res.status(404).json({ failed: "No segment matching this ID" });
+      return res.status(404).send({ failed: "No segment matching this ID" });
     }
 
     const segment = await prisma.segment.update({
@@ -117,16 +123,16 @@ export const updateOneSegment = async (req: Request, res: Response) => {
       },
       data: payload,
     });
-    return res.status(204).json(segment); // Research which status code should be used. 200 / 204 / or another?
+    return res.status(204).send(segment); // Research which status code should be used. 200 / 204 / or another?
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).send(error);
   }
 };
 
 export const deleteOneSegment = async (req: Request, res: Response) => {
   // Validate req.params.id
   if (!Number(req.params.id)) {
-    return res.json({ error: "ID is not a number" });
+    return res.status(400).send({ error: "ID is not a number" });
   }
 
   try {
@@ -138,16 +144,16 @@ export const deleteOneSegment = async (req: Request, res: Response) => {
     });
     // return res.status(201).json({ segment: "Trying to delete..", getSegment: getSegment });
     if (getSegment === null) {
-      return res.status(404).json({ failed: "No segment matching this ID" });
+      return res.status(404).send({ failed: "No segment matching this ID" });
     }
     const segment = await prisma.segment.delete({
       where: {
         id: Number(req.params.id),
       },
     });
-    return res.status(200).json(segment);
+    return res.status(200).send(segment);
   } catch (error) {
-    return res.status(500).json(error);
+    return res.status(500).send(error);
   }
 };
 
@@ -175,7 +181,7 @@ export const getSegmentConstruction = async (req: Request, res: Response) => {
 export const createSegmentRules = async (req: Request, res: Response) => {
   // Validate req.params.id - make sure it is a number
   if (!Number(req.params.id)) {
-    return res.json({ message: "ID is not a number" });
+    return res.status(400).send({ message: "ID is not a number" });
   }
 
   // Rules from frontend
@@ -319,6 +325,9 @@ export const createSegmentRules = async (req: Request, res: Response) => {
       sites: {
         set: sites,
       },
+    },
+    include: {
+      sites: true,
     },
   });
 
