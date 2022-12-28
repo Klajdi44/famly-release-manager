@@ -7,8 +7,10 @@ import * as SegmentTypes from "./types";
 export const getAllSegments = async (req: Request, res: Response) => {
   console.log("** Running controller: getAllSegments (prisma)");
   try {
-    const segments = await prisma.segment.findMany();
-    return res.status(200).json(segments);
+    const segments = await prisma.segment.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+    return res.status(200).send(segments);
   } catch (error) {
     return res
       .status(500)
