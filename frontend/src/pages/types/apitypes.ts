@@ -1,11 +1,17 @@
 import { Attributes, Operators } from "../segments/constants";
 
+type Site = {
+  id: number;
+  name: string;
+};
+
 type Segment = {
   id: string;
   title: string;
   description: string;
   rules: Rule[];
   createdAt: Date;
+  sites: Site[];
 };
 
 type ReleaseToggle = {
@@ -66,4 +72,5 @@ export type {
   Country,
   Rule,
   RulesPayload,
+  Site,
 };

@@ -13,12 +13,14 @@ services:
       - POSTGRES_DB=db_dev_prisma
     volumes:
       - famly_db_dev_data_prisma:/var/lib/postgresql/data
+    restart: on-failure
 
   redis:
     image: redis
     container_name: redis
     expose:
       - 6379
+    restart: on-failure
 
   backend:
     build: ./backend
@@ -32,6 +34,7 @@ services:
       - redis
     links:
       - redis
+    restart: on-failure
     # environment:
     # - REDIS_URL=redis://cache
 
@@ -44,6 +47,7 @@ services:
       - ./frontend:/app
     stdin_open: true
     tty: true
+    restart: on-failure
 
 volumes:
   famly_db_dev_data_prisma:

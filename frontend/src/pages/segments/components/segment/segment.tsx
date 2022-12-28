@@ -1,5 +1,5 @@
-import { Button, Container, Flex, Text } from "@mantine/core";
-import { useState, useCallback } from "react";
+import { Button, Container, Flex, Paper, Text } from "@mantine/core";
+import { useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../../components/centered-loader/centered-loader";
 import { useFetch } from "../../../../hooks/use-fetch/use-fetch";
@@ -13,14 +13,16 @@ type SegmentProps = {
   countries: ApiTypes.Country[];
   segment: ApiTypes.Segment;
   subscriptions: ApiTypes.Subscription[];
+  sites: ApiTypes.Site[];
   refetchSegment: () => Promise<void>;
 };
 
 const SegmentContainer = ({
   countries,
   segment,
-  refetchSegment,
   subscriptions,
+  sites,
+  refetchSegment,
 }: SegmentProps) => {
   const [isAddRuleModalVisible, setIsAddRuleModalVisible] = useState(false);
 
@@ -52,12 +54,16 @@ const SegmentContainer = ({
     refetchSegment();
   };
 
+  const { hasSites, sitesLength, hasRules } = useMemo(() => {
+    return {
+      hasSites: segment.sites.length > 0,
+      sitesLength: segment.sites.length,
+      hasRules: segment.rules.length > 0,
+    };
+  }, [segment]);
+
   return (
     <Container>
-      <Flex justify="end">
-        <Button onClick={toggleIsAddRuleModalVisible}>Add new rule</Button>
-      </Flex>
-
       {/* Add new rule modal */}
       <AddRuleModal
         isVisible={isAddRuleModalVisible}
@@ -65,11 +71,31 @@ const SegmentContainer = ({
         onSubmit={handleSubmitNewRule}
         countries={countries}
         subscriptions={subscriptions}
+        sites={sites}
       />
 
+      <Flex justify="end">
+        <Button onClick={toggleIsAddRuleModalVisible}>Add new rule</Button>
+      </Flex>
+
       <Text size="xl" fw="bold">
-        {/* Include Sites who match these rules */}
-        Applied rules
+        {hasSites
+          ? `This segment includes ${sitesLength} ${
+              sitesLength > 1 ? "sites" : "site"
+            }`
+          : "This segment does not include any sites!"}
+      </Text>
+
+      {hasSites && (
+        <Paper p="md" m="md">
+          {segment.sites.map(site => (
+            <Text key={site.id}>{site.name}</Text>
+          ))}
+        </Paper>
+      )}
+
+      <Text size="xl" fw="bold">
+        {hasRules ? "Applied rules" : "No rules applied to this Segment!"}
       </Text>
 
       {segment.rules.map((rule, i) => (
@@ -115,11 +141,27 @@ const SegmentLoader = ({ segmentId }: SegmentLoaderProps) => {
     url: "v1/subscriptions",
   });
 
-  if (isLoading || isCountriesLoading || isSubscriptionsLoading) {
+  const {
+    data: sites,
+    error: sitesError,
+    isLoading: isSitesLoading,
+  } = useFetch<ApiTypes.Subscription[]>({
+    url: "v1/sites",
+  });
+
+  if (
+    isLoading ||
+    isCountriesLoading ||
+    isSubscriptionsLoading ||
+    isSitesLoading
+  ) {
     return <CenteredLoader />;
   }
 
-  if ((error || packageError || countryError) && error !== "canceled") {
+  if (
+    (error || packageError || countryError || sitesError) &&
+    (error || packageError || countryError) !== "canceled"
+  ) {
     return <Text>Something went wrong while getting the segment</Text>;
   }
 
@@ -127,15 +169,16 @@ const SegmentLoader = ({ segmentId }: SegmentLoaderProps) => {
     return <Text>No segment with id: {segmentId} was found!</Text>;
   }
 
-  if (countries === null || subscriptions === null) {
+  if (countries === null || subscriptions === null || sites === null) {
     return <Text>Failed to get countries and subscriptions</Text>;
   }
 
   return (
     <SegmentContainer
-      segment={data}
       countries={countries}
+      segment={data}
       subscriptions={subscriptions}
+      sites={sites}
       refetchSegment={refetchSegment}
     />
   );

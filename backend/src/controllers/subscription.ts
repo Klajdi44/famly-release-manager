@@ -15,9 +15,9 @@ export const getSubscriptions = async (req: Request, res: Response) => {
       id: subscription.id,
     }));
 
-    res.send(responseSubscriptions);
+    return res.send(responseSubscriptions);
   } catch (error) {
-    res
+    return res
       .status(500)
       .send({ message: "Something went wrong while getting subscriptions" });
   }

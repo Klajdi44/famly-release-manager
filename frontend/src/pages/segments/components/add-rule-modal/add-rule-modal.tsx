@@ -24,6 +24,7 @@ type Props = {
   onSubmit: (params: OnSubmitParams) => void;
   countries: ApiTypes.Country[];
   subscriptions: ApiTypes.Subscription[];
+  sites: ApiTypes.Site[];
 };
 
 const AddRuleModal = ({
@@ -32,6 +33,7 @@ const AddRuleModal = ({
   isVisible,
   countries,
   subscriptions,
+  sites,
 }: Props) => {
   const [attribute, setAttribute] = useState<undefined | Attributes>(
     defaultAttribute
@@ -49,10 +51,13 @@ const AddRuleModal = ({
       case "SUBSCRIPTION":
         return subscriptions.map(subscription => subscription.name);
 
+      case "SITE_ID":
+        return sites.map(site => String(site.id));
+
       default:
         return [];
     }
-  }, [countries, subscriptions, attribute, operator]);
+  }, [countries, subscriptions, sites, attribute, operator]);
 
   const resetState = () => {
     setAttribute(defaultAttribute);
@@ -105,11 +110,13 @@ const AddRuleModal = ({
       values,
       countries,
       subscriptions,
+      sites,
     }: {
       attribute: Attributes;
       values: string[];
       countries: ApiTypes.Country[];
       subscriptions: ApiTypes.Subscription[];
+      sites: ApiTypes.Site[];
     }) => {
       switch (attribute.id) {
         case "COUNTRY":
@@ -122,6 +129,11 @@ const AddRuleModal = ({
           return SegmentTransformers.transformDomainSubscriptionToApiSubscription(
             values,
             subscriptions
+          );
+        case "SITE_ID":
+          return SegmentTransformers.transformDomainSiteToApiSite(
+            values,
+            sites
           );
 
         default:
@@ -138,6 +150,7 @@ const AddRuleModal = ({
         values,
         countries,
         subscriptions,
+        sites,
       }),
     };
 
@@ -155,7 +168,7 @@ const AddRuleModal = ({
       size="100%"
       opened={isVisible}
       onClose={handleClose}
-      title="Add new rule"
+      title=" Include Sites that match the rules below"
     >
       <Flex gap="xl" wrap="wrap" align="center" justify="start">
         <div>IF</div>

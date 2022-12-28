@@ -274,7 +274,7 @@ export const toggleReleaseToggle = async (req: Request, res: Response) => {
     const { id, isActive } = req.body;
 
     if (id === undefined || isActive === undefined) {
-      res.status(400).send({
+      return res.status(400).send({
         message: "Release toggle ID or isActiver property are required!",
       });
     }
@@ -286,7 +286,7 @@ export const toggleReleaseToggle = async (req: Request, res: Response) => {
     });
 
     if (!releaseToggle) {
-      res.status(400).send({
+      return res.status(400).send({
         message: `Release toggle with ID or ${id} was not found`,
       });
     }
@@ -300,9 +300,9 @@ export const toggleReleaseToggle = async (req: Request, res: Response) => {
       },
     });
 
-    res.send(updatedReleaseToggle);
+    return res.send(updatedReleaseToggle);
   } catch (error) {
-    res.status(500).send({
+    return res.status(500).send({
       message: error,
     });
   }

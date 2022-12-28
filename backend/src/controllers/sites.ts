@@ -9,7 +9,7 @@ export const getAllSites = async (req: Request, res: Response) => {
   } catch (error) {
     return res
       .status(500)
-      .send({ message: "Server error - could not find release toggles..." });
+      .send({ message: "Server error - could not find sites..." });
   }
 };
 
