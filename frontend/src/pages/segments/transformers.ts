@@ -121,7 +121,8 @@ type TransformDomainSiteToApiSite = (
   // eslint-disable-next-line no-unused-vars
   sites: ApiTypes.Site[]
 ) => {
-  id: string;
+  id: number;
+  name: string;
 }[];
 
 const transformDomainSiteToApiSite: TransformDomainSiteToApiSite = (
