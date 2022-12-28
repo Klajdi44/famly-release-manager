@@ -15,9 +15,11 @@ const getCountries = async (req: Request, res: Response) => {
       id: country.id,
     }));
 
-    res.send(responseCountries);
+    return res.send(responseCountries);
   } catch (error) {
-    res.send({ message: "Something went wrong while getting countries" });
+    return res.send({
+      message: "Something went wrong while getting countries",
+    });
   }
 };
 

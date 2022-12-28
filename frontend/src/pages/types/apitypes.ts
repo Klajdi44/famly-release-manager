@@ -51,6 +51,11 @@ type Subscription = {
   name: string;
 };
 
+type Site = {
+  id: number;
+  name: string;
+};
+
 type RulesPayload = {
   id: string;
   attribute: Attributes["id"];
@@ -66,4 +71,5 @@ export type {
   Country,
   Rule,
   RulesPayload,
+  Site,
 };

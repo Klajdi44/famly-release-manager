@@ -115,9 +115,37 @@ const transformDomainSubscriptionToApiSubscription: TransformDomainSubscriptionT
     });
   };
 
+type TransformDomainSiteToApiSite = (
+  // eslint-disable-next-line no-unused-vars
+  sitesFromResults: string[],
+  // eslint-disable-next-line no-unused-vars
+  sites: ApiTypes.Site[]
+) => {
+  id: string;
+}[];
+
+const transformDomainSiteToApiSite: TransformDomainSiteToApiSite = (
+  sitesFromResults,
+  sites
+) => {
+  return sitesFromResults.flatMap(siteResult => {
+    const foundSite = sites.find(site => String(site.id) === siteResult);
+    console.log({ foundSite });
+
+    if (foundSite === undefined) {
+      return [];
+    }
+
+    return {
+      id: foundSite.id,
+      name: foundSite.name,
+    };
+  });
+};
 export {
   transformDomainCountryToApiCountry,
   transformDomainSubscriptionToApiSubscription,
   transformApiAttributeToDomainAttribute,
   transformApiOperatorToDomainAttribute,
+  transformDomainSiteToApiSite,
 };

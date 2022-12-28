@@ -13,14 +13,16 @@ type SegmentProps = {
   countries: ApiTypes.Country[];
   segment: ApiTypes.Segment;
   subscriptions: ApiTypes.Subscription[];
+  sites: ApiTypes.Site[];
   refetchSegment: () => Promise<void>;
 };
 
 const SegmentContainer = ({
   countries,
   segment,
-  refetchSegment,
   subscriptions,
+  sites,
+  refetchSegment,
 }: SegmentProps) => {
   const [isAddRuleModalVisible, setIsAddRuleModalVisible] = useState(false);
 
@@ -65,6 +67,7 @@ const SegmentContainer = ({
         onSubmit={handleSubmitNewRule}
         countries={countries}
         subscriptions={subscriptions}
+        sites={sites}
       />
 
       <Text size="xl" fw="bold">
@@ -115,11 +118,27 @@ const SegmentLoader = ({ segmentId }: SegmentLoaderProps) => {
     url: "v1/subscriptions",
   });
 
-  if (isLoading || isCountriesLoading || isSubscriptionsLoading) {
+  const {
+    data: sites,
+    error: sitesError,
+    isLoading: isSitesLoading,
+  } = useFetch<ApiTypes.Subscription[]>({
+    url: "v1/sites",
+  });
+
+  if (
+    isLoading ||
+    isCountriesLoading ||
+    isSubscriptionsLoading ||
+    isSitesLoading
+  ) {
     return <CenteredLoader />;
   }
 
-  if ((error || packageError || countryError) && error !== "canceled") {
+  if (
+    (error || packageError || countryError || sitesError) &&
+    (error || packageError || countryError) !== "canceled"
+  ) {
     return <Text>Something went wrong while getting the segment</Text>;
   }
 
@@ -127,15 +146,16 @@ const SegmentLoader = ({ segmentId }: SegmentLoaderProps) => {
     return <Text>No segment with id: {segmentId} was found!</Text>;
   }
 
-  if (countries === null || subscriptions === null) {
+  if (countries === null || subscriptions === null || sites === null) {
     return <Text>Failed to get countries and subscriptions</Text>;
   }
 
   return (
     <SegmentContainer
-      segment={data}
       countries={countries}
+      segment={data}
       subscriptions={subscriptions}
+      sites={sites}
       refetchSegment={refetchSegment}
     />
   );

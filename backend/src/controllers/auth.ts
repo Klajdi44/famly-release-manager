@@ -45,7 +45,7 @@ const login = async (req: Request, res: Response) => {
     try {
       await redisClient.set(refreshToken, user.id);
     } catch (error) {
-      res.status(500).send({
+      return res.status(500).send({
         message:
           "Something went wrong while saving token, please try again later",
       });
