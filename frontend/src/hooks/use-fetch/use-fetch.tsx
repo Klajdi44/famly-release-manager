@@ -39,6 +39,7 @@ const useFetch = <T,>({
         setError(null);
         setIsLoading(false);
         setData(response.data);
+        return response.data;
       }
     } catch (error) {
       if (error instanceof Error) {

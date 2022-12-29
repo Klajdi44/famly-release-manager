@@ -14,6 +14,11 @@ type Segment = {
   sites: Site[];
 };
 
+type Release = {
+  scheduleRef: string;
+  date: string;
+};
+
 type ReleaseToggle = {
   id: number;
   isActive: boolean;
@@ -25,6 +30,7 @@ type ReleaseToggle = {
   userId: number | null;
   segments: Segment[];
   user: User | null;
+  release: Release | null;
 };
 
 type User = {
