@@ -16,7 +16,7 @@ export const getAllReleaseToggles = async (req: Request, res: Response) => {
           },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { id: "desc" },
     });
 
     return res.send(releaseToggles);
