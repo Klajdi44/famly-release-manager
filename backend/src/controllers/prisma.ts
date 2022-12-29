@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma, ReleaseToggle } from "@prisma/client";
 import cron from "node-schedule";
 
 type Attribute = "COUNTRY" | "SUBSCRIPTION" | "SITE_ID";
@@ -190,6 +190,7 @@ export const scheduleReleaseToggle = async (req: Request, res: Response) => {
         },
         data: {
           isActive: true,
+          release: JSON.stringify(null),
         },
       });
     });
@@ -201,16 +202,16 @@ export const scheduleReleaseToggle = async (req: Request, res: Response) => {
       });
     }
 
-    const releaseToggleWithCronRef = await prisma.releaseToggle.update({
+    const releaseToggleWithReleaseProperty = await prisma.releaseToggle.update({
       where: {
         id: id,
       },
       data: {
-        cronJobRef: job.name,
+        release: JSON.stringify({ scheduleRef: job.name, date }),
       },
     });
 
-    res.send(releaseToggleWithCronRef);
+    res.send(releaseToggleWithReleaseProperty);
   } catch (error) {
     res.status(500).send({ message: error });
   }
@@ -239,10 +240,18 @@ export const deleteScheduleForReleaseToggle = async (
       return res.status(404).send({ message: "Release toggle not found" });
     }
 
-    if (!releaseToggle.cronJobRef) {
+    const release = JSON.parse(
+      String(releaseToggle.release)
+    ) as Prisma.JsonObject;
+
+    if (!release || !release?.scheduleRef) {
       return res
         .status(400)
         .send({ message: "This release toggle is not scheduled for release" });
+    }
+
+    if (!cron.cancelJob(String(release.scheduleRef))) {
+      res.status(500).send({ message: "Could not cancel this schedule" });
     }
 
     const releaseToggleWithCronRef = await prisma.releaseToggle.update({
@@ -250,11 +259,9 @@ export const deleteScheduleForReleaseToggle = async (
         id: id,
       },
       data: {
-        cronJobRef: "",
+        release: JSON.stringify(null),
       },
     });
-
-    cron.cancelJob(releaseToggle.cronJobRef);
 
     res.send(releaseToggleWithCronRef);
   } catch (error) {

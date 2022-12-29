@@ -20,7 +20,7 @@ model Country {
 model ReleaseToggle {
   id          Int       @id @default(autoincrement())
   name        String?   @db.VarChar(255)
-  cronJobRef  String    @db.VarChar(255) @default("")
+  release     Json      @default("null")
   description String? 
   releaseAt   DateTime? @db.Timestamptz(6)
   createdAt   DateTime  @default(now())
