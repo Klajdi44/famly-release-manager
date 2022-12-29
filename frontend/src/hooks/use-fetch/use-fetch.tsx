@@ -1,3 +1,4 @@
+import { AxiosError, AxiosResponse } from "axios";
 import { useState, useEffect, useRef } from "react";
 import jwtAxios from "../../util/axios/axiosInstance";
 
@@ -10,12 +11,19 @@ type Props = {
   lazy?: boolean;
 };
 
+type UseFetchResponse<T> = {
+  data: T | null;
+  error: string | null;
+  isLoading: boolean;
+  fetchData: (variables?: Props["variables"]) => Promise<AxiosResponse>;
+};
+
 const useFetch = <T,>({
   url,
   method = "get",
   variables,
   lazy = false,
-}: Props) => {
+}: Props): UseFetchResponse<T> => {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -42,11 +50,12 @@ const useFetch = <T,>({
         return response.data;
       }
     } catch (error) {
-      if (error instanceof Error) {
+      if (error instanceof AxiosError) {
         if (error.name === "AbortError" || error.name === "CanceledError") {
           console.log("fetch canceled");
         } else {
-          setError(error.message);
+          setError(error.response?.data.message);
+          throw new Error(error.response?.data.message);
         }
       }
     } finally {

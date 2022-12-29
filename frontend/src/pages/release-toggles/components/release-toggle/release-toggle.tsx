@@ -1,6 +1,6 @@
 import { Button, Container, Flex, Paper, Text, Title } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
-import { IconCircleCaretDown, IconCircleCheck, IconTrash } from "@tabler/icons";
+import { IconCircleCheck, IconTrash, IconX } from "@tabler/icons";
 import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../../components/centered-loader/centered-loader";
@@ -68,18 +68,25 @@ const ReleaseToggle = ({
   const handleScheduleRelease = useCallback(
     (releaseToggleId: number) =>
       async ({ date }: { date: Date }) => {
-        console.log(releaseToggleId, date);
-        const data = await scheduleRelease({
-          id: releaseToggleId,
-          date,
-        });
+        try {
+          await scheduleRelease({
+            id: releaseToggleId,
+            date,
+          });
 
-        if (data) {
           showNotification({
             title: "Release scheduled!",
             message: `This release toggle will be released on ${date}`,
             color: "dark",
             icon: <IconCircleCheck color="lightgreen" />,
+            autoClose: 10000,
+          });
+        } catch (error) {
+          showNotification({
+            title: "Failed to schedule release",
+            message: `${error}`,
+            color: "gray",
+            icon: <IconX color="red" />,
             autoClose: 10000,
           });
         }
