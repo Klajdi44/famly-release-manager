@@ -1,22 +1,18 @@
 import {
   ActionIcon,
   Button,
-  Container,
   Flex,
   Menu,
   Paper,
+  Table,
   Text,
   Title,
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import {
-  IconArrowsLeftRight,
   IconCalendarEvent,
   IconCaretDown,
   IconCircleCheck,
-  IconMessageCircle,
-  IconPhoto,
-  IconSearch,
   IconSettings,
   IconTrash,
   IconX,
@@ -140,32 +136,18 @@ const ReleaseToggle = ({
         onSubmit={handleAddSegmentToReleaseToggle}
       />
 
+      {/*  Schedule Release modal*/}
+      <ScheduleReleaseModal
+        isVisible={isScheduleReleaseModalVisible}
+        onClose={toggleScheduleReleaseModal}
+        onSubmit={handleScheduleRelease(releaseToggle.id)}
+      />
+
       <Flex justify="space-between" align="center">
-        <div>
-          <Title>
-            {ReleaseToggle.name} {releaseToggle.id}(ID)
-          </Title>
+        <Title>
+          {ReleaseToggle.name} {releaseToggle.id}(ID)
+        </Title>
 
-          {/*  Schedule Release modal*/}
-          <ScheduleReleaseModal
-            isVisible={isScheduleReleaseModalVisible}
-            onClose={toggleScheduleReleaseModal}
-            onSubmit={handleScheduleRelease(releaseToggle.id)}
-          />
-
-          <Title fz="md" mt="xl" mb="sm">
-            Description
-          </Title>
-          <Paper>
-            <Text>{releaseToggle.description}</Text>
-          </Paper>
-
-          <Title fz="md" mt="xl" mb="sm">
-            {hasSegments
-              ? "Applied Segments"
-              : "No segments has been applied to this release toggle"}
-          </Title>
-        </div>
         <Menu shadow="md" width={200}>
           <Menu.Target>
             <ActionIcon variant="default">
@@ -190,27 +172,51 @@ const ReleaseToggle = ({
           </Menu.Dropdown>
         </Menu>
       </Flex>
-      {releaseToggle.segments.length ? (
-        <Paper>
-          {releaseToggle.segments.map(segment => (
-            <Container key={segment.id} p="md">
-              <Flex justify="space-between" wrap="wrap">
-                <Title fz="lg">{segment.title}</Title>
-                <Title fz="lg">{segment.description}</Title>
-                <Title fz="lg">
-                  {new Date(segment.createdAt).toDateString()}
-                </Title>
-                <Button
-                  variant="outline"
-                  color="red"
-                  onClick={handleDelete(segment.id)}
-                >
-                  <IconTrash />
-                </Button>
-              </Flex>
-            </Container>
-          ))}
+
+      <div>
+        <Title fz="md" mt="xl" mb="sm">
+          Description
+        </Title>
+        <Paper p="md">
+          <Text>{releaseToggle.description}</Text>
         </Paper>
+
+        <Title fz="md" mt="xl" mb="sm">
+          {hasSegments
+            ? "Applied Segments"
+            : "No segments has been applied to this release toggle"}
+        </Title>
+      </div>
+
+      {releaseToggle.segments.length ? (
+        <Table verticalSpacing="md" highlightOnHover>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Created at</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {releaseToggle.segments.map(segment => (
+              <tr key={segment.id}>
+                <td>{segment.title}</td>
+                <td>{segment.description}</td>
+                <td>{new Date(segment.createdAt).toDateString()}</td>
+                <td>
+                  <Button
+                    variant="outline"
+                    color="red"
+                    onClick={handleDelete(segment.id)}
+                  >
+                    <IconTrash />
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       ) : null}
     </div>
   );
