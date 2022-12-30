@@ -246,18 +246,18 @@ export const deleteScheduleForReleaseToggle = async (
       return res.status(404).send({ message: "Release toggle not found" });
     }
 
-    const release = JSON.parse(
-      String(releaseToggle.release)
-    ) as Prisma.JsonObject;
+    const release = releaseToggle.release as Prisma.JsonObject;
 
-    if (!release || !release?.scheduleRef) {
+    if (!release?.scheduleRef) {
       return res
         .status(400)
         .send({ message: "This release toggle is not scheduled for release" });
     }
 
     if (!cron.cancelJob(String(release.scheduleRef))) {
-      res.status(500).send({ message: "Could not cancel this schedule" });
+      return res
+        .status(500)
+        .send({ message: "Could not cancel this schedule" });
     }
 
     const releaseToggleWithCronRef = await prisma.releaseToggle.update({
@@ -265,12 +265,12 @@ export const deleteScheduleForReleaseToggle = async (
         id: id,
       },
       data: {
-        release: JSON.stringify(null),
+        release: {},
       },
     });
 
-    res.send(releaseToggleWithCronRef);
+    return res.send(releaseToggleWithCronRef);
   } catch (error) {
-    res.status(500).send({ message: error });
+    return res.status(500).send({ message: error });
   }
 };

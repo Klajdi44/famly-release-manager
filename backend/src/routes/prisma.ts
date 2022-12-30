@@ -13,7 +13,7 @@ const router = express.Router();
 router
   .get("/", test)
   .post("/schedule", scheduleReleaseToggle)
-  .delete("/delete", deleteScheduleForReleaseToggle);
+  .patch("/delete", deleteScheduleForReleaseToggle);
 //  .get("/:id", getOneSegment)
 //  .post("/", createSegment)
 //  .patch("/:id", updateOneSegment)

@@ -2,7 +2,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import { useState, useEffect, useRef } from "react";
 import jwtAxios from "../../util/axios/axiosInstance";
 
-type Methods = "get" | "post" | "patch" | "put";
+type Methods = "get" | "post" | "patch" | "put" | "delete";
 
 type Props = {
   url: string;

@@ -65,6 +65,12 @@ const ReleaseToggle = ({
     method: "post",
   });
 
+  const { fetchData: cancelScheduledRelease } = useFetch({
+    url: `v1/prisma/delete`,
+    lazy: true,
+    method: "patch",
+  });
+
   const toggleAddSegmentModal = () => {
     setIsAddSegmentModalVisible(prevState => !prevState);
   };
@@ -116,6 +122,18 @@ const ReleaseToggle = ({
       },
     []
   );
+
+  const handleCancelScheduledRelease =
+    (releaseToggle: ApiTypes.ReleaseToggle) => async () => {
+      if (releaseToggle.release?.scheduleRef === undefined) {
+        return;
+      }
+
+      await cancelScheduledRelease({
+        id: releaseToggle.id,
+      });
+      await refetchReleaseToggle();
+    };
 
   const handleDelete = (segmentId: ApiTypes.Segment["id"]) => async () => {
     await jwtAxios.delete(
@@ -178,7 +196,7 @@ const ReleaseToggle = ({
       </Flex>
 
       {releaseToggle.release?.scheduleRef && releaseToggle.release.date ? (
-        <Flex maw={"45%"} mt="lg" mb="lg">
+        <Flex maw={"45%"} mt="lg" mb="lg" direction="column">
           <Alert
             icon={<IconAlertCircle size={16} />}
             title="Scheduled for release!"
@@ -191,6 +209,13 @@ const ReleaseToggle = ({
             ).toLocaleDateString()} ${new Date(
               releaseToggle.release.date
             ).toLocaleTimeString()}`}
+            <Button
+              mt="md"
+              variant="light"
+              onClick={handleCancelScheduledRelease(releaseToggle)}
+            >
+              Cancel schedule
+            </Button>
           </Alert>
         </Flex>
       ) : null}
