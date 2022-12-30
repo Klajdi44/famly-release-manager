@@ -249,15 +249,17 @@ export const deleteScheduleForReleaseToggle = async (
     const release = releaseToggle.release as Prisma.JsonObject;
 
     if (!release?.scheduleRef) {
-      return res
-        .status(400)
-        .send({ message: "This release toggle is not scheduled for release" });
+      return res.status(400).send({
+        message:
+          "This release toggle is not scheduled for release, Make sure it was not released already",
+      });
     }
 
     if (!cron.cancelJob(String(release.scheduleRef))) {
-      return res
-        .status(500)
-        .send({ message: "Could not cancel this schedule" });
+      return res.status(500).send({
+        message:
+          "Could not cancel this schedule, Make sure it was not released already",
+      });
     }
 
     const releaseToggleWithCronRef = await prisma.releaseToggle.update({

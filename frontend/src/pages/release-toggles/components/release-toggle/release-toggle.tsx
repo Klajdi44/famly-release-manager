@@ -128,11 +128,29 @@ const ReleaseToggle = ({
       if (releaseToggle.release?.scheduleRef === undefined) {
         return;
       }
+      try {
+        await cancelScheduledRelease({
+          id: releaseToggle.id,
+        });
 
-      await cancelScheduledRelease({
-        id: releaseToggle.id,
-      });
-      await refetchReleaseToggle();
+        await refetchReleaseToggle();
+
+        showNotification({
+          title: "Canceled!",
+          message: "The scheduled release as been canceled!",
+          color: "dark",
+          icon: <IconCircleCheck color="lightgreen" />,
+          autoClose: 10000,
+        });
+      } catch (error) {
+        showNotification({
+          title: "Failed to cancel schedule",
+          message: `${error}`,
+          color: "gray",
+          icon: <IconX color="red" />,
+          autoClose: 10000,
+        });
+      }
     };
 
   const handleDelete = (segmentId: ApiTypes.Segment["id"]) => async () => {
