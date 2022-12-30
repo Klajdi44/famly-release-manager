@@ -190,7 +190,7 @@ export const scheduleReleaseToggle = async (req: Request, res: Response) => {
         },
         data: {
           isActive: true,
-          release: JSON.stringify(null),
+          release: {},
         },
       });
     });
@@ -207,7 +207,7 @@ export const scheduleReleaseToggle = async (req: Request, res: Response) => {
         id: id,
       },
       data: {
-        release: JSON.stringify({ scheduleRef: job.name, date }),
+        release: { scheduleRef: job.name, date },
       },
     });
 
