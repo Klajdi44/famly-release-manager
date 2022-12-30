@@ -181,6 +181,12 @@ export const scheduleReleaseToggle = async (req: Request, res: Response) => {
       return res.status(404).send({ message: "Release toggle not found" });
     }
 
+    const releaseToggleSchedule = releaseToggle.release as Prisma.JsonObject;
+
+    if (releaseToggleSchedule?.scheduleRef) {
+      cron.cancelJob(String(releaseToggleSchedule.scheduleRef));
+    }
+
     const job = cron.scheduleJob(new Date(date), async function () {
       console.log("----- cron run", "ReleaseToggleId:", id);
 
