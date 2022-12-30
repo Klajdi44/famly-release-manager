@@ -1,6 +1,8 @@
 import {
   ActionIcon,
+  Alert,
   Button,
+  Container,
   Flex,
   Menu,
   Paper,
@@ -10,6 +12,7 @@ import {
 } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import {
+  IconAlertCircle,
   IconCalendarEvent,
   IconCaretDown,
   IconCircleCheck,
@@ -17,6 +20,7 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons";
+import { AxiosResponse } from "axios";
 import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../../components/centered-loader/centered-loader";
@@ -33,7 +37,7 @@ const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 type ReleaseToggleProps = {
   releaseToggle: ApiTypes.ReleaseToggle;
   segments: ApiTypes.Segment[];
-  refetchReleaseToggle: () => Promise<void>;
+  refetchReleaseToggle: () => Promise<AxiosResponse>;
 };
 
 const ReleaseToggle = ({
@@ -173,6 +177,24 @@ const ReleaseToggle = ({
         </Menu>
       </Flex>
 
+      {releaseToggle.release?.scheduleRef && releaseToggle.release.date ? (
+        <Flex maw={"45%"} mt="lg" mb="lg">
+          <Alert
+            icon={<IconAlertCircle size={16} />}
+            title="Scheduled for release!"
+            color="red"
+            radius="xs"
+          >
+            This release toggle is schedule to release on
+            {` ${new Date(
+              releaseToggle.release.date
+            ).toLocaleDateString()} ${new Date(
+              releaseToggle.release.date
+            ).toLocaleTimeString()}`}
+          </Alert>
+        </Flex>
+      ) : null}
+
       <div>
         <Title fz="md" mt="xl" mb="sm">
           Description
@@ -193,6 +215,7 @@ const ReleaseToggle = ({
           <thead>
             <tr>
               <th>Title</th>
+              <th>Id</th>
               <th>Description</th>
               <th>Created at</th>
               <th></th>
@@ -202,6 +225,7 @@ const ReleaseToggle = ({
             {releaseToggle.segments.map(segment => (
               <tr key={segment.id}>
                 <td>{segment.title}</td>
+                <td>{segment.id}</td>
                 <td>{segment.description}</td>
                 <td>{new Date(segment.createdAt).toDateString()}</td>
                 <td>
@@ -267,7 +291,7 @@ const WithReleaseToggleAndSegmentData = ({
 
   return (
     <ReleaseToggle
-      releaseToggle={data}
+      releaseToggle={{ ...data }}
       segments={segments ?? []}
       refetchReleaseToggle={refetchReleaseToggle}
     />
