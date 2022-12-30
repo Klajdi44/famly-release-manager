@@ -1,6 +1,26 @@
-import { Button, Container, Flex, Paper, Text, Title } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Container,
+  Flex,
+  Menu,
+  Paper,
+  Text,
+  Title,
+} from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
-import { IconCircleCheck, IconTrash, IconX } from "@tabler/icons";
+import {
+  IconArrowsLeftRight,
+  IconCalendarEvent,
+  IconCaretDown,
+  IconCircleCheck,
+  IconMessageCircle,
+  IconPhoto,
+  IconSearch,
+  IconSettings,
+  IconTrash,
+  IconX,
+} from "@tabler/icons";
 import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../../components/centered-loader/centered-loader";
@@ -133,19 +153,42 @@ const ReleaseToggle = ({
             onSubmit={handleScheduleRelease(releaseToggle.id)}
           />
 
-          <Button onClick={toggleScheduleReleaseModal}>Schedule release</Button>
-
+          <Title fz="md" mt="xl" mb="sm">
+            Description
+          </Title>
           <Paper>
             <Text>{releaseToggle.description}</Text>
           </Paper>
 
-          <Text mt={hasSegments ? "lg" : "sm"}>
+          <Title fz="md" mt="xl" mb="sm">
             {hasSegments
               ? "Applied Segments"
               : "No segments has been applied to this release toggle"}
-          </Text>
+          </Title>
         </div>
-        <Button onClick={toggleAddSegmentModal}>Add segment</Button>
+        <Menu shadow="md" width={200}>
+          <Menu.Target>
+            <ActionIcon variant="default">
+              <IconCaretDown size={16} />
+            </ActionIcon>
+          </Menu.Target>
+
+          <Menu.Dropdown>
+            <Menu.Item
+              onClick={toggleAddSegmentModal}
+              icon={<IconSettings size={14} />}
+            >
+              Add segment
+            </Menu.Item>
+            <Menu.Divider />
+            <Menu.Item
+              onClick={toggleScheduleReleaseModal}
+              icon={<IconCalendarEvent size={14} />}
+            >
+              Schedule release
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
       </Flex>
       {releaseToggle.segments.length ? (
         <Paper>
