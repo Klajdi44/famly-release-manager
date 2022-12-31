@@ -65,4 +65,18 @@ const isAuthenticated = () => {
   return hasExpired === false;
 };
 
-export { isAuthenticated, getUser, decodeJwt };
+const getColorScheme = (): "light" | "dark" => {
+  const colorScheme = localStorage.getItem("colorScheme");
+
+  if (
+    colorScheme === null ||
+    (colorScheme !== "dark" && colorScheme !== "light")
+  ) {
+    localStorage.setItem("colorScheme", "dark");
+    return "dark";
+  }
+
+  return colorScheme;
+};
+
+export { isAuthenticated, getUser, decodeJwt, getColorScheme };

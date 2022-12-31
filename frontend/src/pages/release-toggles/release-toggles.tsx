@@ -1,4 +1,13 @@
-import { Button, Container, Divider, Flex, Paper, Text } from "@mantine/core";
+import {
+  Button,
+  Container,
+  Divider,
+  Flex,
+  Paper,
+  Text,
+  Title,
+} from "@mantine/core";
+import { IconCirclePlus } from "@tabler/icons";
 import { AxiosResponse } from "axios";
 import { Fragment, useCallback, useState } from "react";
 
@@ -70,10 +79,11 @@ const ReleaseToggles = ({ releaseToggles, refetch }: ReleaseTogglesProps) => {
   );
 
   return (
-    <Container>
+    <Container size="xl">
       {/* Button that opens the add toggle modal */}
-      <Flex justify="end">
-        <Button variant="filled" onClick={toggleModalVisibility}>
+      <Flex align="center" justify="space-between">
+        <Title>Release toggles</Title>
+        <Button leftIcon={<IconCirclePlus />} onClick={toggleModalVisibility}>
           Add release toggle
         </Button>
       </Flex>

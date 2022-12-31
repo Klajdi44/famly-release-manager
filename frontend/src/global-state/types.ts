@@ -2,6 +2,7 @@ import * as UserTypes from "../pages/login/types";
 
 type State = {
   user: UserTypes.State;
+  colorScheme: "light" | "dark";
 };
 
 type Action = UserTypes.Action;
