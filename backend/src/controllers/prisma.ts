@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma, ReleaseToggle } from "@prisma/client";
+import cron from "node-schedule";
 
 type Attribute = "COUNTRY" | "SUBSCRIPTION" | "SITE_ID";
 
@@ -98,10 +99,17 @@ export const test = async (req: Request, res: Response) => {
 
     // const rulesFromDb = segmentFromDb?.rules ?? [];
 
-    if (segmentFromDb?.rules && typeof segmentFromDb?.rules === "object" && Array.isArray(segmentFromDb?.rules)) {
+    if (
+      segmentFromDb?.rules &&
+      typeof segmentFromDb?.rules === "object" &&
+      Array.isArray(segmentFromDb?.rules)
+    ) {
       const segmentRules = segmentFromDb?.rules as Prisma.JsonArray;
 
-      const mergeFrontendSentRulesWithDbRules = [...segmentRules, ...rulesFromFrontend];
+      const mergeFrontendSentRulesWithDbRules = [
+        ...segmentRules,
+        ...rulesFromFrontend,
+      ];
 
       const segmentWithUpdatedRules = await prisma.segment.update({
         where: {
@@ -145,4 +153,118 @@ export const test = async (req: Request, res: Response) => {
 
     res.send([]);
   } catch {}
+};
+
+export const scheduleReleaseToggle = async (req: Request, res: Response) => {
+  try {
+    const { id, date }: { id: number; date: string } = req.body;
+
+    if (id === undefined || date === undefined) {
+      return res
+        .status(400)
+        .send({ message: "Release toggle ID and Date are required" });
+    }
+
+    if (Number.isNaN(id)) {
+      return res
+        .status(400)
+        .send({ message: "Release toggle ID must be a number" });
+    }
+
+    const releaseToggle = await prisma.releaseToggle.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (releaseToggle === null) {
+      return res.status(404).send({ message: "Release toggle not found" });
+    }
+
+    const job = cron.scheduleJob(new Date(date), async function () {
+      console.log("----- cron run", "ReleaseToggleId:", id);
+
+      await prisma.releaseToggle.update({
+        where: {
+          id: id,
+        },
+        data: {
+          isActive: true,
+          release: {},
+        },
+      });
+    });
+
+    if (job === null) {
+      return res.status(400).send({
+        message:
+          "Schedule failed! Make sure that the date is correct! No past dates can be scheduled!",
+      });
+    }
+
+    const releaseToggleWithReleaseProperty = await prisma.releaseToggle.update({
+      where: {
+        id: id,
+      },
+      data: {
+        release: { scheduleRef: job.name, date },
+      },
+    });
+
+    res.send(releaseToggleWithReleaseProperty);
+  } catch (error) {
+    res.status(500).send({ message: error });
+  }
+};
+
+export const deleteScheduleForReleaseToggle = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id }: { id: number } = req.body;
+
+    if (Number.isNaN(id)) {
+      return res
+        .status(400)
+        .send({ message: "Release toggle ID must be a number" });
+    }
+
+    const releaseToggle = await prisma.releaseToggle.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (releaseToggle === null) {
+      return res.status(404).send({ message: "Release toggle not found" });
+    }
+
+    const release = JSON.parse(
+      String(releaseToggle.release)
+    ) as Prisma.JsonObject;
+
+    if (!release || !release?.scheduleRef) {
+      return res
+        .status(400)
+        .send({ message: "This release toggle is not scheduled for release" });
+    }
+
+    if (!cron.cancelJob(String(release.scheduleRef))) {
+      res.status(500).send({ message: "Could not cancel this schedule" });
+    }
+
+    const releaseToggleWithCronRef = await prisma.releaseToggle.update({
+      where: {
+        id: id,
+      },
+      data: {
+        release: JSON.stringify(null),
+      },
+    });
+
+    res.send(releaseToggleWithCronRef);
+  } catch (error) {
+    res.status(500).send({ message: error });
+  }
 };

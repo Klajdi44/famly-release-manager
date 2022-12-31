@@ -1,5 +1,6 @@
 import { Button, Container, Flex, Paper, Text, Title } from "@mantine/core";
-import { IconTrash } from "@tabler/icons";
+import { showNotification } from "@mantine/notifications";
+import { IconCircleCheck, IconTrash, IconX } from "@tabler/icons";
 import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../../components/centered-loader/centered-loader";
@@ -9,6 +10,7 @@ import * as ApiTypes from "../../../types/apitypes";
 import AddSegmentToReleaseToggleModal, {
   OnSubmitParams,
 } from "../add-segment-to-release-toggle-modal/add-segment-to-release-toggle-modal";
+import ScheduleReleaseModal from "../schedule-release-modal/schedule-release-modal";
 
 const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 
@@ -26,6 +28,9 @@ const ReleaseToggle = ({
   const [isAddSegmentModalVisible, setIsAddSegmentModalVisible] =
     useState(false);
 
+  const [isScheduleReleaseModalVisible, setIsScheduleReleaseModalVisible] =
+    useState(false);
+
   const hasSegments = releaseToggle.segments.length > 0;
 
   const { fetchData: addSegmentToReleaseToggle } = useFetch({
@@ -34,8 +39,18 @@ const ReleaseToggle = ({
     method: "post",
   });
 
+  const { fetchData: scheduleRelease } = useFetch({
+    url: `v1/prisma/schedule`,
+    lazy: true,
+    method: "post",
+  });
+
   const toggleAddSegmentModal = () => {
     setIsAddSegmentModalVisible(prevState => !prevState);
+  };
+
+  const toggleScheduleReleaseModal = () => {
+    setIsScheduleReleaseModalVisible(prevState => !prevState);
   };
 
   const handleAddSegmentToReleaseToggle = useCallback(
@@ -43,9 +58,42 @@ const ReleaseToggle = ({
       await addSegmentToReleaseToggle({
         segments: segmentIds,
       });
+
       toggleAddSegmentModal();
       await refetchReleaseToggle();
     },
+    []
+  );
+
+  const handleScheduleRelease = useCallback(
+    (releaseToggleId: number) =>
+      async ({ date }: { date: Date }) => {
+        try {
+          await scheduleRelease({
+            id: releaseToggleId,
+            date,
+          });
+
+          showNotification({
+            title: "Release scheduled!",
+            message: `This release toggle will be released on ${date}`,
+            color: "dark",
+            icon: <IconCircleCheck color="lightgreen" />,
+            autoClose: 10000,
+          });
+        } catch (error) {
+          showNotification({
+            title: "Failed to schedule release",
+            message: `${error}`,
+            color: "gray",
+            icon: <IconX color="red" />,
+            autoClose: 10000,
+          });
+        }
+
+        toggleScheduleReleaseModal();
+        await refetchReleaseToggle();
+      },
     []
   );
 
@@ -77,6 +125,15 @@ const ReleaseToggle = ({
           <Title>
             {ReleaseToggle.name} {releaseToggle.id}(ID)
           </Title>
+
+          {/*  Schedule Release modal*/}
+          <ScheduleReleaseModal
+            isVisible={isScheduleReleaseModalVisible}
+            onClose={toggleScheduleReleaseModal}
+            onSubmit={handleScheduleRelease(releaseToggle.id)}
+          />
+
+          <Button onClick={toggleScheduleReleaseModal}>Schedule release</Button>
 
           <Paper>
             <Text>{releaseToggle.description}</Text>
