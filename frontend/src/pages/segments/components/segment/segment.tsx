@@ -8,13 +8,14 @@ import * as SegmentTransformers from "../../transformers";
 import { Attributes, Operators } from "../../constants";
 import { Rule } from "../rule/rule";
 import AddRuleModal from "../add-rule-modal/add-rule-modal";
+import { AxiosResponse } from "axios";
 
 type SegmentProps = {
   countries: ApiTypes.Country[];
   segment: ApiTypes.Segment;
   subscriptions: ApiTypes.Subscription[];
   sites: ApiTypes.Site[];
-  refetchSegment: () => Promise<void>;
+  refetchSegment: () => Promise<AxiosResponse>;
 };
 
 const SegmentContainer = ({

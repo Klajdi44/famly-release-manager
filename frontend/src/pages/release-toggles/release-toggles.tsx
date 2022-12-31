@@ -1,4 +1,5 @@
 import { Button, Container, Divider, Flex, Paper, Text } from "@mantine/core";
+import { AxiosResponse } from "axios";
 import { Fragment, useCallback, useState } from "react";
 
 import CenteredLoader from "../../components/centered-loader/centered-loader";
@@ -13,7 +14,7 @@ const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 
 type ReleaseTogglesProps = {
   releaseToggles: ReleaseToggle[];
-  refetch: () => Promise<void>;
+  refetch: () => Promise<AxiosResponse>;
 };
 
 const ReleaseToggles = ({ releaseToggles, refetch }: ReleaseTogglesProps) => {

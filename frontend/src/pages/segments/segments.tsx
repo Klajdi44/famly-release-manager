@@ -18,12 +18,13 @@ import SegmentsModal, { OnSubmitParams } from "./components/modal/modal";
 import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
 import { IconTrash } from "@tabler/icons";
 import { useCallback } from "react";
+import { AxiosResponse } from "axios";
 
 const SEGMENTS_URL = "v1/segments";
 
 type SegmentsProps = {
   segments: ApiTypes.Segment[];
-  refetch: () => Promise<void>;
+  refetch: () => Promise<AxiosResponse>;
 };
 
 const Segments = ({ segments, refetch }: SegmentsProps) => {
