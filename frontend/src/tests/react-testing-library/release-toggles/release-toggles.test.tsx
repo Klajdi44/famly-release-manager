@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "../test-util";
+import { render, screen } from "../test-util";
 import { ReleaseToggles } from "../../../pages/release-toggles/release-toggles";
 import * as ApiTypes from "../../../pages/types/apitypes";
 
@@ -14,6 +14,7 @@ describe("Release toggles page", () => {
     segments: [],
     user: null,
     isActive: false,
+    release: {},
   };
 
   const refetch = jest.fn();

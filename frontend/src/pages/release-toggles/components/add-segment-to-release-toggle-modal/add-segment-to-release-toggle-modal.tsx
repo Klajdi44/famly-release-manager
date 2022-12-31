@@ -71,7 +71,7 @@ const AddSegmentToReleaseToggleModal = ({
       </Flex>
 
       <Button mt={20} variant="filled" onClick={handleSubmit}>
-        Submit
+        Add
       </Button>
     </Modal>
   );

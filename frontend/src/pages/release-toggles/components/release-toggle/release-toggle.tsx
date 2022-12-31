@@ -1,6 +1,25 @@
-import { Button, Container, Flex, Paper, Text, Title } from "@mantine/core";
+import {
+  ActionIcon,
+  Alert,
+  Button,
+  Flex,
+  Menu,
+  Paper,
+  Table,
+  Text,
+  Title,
+} from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
-import { IconCircleCheck, IconTrash, IconX } from "@tabler/icons";
+import {
+  IconAlertCircle,
+  IconCalendarEvent,
+  IconCaretDown,
+  IconCircleCheck,
+  IconSettings,
+  IconTrash,
+  IconX,
+} from "@tabler/icons";
+import { AxiosResponse } from "axios";
 import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../../components/centered-loader/centered-loader";
@@ -17,7 +36,7 @@ const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 type ReleaseToggleProps = {
   releaseToggle: ApiTypes.ReleaseToggle;
   segments: ApiTypes.Segment[];
-  refetchReleaseToggle: () => Promise<void>;
+  refetchReleaseToggle: () => Promise<AxiosResponse>;
 };
 
 const ReleaseToggle = ({
@@ -43,6 +62,12 @@ const ReleaseToggle = ({
     url: `v1/prisma/schedule`,
     lazy: true,
     method: "post",
+  });
+
+  const { fetchData: cancelScheduledRelease } = useFetch({
+    url: `v1/prisma/delete`,
+    lazy: true,
+    method: "patch",
   });
 
   const toggleAddSegmentModal = () => {
@@ -97,6 +122,36 @@ const ReleaseToggle = ({
     []
   );
 
+  const handleCancelScheduledRelease =
+    (releaseToggle: ApiTypes.ReleaseToggle) => async () => {
+      if (releaseToggle.release?.scheduleRef === undefined) {
+        return;
+      }
+      try {
+        await cancelScheduledRelease({
+          id: releaseToggle.id,
+        });
+
+        await refetchReleaseToggle();
+
+        showNotification({
+          title: "Canceled!",
+          message: "The scheduled release has been canceled!",
+          color: "dark",
+          icon: <IconCircleCheck color="lightgreen" />,
+          autoClose: 10000,
+        });
+      } catch (error) {
+        showNotification({
+          title: "Failed to cancel schedule",
+          message: `${error}`,
+          color: "gray",
+          icon: <IconX color="red" />,
+          autoClose: 10000,
+        });
+      }
+    };
+
   const handleDelete = (segmentId: ApiTypes.Segment["id"]) => async () => {
     await jwtAxios.delete(
       `v1/release-toggles/delete-segment-from-release-toggle/${releaseToggle.id}`,
@@ -120,54 +175,118 @@ const ReleaseToggle = ({
         onSubmit={handleAddSegmentToReleaseToggle}
       />
 
+      {/*  Schedule Release modal*/}
+      <ScheduleReleaseModal
+        isVisible={isScheduleReleaseModalVisible}
+        onClose={toggleScheduleReleaseModal}
+        onSubmit={handleScheduleRelease(releaseToggle.id)}
+      />
+
       <Flex justify="space-between" align="center">
-        <div>
-          <Title>
-            {ReleaseToggle.name} {releaseToggle.id}(ID)
-          </Title>
+        <Title>
+          {ReleaseToggle.name} {releaseToggle.id}(ID)
+        </Title>
 
-          {/*  Schedule Release modal*/}
-          <ScheduleReleaseModal
-            isVisible={isScheduleReleaseModalVisible}
-            onClose={toggleScheduleReleaseModal}
-            onSubmit={handleScheduleRelease(releaseToggle.id)}
-          />
+        <Menu shadow="md" width={200}>
+          <Menu.Target>
+            <ActionIcon variant="default">
+              <IconCaretDown size={16} />
+            </ActionIcon>
+          </Menu.Target>
 
-          <Button onClick={toggleScheduleReleaseModal}>Schedule release</Button>
-
-          <Paper>
-            <Text>{releaseToggle.description}</Text>
-          </Paper>
-
-          <Text mt={hasSegments ? "lg" : "sm"}>
-            {hasSegments
-              ? "Applied Segments"
-              : "No segments has been applied to this release toggle"}
-          </Text>
-        </div>
-        <Button onClick={toggleAddSegmentModal}>Add segment</Button>
+          <Menu.Dropdown>
+            <Menu.Item
+              onClick={toggleAddSegmentModal}
+              icon={<IconSettings size={14} />}
+            >
+              Add segment
+            </Menu.Item>
+            <Menu.Divider />
+            <Menu.Item
+              onClick={toggleScheduleReleaseModal}
+              icon={<IconCalendarEvent size={14} />}
+            >
+              Schedule release
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
       </Flex>
-      {releaseToggle.segments.length ? (
-        <Paper>
-          {releaseToggle.segments.map(segment => (
-            <Container key={segment.id} p="md">
-              <Flex justify="space-between" wrap="wrap">
-                <Title fz="lg">{segment.title}</Title>
-                <Title fz="lg">{segment.description}</Title>
-                <Title fz="lg">
-                  {new Date(segment.createdAt).toDateString()}
-                </Title>
-                <Button
-                  variant="outline"
-                  color="red"
-                  onClick={handleDelete(segment.id)}
-                >
-                  <IconTrash />
-                </Button>
-              </Flex>
-            </Container>
-          ))}
+
+      {releaseToggle.release?.scheduleRef && releaseToggle.release.date ? (
+        <Flex maw={"45%"} mt="lg" mb="lg" direction="column">
+          <Alert
+            icon={<IconAlertCircle size={16} />}
+            title="Scheduled for release!"
+            color="red"
+            radius="xs"
+          >
+            <div>
+              This release toggle is schedule to release on
+              {` ${new Date(
+                releaseToggle.release.date
+              ).toLocaleDateString()} ${new Date(
+                releaseToggle.release.date
+              ).toLocaleTimeString()}`}
+            </div>
+            <Button
+              mt="md"
+              variant="light"
+              onClick={handleCancelScheduledRelease(releaseToggle)}
+            >
+              Cancel schedule
+            </Button>
+          </Alert>
+        </Flex>
+      ) : null}
+
+      <div>
+        <Title fz="md" mt="xl" mb="sm">
+          Description
+        </Title>
+        <Paper p="md">
+          <Text>{releaseToggle.description}</Text>
         </Paper>
+
+        <Title fz="md" mt="xl" mb="sm">
+          {hasSegments
+            ? "Applied Segments"
+            : "No segments has been applied to this release toggle"}
+        </Title>
+      </div>
+
+      {releaseToggle.segments.length ? (
+        <Table verticalSpacing="md" highlightOnHover>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Id</th>
+              <th>Number of sites</th>
+              <th>Description</th>
+              <th>Created at</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {releaseToggle.segments.map(segment => (
+              <tr key={segment.id}>
+                <td>{segment.title}</td>
+                <td>{segment.id}</td>
+                <td>{segment.sites.length}</td>
+                <td>{segment.description}</td>
+                <td>{new Date(segment.createdAt).toDateString()}</td>
+                <td>
+                  <Button
+                    variant="outline"
+                    color="red"
+                    onClick={handleDelete(segment.id)}
+                  >
+                    <IconTrash />
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       ) : null}
     </div>
   );
@@ -218,7 +337,7 @@ const WithReleaseToggleAndSegmentData = ({
 
   return (
     <ReleaseToggle
-      releaseToggle={data}
+      releaseToggle={{ ...data }}
       segments={segments ?? []}
       refetchReleaseToggle={refetchReleaseToggle}
     />

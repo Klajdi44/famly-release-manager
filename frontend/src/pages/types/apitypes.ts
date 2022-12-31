@@ -30,7 +30,7 @@ type ReleaseToggle = {
   userId: number | null;
   segments: Segment[];
   user: User | null;
-  release: Release | null;
+  release: Release | Record<string, never>;
 };
 
 type User = {
