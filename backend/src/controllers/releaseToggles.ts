@@ -53,6 +53,7 @@ export const getOneReleaseToggle = async (req: Request, res: Response) => {
             title: true,
             description: true,
             createdAt: true,
+            sites: true,
           },
         },
       },

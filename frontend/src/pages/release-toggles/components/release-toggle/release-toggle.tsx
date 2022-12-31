@@ -2,7 +2,6 @@ import {
   ActionIcon,
   Alert,
   Button,
-  Container,
   Flex,
   Menu,
   Paper,
@@ -137,7 +136,7 @@ const ReleaseToggle = ({
 
         showNotification({
           title: "Canceled!",
-          message: "The scheduled release as been canceled!",
+          message: "The scheduled release has been canceled!",
           color: "dark",
           icon: <IconCircleCheck color="lightgreen" />,
           autoClose: 10000,
@@ -221,12 +220,14 @@ const ReleaseToggle = ({
             color="red"
             radius="xs"
           >
-            This release toggle is schedule to release on
-            {` ${new Date(
-              releaseToggle.release.date
-            ).toLocaleDateString()} ${new Date(
-              releaseToggle.release.date
-            ).toLocaleTimeString()}`}
+            <div>
+              This release toggle is schedule to release on
+              {` ${new Date(
+                releaseToggle.release.date
+              ).toLocaleDateString()} ${new Date(
+                releaseToggle.release.date
+              ).toLocaleTimeString()}`}
+            </div>
             <Button
               mt="md"
               variant="light"
@@ -259,6 +260,7 @@ const ReleaseToggle = ({
             <tr>
               <th>Title</th>
               <th>Id</th>
+              <th>Number of sites</th>
               <th>Description</th>
               <th>Created at</th>
               <th></th>
@@ -269,6 +271,7 @@ const ReleaseToggle = ({
               <tr key={segment.id}>
                 <td>{segment.title}</td>
                 <td>{segment.id}</td>
+                <td>{segment.sites.length}</td>
                 <td>{segment.description}</td>
                 <td>{new Date(segment.createdAt).toDateString()}</td>
                 <td>

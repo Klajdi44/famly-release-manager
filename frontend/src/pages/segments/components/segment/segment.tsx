@@ -1,4 +1,4 @@
-import { Button, Container, Flex, Paper, Text } from "@mantine/core";
+import { Accordion, Button, Container, Flex, Paper, Text } from "@mantine/core";
 import { useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../../components/centered-loader/centered-loader";
@@ -78,7 +78,7 @@ const SegmentContainer = ({
         <Button onClick={toggleIsAddRuleModalVisible}>Add new rule</Button>
       </Flex>
 
-      <Text size="xl" fw="bold">
+      <Text size="xl" fw="bold" mt="xl">
         {hasSites
           ? `This segment includes ${sitesLength} ${
               sitesLength > 1 ? "sites" : "site"
@@ -87,11 +87,16 @@ const SegmentContainer = ({
       </Text>
 
       {hasSites && (
-        <Paper p="md" m="md">
-          {segment.sites.map(site => (
-            <Text key={site.id}>{site.name}</Text>
-          ))}
-        </Paper>
+        <Accordion variant="contained" mt="sm" mb="xl">
+          <Accordion.Item value="Sites">
+            <Accordion.Control>Sites Included</Accordion.Control>
+            <Accordion.Panel>
+              {segment.sites.map(site => (
+                <Text key={site.id}>{site.name}</Text>
+              ))}
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
       )}
 
       <Text size="xl" fw="bold">
