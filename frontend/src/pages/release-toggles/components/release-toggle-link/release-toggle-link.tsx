@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Text } from "@mantine/core";
 
 import { ReleaseToggle } from "../../../types/apitypes";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
 
 type Props = {
   toggle: ReleaseToggle;
