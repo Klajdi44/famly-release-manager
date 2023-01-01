@@ -115,7 +115,7 @@ const ApplicationShell = ({
             <Flex justify="space-between" align="center">
               <Link to="/">
                 <Image
-                  src={"/public/Famly-Logo-WhiteBG.svg"}
+                  src={"Famly-Logo-WhiteBG.svg"}
                   alt="famly logo"
                   width={120}
                   mt="lg"
