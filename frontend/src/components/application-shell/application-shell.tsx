@@ -9,6 +9,7 @@ import {
   Header,
   Flex,
   Switch,
+  Image,
 } from "@mantine/core";
 import {
   IconSettings,
@@ -108,6 +109,41 @@ const ApplicationShell = ({
         },
       }}
       navbarOffsetBreakpoint="sm"
+      header={
+        <Header height={{ base: 60, md: 70 }} pr="md" pl="md">
+          <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
+            <Flex justify="space-between" align="center">
+              <Link to="/">
+                <Image
+                  src={"/public/Famly-Logo-WhiteBG.svg"}
+                  alt="famly logo"
+                  width={120}
+                  mt="lg"
+                />
+              </Link>
+              <Switch
+                checked={state.colorScheme === "dark"}
+                size="md"
+                onLabel={<IconMoonStars size={18} />}
+                offLabel={<IconSunHigh size={20} />}
+                color="gray"
+                onChange={handleToggleColorScheme}
+              />
+            </Flex>
+          </MediaQuery>
+
+          <MediaQuery largerThan="sm" styles={{ display: "none" }}>
+            <Burger
+              opened={opened}
+              onClick={handleOpen}
+              size="sm"
+              color={theme.colors.gray[6]}
+              mr="xl"
+              mt="md"
+            />
+          </MediaQuery>
+        </Header>
+      }
       navbar={
         <Navbar
           p="md"
@@ -124,33 +160,6 @@ const ApplicationShell = ({
             </a>
           </Navbar.Section>
         </Navbar>
-      }
-      header={
-        <Header height={{ base: 60, md: 70 }} pr="md" pl="md">
-          <Flex justify="end">
-            <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
-              <Switch
-                checked={state.colorScheme === "dark"}
-                size="md"
-                onLabel={<IconMoonStars size={18} />}
-                offLabel={<IconSunHigh size={20} />}
-                color="gray"
-                onChange={handleToggleColorScheme}
-              />
-            </MediaQuery>
-          </Flex>
-
-          <MediaQuery largerThan="sm" styles={{ display: "none" }}>
-            <Burger
-              opened={opened}
-              onClick={handleOpen}
-              size="sm"
-              color={theme.colors.gray[6]}
-              mr="xl"
-              mt="md"
-            />
-          </MediaQuery>
-        </Header>
       }
     >
       {children}
