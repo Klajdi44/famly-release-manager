@@ -7,11 +7,20 @@ import {
   Burger,
   useMantineTheme,
   Header,
+  Flex,
+  Switch,
 } from "@mantine/core";
-import { IconSettings, IconLogout, IconToggleRight } from "@tabler/icons";
+import {
+  IconSettings,
+  IconLogout,
+  IconToggleRight,
+  IconSunHigh,
+  IconMoonStars,
+} from "@tabler/icons";
 
 import { useStyles } from "./styles";
 import { resetTokens } from "../../util/jwt";
+import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
 
 const data = [
   { link: "/", label: "Release toggles", icon: IconToggleRight },
@@ -40,11 +49,15 @@ const ApplicationShell = ({
   };
 
   const handleSetActive = useCallback(
-    (label: string) => () => setActive(label),
+    (label: string) => () => {
+      setActive(label);
+      setOpened(prevState => !prevState);
+    },
     []
   );
 
   const { classes, cx } = useStyles();
+  const [state, dispatch] = useGlobalState();
 
   const links = useMemo(
     () =>
@@ -70,6 +83,15 @@ const ApplicationShell = ({
       handleSetActive,
     ]
   );
+
+  const handleToggleColorScheme = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    dispatch({
+      type: "THEME_CHANGE_COLOR_SCHEME",
+      payload: event.target.checked ? "dark" : "light",
+    });
+  };
 
   if (shouldRender === false) {
     return <AppShell>{children}</AppShell>;
@@ -104,20 +126,30 @@ const ApplicationShell = ({
         </Navbar>
       }
       header={
-        <Header height={{ base: 50, md: 70 }} p="md">
-          <div
-            style={{ display: "flex", alignItems: "center", height: "100%" }}
-          >
-            <MediaQuery largerThan="sm" styles={{ display: "none" }}>
-              <Burger
-                opened={opened}
-                onClick={handleOpen}
-                size="sm"
-                color={theme.colors.gray[6]}
-                mr="xl"
+        <Header height={{ base: 60, md: 70 }} pr="md" pl="md">
+          <Flex justify="end">
+            <MediaQuery smallerThan="sm" styles={{ display: "none" }}>
+              <Switch
+                checked={state.colorScheme === "dark"}
+                size="md"
+                onLabel={<IconMoonStars size={18} />}
+                offLabel={<IconSunHigh size={20} />}
+                color="gray"
+                onChange={handleToggleColorScheme}
               />
             </MediaQuery>
-          </div>
+          </Flex>
+
+          <MediaQuery largerThan="sm" styles={{ display: "none" }}>
+            <Burger
+              opened={opened}
+              onClick={handleOpen}
+              size="sm"
+              color={theme.colors.gray[6]}
+              mr="xl"
+              mt="md"
+            />
+          </MediaQuery>
         </Header>
       }
     >

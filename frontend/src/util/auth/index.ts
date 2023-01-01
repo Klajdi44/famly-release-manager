@@ -1,5 +1,7 @@
 import jwtDecode from "jwt-decode";
 import { UserWithTokens, User } from "../../pages/login/types";
+import * as ColorSchemeConstants from "../../global-state/colorScheme/constants";
+import * as ColorSchemeTypes from "../../global-state/colorScheme/types";
 
 type DecodeJwtReturnValue = {
   exp: number;
@@ -65,14 +67,14 @@ const isAuthenticated = () => {
   return hasExpired === false;
 };
 
-const getColorScheme = (): "light" | "dark" => {
+const getColorScheme = (): ColorSchemeTypes.ColorScheme => {
   const colorScheme = localStorage.getItem("colorScheme");
 
   if (
     colorScheme === null ||
     (colorScheme !== "dark" && colorScheme !== "light")
   ) {
-    localStorage.setItem("colorScheme", "dark");
+    localStorage.setItem("colorScheme", ColorSchemeConstants.DEFAULT_STATE);
     return "dark";
   }
 
