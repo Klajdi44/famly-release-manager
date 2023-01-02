@@ -24,6 +24,7 @@ import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../../../components/centered-loader/centered-loader";
 import { useFetch } from "../../../../hooks/use-fetch/use-fetch";
+import { useGlobalState } from "../../../../hooks/use-global-state/use-global-state";
 import jwtAxios from "../../../../util/axios/axiosInstance";
 import * as ApiTypes from "../../../types/apitypes";
 import AddSegmentToReleaseToggleModal, {
@@ -44,6 +45,8 @@ const ReleaseToggle = ({
   segments,
   refetchReleaseToggle,
 }: ReleaseToggleProps) => {
+  const [state] = useGlobalState();
+
   const [isAddSegmentModalVisible, setIsAddSegmentModalVisible] =
     useState(false);
 
@@ -97,6 +100,7 @@ const ReleaseToggle = ({
           await scheduleRelease({
             id: releaseToggleId,
             date,
+            userName: `${state.user?.firstName} ${state.user?.lastName}`,
           });
 
           showNotification({
@@ -212,7 +216,9 @@ const ReleaseToggle = ({
         </Menu>
       </Flex>
 
-      {releaseToggle.release?.scheduleRef && releaseToggle.release.date ? (
+      {releaseToggle.release?.scheduleRef &&
+      releaseToggle.release.date &&
+      releaseToggle.release.userName ? (
         <Flex maw={"45%"} mt="lg" mb="lg" direction="column">
           <Alert
             icon={<IconAlertCircle size={16} />}
@@ -220,14 +226,15 @@ const ReleaseToggle = ({
             color="red"
             radius="xs"
           >
-            <div>
+            <Text>
               This release toggle is schedule to release on
               {` ${new Date(
                 releaseToggle.release.date
               ).toLocaleDateString()} ${new Date(
                 releaseToggle.release.date
-              ).toLocaleTimeString()}`}
-            </div>
+              ).toLocaleTimeString()}`}{" "}
+              by {releaseToggle.release.userName}
+            </Text>
             <Button
               mt="md"
               variant="light"

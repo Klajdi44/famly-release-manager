@@ -16,7 +16,7 @@ import * as ApiTypes from "../types/apitypes";
 import jwtAxios from "../../util/axios/axiosInstance";
 import SegmentsModal, { OnSubmitParams } from "./components/modal/modal";
 import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
-import { IconTrash } from "@tabler/icons";
+import { IconCirclePlus, IconTrash } from "@tabler/icons";
 import { useCallback } from "react";
 import { AxiosResponse } from "axios";
 
@@ -64,10 +64,15 @@ const Segments = ({ segments, refetch }: SegmentsProps) => {
   );
 
   return (
-    <>
+    <Container size="xl">
       <Flex align="center" justify="space-between">
         <Title>Segments</Title>
-        <Button onClick={toggleAddSegmentModalVisibility}>Add segment</Button>
+        <Button
+          leftIcon={<IconCirclePlus />}
+          onClick={toggleAddSegmentModalVisibility}
+        >
+          Add segment
+        </Button>
       </Flex>
 
       {/* Modal */}
@@ -78,35 +83,33 @@ const Segments = ({ segments, refetch }: SegmentsProps) => {
       />
 
       {hasSegments ? (
-        <Container>
-          {/* segments */}
-          <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-            {segments.map(segment => (
-              <Fragment key={segment.id}>
-                <Flex justify={"space-between"} align="center" m={"md"}>
-                  <Link
-                    to={{
-                      pathname: "/segment",
-                      search: `?id=${segment.id}`,
-                    }}
-                  >
-                    <Title fz="xl">{segment.title}</Title>
-                  </Link>
-                  <Tooltip label="Delete segment" position="bottom-start">
-                    <Text>
-                      <IconTrash onClick={handleDeleteSegment(segment.id)} />
-                    </Text>
-                  </Tooltip>
-                </Flex>
-                <Divider />
-              </Fragment>
-            ))}
-          </Paper>
-        </Container>
+        // segments
+        <Paper withBorder shadow="md" p={30} mt={30} radius="md">
+          {segments.map(segment => (
+            <Fragment key={segment.id}>
+              <Flex justify={"space-between"} align="center" m={"md"}>
+                <Link
+                  to={{
+                    pathname: "/segment",
+                    search: `?id=${segment.id}`,
+                  }}
+                >
+                  <Title fz="xl">{segment.title}</Title>
+                </Link>
+                <Tooltip label="Delete segment" position="bottom-start">
+                  <Text>
+                    <IconTrash onClick={handleDeleteSegment(segment.id)} />
+                  </Text>
+                </Tooltip>
+              </Flex>
+              <Divider />
+            </Fragment>
+          ))}
+        </Paper>
       ) : (
         <Text>No segments found</Text>
       )}
-    </>
+    </Container>
   );
 };
 

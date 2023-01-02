@@ -157,12 +157,16 @@ export const test = async (req: Request, res: Response) => {
 
 export const scheduleReleaseToggle = async (req: Request, res: Response) => {
   try {
-    const { id, date }: { id: number; date: string } = req.body;
+    const {
+      id,
+      date,
+      userName,
+    }: { id: number; date: string; userName: string } = req.body;
 
-    if (id === undefined || date === undefined) {
+    if (id === undefined || date === undefined || userName === undefined) {
       return res
         .status(400)
-        .send({ message: "Release toggle ID and Date are required" });
+        .send({ message: "Release toggle ID,Date and User are required" });
     }
 
     if (Number.isNaN(id)) {
@@ -213,7 +217,7 @@ export const scheduleReleaseToggle = async (req: Request, res: Response) => {
         id: id,
       },
       data: {
-        release: { scheduleRef: job.name, date },
+        release: { scheduleRef: job.name, date, userName },
       },
     });
 

@@ -1,27 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import { MantineProvider } from "@mantine/core";
-import { NotificationsProvider } from "@mantine/notifications";
-
-import App from "./App";
+import AppProviders from "./AppProviders";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
-      <MantineProvider
-        withGlobalStyles
-        withNormalizeCSS
-        theme={{
-          /** Put your mantine theme override here */
-          colorScheme: "dark",
-          loader: "bars",
-        }}
-      >
-        <NotificationsProvider>
-          <App />
-        </NotificationsProvider>
-      </MantineProvider>
+      <AppProviders />
     </BrowserRouter>
   </React.StrictMode>
 );

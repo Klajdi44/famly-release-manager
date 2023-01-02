@@ -17,6 +17,7 @@ type Segment = {
 type Release = {
   scheduleRef: string;
   date: string;
+  userName: string;
 };
 
 type ReleaseToggle = {
