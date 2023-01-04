@@ -1,5 +1,5 @@
 import { Flex, Title, Switch, Tooltip } from "@mantine/core";
-import { IconTrash } from "@tabler/icons";
+import { IconClockHour4, IconTrash } from "@tabler/icons";
 import { Link } from "react-router-dom";
 import { Text } from "@mantine/core";
 
@@ -32,6 +32,20 @@ const ReleaseToggleLink = ({ toggle, onDelete, onChange }: Props) => {
           {toggle.name}
         </Title>
       </Link>
+      {toggle.release?.date && (
+        <Tooltip
+          label={`scheduled to be released on ${new Date(
+            toggle.release.date
+          ).toLocaleDateString()} ${new Date(
+            toggle.release.date
+          ).toLocaleTimeString()}`}
+          position="top"
+        >
+          <div>
+            <IconClockHour4 />
+          </div>
+        </Tooltip>
+      )}
       <Flex align="end" gap="sm">
         <Switch
           checked={toggle.isActive}
