@@ -1,12 +1,4 @@
-import {
-  Accordion,
-  Button,
-  Container,
-  Flex,
-  Paper,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Accordion, Button, Container, Flex, Text, Title } from "@mantine/core";
 import { useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../components/centered-loader/centered-loader";

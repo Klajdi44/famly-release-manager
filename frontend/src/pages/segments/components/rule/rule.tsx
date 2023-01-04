@@ -1,11 +1,4 @@
-import {
-  Paper,
-  Flex,
-  NativeSelect,
-  MultiSelect,
-  Button,
-  Center,
-} from "@mantine/core";
+import { Paper, Flex, NativeSelect, MultiSelect } from "@mantine/core";
 import { ChangeEvent, useState } from "react";
 import { attributes, operators, Attributes, Operators } from "../../constants";
 

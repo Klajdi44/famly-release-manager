@@ -45,7 +45,7 @@ type User = {
 
 type Attribute = "COUNTRY" | "SUBSCRIPTION" | "SITE_ID";
 
-type Operator = "isOneOf" | "isNotOneOf";
+type Operator = "IS_ONE_OF" | "IS_NOT_ONE_OF";
 
 type Rule = {
   attribute: Attribute;
