@@ -1,4 +1,12 @@
-import { Accordion, Button, Container, Flex, Paper, Text } from "@mantine/core";
+import {
+  Accordion,
+  Button,
+  Container,
+  Flex,
+  Paper,
+  Text,
+  Title,
+} from "@mantine/core";
 import { useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import CenteredLoader from "../../components/centered-loader/centered-loader";
@@ -9,6 +17,7 @@ import { Attributes, Operators } from "../segments/constants";
 import { Rule } from "../segments/components/rule/rule";
 import AddRuleModal from "../segments/components/add-rule-modal/add-rule-modal";
 import { AxiosResponse } from "axios";
+import { IconCirclePlus } from "@tabler/icons";
 
 type SegmentProps = {
   countries: ApiTypes.Country[];
@@ -64,7 +73,7 @@ const SegmentContainer = ({
   }, [segment]);
 
   return (
-    <Container>
+    <Container size="xl">
       {/* Add new rule modal */}
       <AddRuleModal
         isVisible={isAddRuleModalVisible}
@@ -75,8 +84,14 @@ const SegmentContainer = ({
         sites={sites}
       />
 
-      <Flex justify="end">
-        <Button onClick={toggleIsAddRuleModalVisible}>Add new rule</Button>
+      <Flex justify="space-between" align="center">
+        <Title>{segment.title}</Title>
+        <Button
+          leftIcon={<IconCirclePlus />}
+          onClick={toggleIsAddRuleModalVisible}
+        >
+          Add new rule
+        </Button>
       </Flex>
 
       <Text size="xl" fw="bold" mt="xl">

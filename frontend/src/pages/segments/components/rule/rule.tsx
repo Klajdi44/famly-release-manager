@@ -65,21 +65,11 @@ const Rule = ({ isReadOnly, onSubmit, ...restOfProps }: Props) => {
     ) {
       return;
     }
-
-    // if (attribute.id === "COUNTRY") {
-    //   query = {
-    //     ...query,
-    //     OR: SegmentTransformers.transformDomainCountryToApiCountry(
-    //       result,
-    //       countries
-    //     ),
-    //   };
-    // }
   };
 
   return (
     <Paper p="lg" m="md">
-      <Flex justify="space-around">
+      <Flex justify="space-around" wrap="wrap" gap="md">
         <NativeSelect
           value={attribute?.value}
           data={attributes}
@@ -102,12 +92,12 @@ const Rule = ({ isReadOnly, onSubmit, ...restOfProps }: Props) => {
           onChange={handleResultChange}
           disabled={isReadOnly}
         />
-
+        {/* 
         <Center>
           <Button variant="outline" color="red" onClick={handleSubmit}>
             Delete
           </Button>
-        </Center>
+        </Center> */}
       </Flex>
     </Paper>
   );
