@@ -40,14 +40,14 @@ type TransformApiOperatorToDomainOperator = (
 const transformApiOperatorToDomainAttribute: TransformApiOperatorToDomainOperator =
   ApiOperator => {
     switch (ApiOperator) {
-      case "isOneOf":
+      case "IS_ONE_OF":
         return {
           id: "IS_ONE_OF",
           label: "Is one of",
           value: "isOneOf",
         };
 
-      case "isNotOneOf":
+      case "IS_NOT_ONE_OF":
         return {
           id: "IS_NOT_ONE_OF",
           label: "Is not one of",

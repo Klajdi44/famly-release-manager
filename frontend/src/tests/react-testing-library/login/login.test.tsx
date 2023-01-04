@@ -27,5 +27,3 @@ describe("Login page", () => {
     expect(button).toBeEnabled();
   });
 });
-
-export {};

@@ -1,14 +1,15 @@
-import { Accordion, Button, Container, Flex, Paper, Text } from "@mantine/core";
+import { Accordion, Button, Container, Flex, Text, Title } from "@mantine/core";
 import { useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import CenteredLoader from "../../../../components/centered-loader/centered-loader";
-import { useFetch } from "../../../../hooks/use-fetch/use-fetch";
-import * as ApiTypes from "../../../types/apitypes";
-import * as SegmentTransformers from "../../transformers";
-import { Attributes, Operators } from "../../constants";
-import { Rule } from "../rule/rule";
-import AddRuleModal from "../add-rule-modal/add-rule-modal";
+import CenteredLoader from "../../components/centered-loader/centered-loader";
+import { useFetch } from "../../hooks/use-fetch/use-fetch";
+import * as ApiTypes from "../types/apitypes";
+import * as SegmentTransformers from "../segments/transformers";
+import { Attributes, Operators } from "../segments/constants";
+import { Rule } from "../segments/components/rule/rule";
+import AddRuleModal from "../segments/components/add-rule-modal/add-rule-modal";
 import { AxiosResponse } from "axios";
+import { IconCirclePlus } from "@tabler/icons";
 
 type SegmentProps = {
   countries: ApiTypes.Country[];
@@ -64,7 +65,7 @@ const SegmentContainer = ({
   }, [segment]);
 
   return (
-    <Container>
+    <Container size="xl">
       {/* Add new rule modal */}
       <AddRuleModal
         isVisible={isAddRuleModalVisible}
@@ -75,8 +76,14 @@ const SegmentContainer = ({
         sites={sites}
       />
 
-      <Flex justify="end">
-        <Button onClick={toggleIsAddRuleModalVisible}>Add new rule</Button>
+      <Flex justify="space-between" align="center">
+        <Title>{segment.title}</Title>
+        <Button
+          leftIcon={<IconCirclePlus />}
+          onClick={toggleIsAddRuleModalVisible}
+        >
+          Add new rule
+        </Button>
       </Flex>
 
       <Text size="xl" fw="bold" mt="xl">
@@ -151,7 +158,7 @@ const SegmentLoader = ({ segmentId }: SegmentLoaderProps) => {
     data: sites,
     error: sitesError,
     isLoading: isSitesLoading,
-  } = useFetch<ApiTypes.Subscription[]>({
+  } = useFetch<ApiTypes.Site[]>({
     url: "v1/sites",
   });
 

@@ -22,15 +22,15 @@ import {
 import { AxiosResponse } from "axios";
 import { useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import CenteredLoader from "../../../../components/centered-loader/centered-loader";
-import { useFetch } from "../../../../hooks/use-fetch/use-fetch";
-import { useGlobalState } from "../../../../hooks/use-global-state/use-global-state";
-import jwtAxios from "../../../../util/axios/axiosInstance";
-import * as ApiTypes from "../../../types/apitypes";
+import CenteredLoader from "../../components/centered-loader/centered-loader";
+import { useFetch } from "../../hooks/use-fetch/use-fetch";
+import { useGlobalState } from "../../hooks/use-global-state/use-global-state";
+import jwtAxios from "../../util/axios/axiosInstance";
+import * as ApiTypes from "../types/apitypes";
 import AddSegmentToReleaseToggleModal, {
   OnSubmitParams,
-} from "../add-segment-to-release-toggle-modal/add-segment-to-release-toggle-modal";
-import ScheduleReleaseModal from "../schedule-release-modal/schedule-release-modal";
+} from "../release-toggles/components/add-segment-to-release-toggle-modal/add-segment-to-release-toggle-modal";
+import ScheduleReleaseModal from "../release-toggles/components/schedule-release-modal/schedule-release-modal";
 
 const RELEASE_TOGGLE_URL = "/v1/release-toggles";
 
@@ -62,13 +62,13 @@ const ReleaseToggle = ({
   });
 
   const { fetchData: scheduleRelease } = useFetch({
-    url: `v1/prisma/schedule`,
+    url: `v1/schedule/schedule`,
     lazy: true,
     method: "post",
   });
 
   const { fetchData: cancelScheduledRelease } = useFetch({
-    url: `v1/prisma/delete`,
+    url: `v1/schedule/delete`,
     lazy: true,
     method: "patch",
   });
