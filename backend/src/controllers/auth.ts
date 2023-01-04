@@ -44,6 +44,8 @@ const login = async (req: Request, res: Response) => {
 
     try {
       await redisClient.set(refreshToken, user.id);
+      const sevenDaysInSeconds = 604800;
+      await redisClient.EXPIRE(refreshToken, sevenDaysInSeconds);
     } catch (error) {
       return res.status(500).send({
         message:
@@ -109,7 +111,9 @@ const refresh = async (req: Request, res: Response) => {
 
     const newAccessToken = jwt.generateToken("access", responseUser);
     const newRefreshToken = jwt.generateToken("refresh", responseUser);
-    redisClient.set(newRefreshToken, user.id);
+    await redisClient.set(newRefreshToken, user.id);
+    const sevenDaysInSeconds = 604800;
+    await redisClient.EXPIRE(newRefreshToken, sevenDaysInSeconds);
 
     return res.send({
       user: responseUser,
