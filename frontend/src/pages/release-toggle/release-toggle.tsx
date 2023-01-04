@@ -62,13 +62,13 @@ const ReleaseToggle = ({
   });
 
   const { fetchData: scheduleRelease } = useFetch({
-    url: `v1/prisma/schedule`,
+    url: `v1/schedule/schedule`,
     lazy: true,
     method: "post",
   });
 
   const { fetchData: cancelScheduledRelease } = useFetch({
-    url: `v1/prisma/delete`,
+    url: `v1/schedule/delete`,
     lazy: true,
     method: "patch",
   });
