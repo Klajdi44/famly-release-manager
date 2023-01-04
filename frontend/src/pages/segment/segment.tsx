@@ -1,13 +1,13 @@
 import { Accordion, Button, Container, Flex, Paper, Text } from "@mantine/core";
 import { useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import CenteredLoader from "../../../../components/centered-loader/centered-loader";
-import { useFetch } from "../../../../hooks/use-fetch/use-fetch";
-import * as ApiTypes from "../../../types/apitypes";
-import * as SegmentTransformers from "../../transformers";
-import { Attributes, Operators } from "../../constants";
-import { Rule } from "../rule/rule";
-import AddRuleModal from "../add-rule-modal/add-rule-modal";
+import CenteredLoader from "../../components/centered-loader/centered-loader";
+import { useFetch } from "../../hooks/use-fetch/use-fetch";
+import * as ApiTypes from "../types/apitypes";
+import * as SegmentTransformers from "../segments/transformers";
+import { Attributes, Operators } from "../segments/constants";
+import { Rule } from "../segments/components/rule/rule";
+import AddRuleModal from "../segments/components/add-rule-modal/add-rule-modal";
 import { AxiosResponse } from "axios";
 
 type SegmentProps = {
@@ -151,7 +151,7 @@ const SegmentLoader = ({ segmentId }: SegmentLoaderProps) => {
     data: sites,
     error: sitesError,
     isLoading: isSitesLoading,
-  } = useFetch<ApiTypes.Subscription[]>({
+  } = useFetch<ApiTypes.Site[]>({
     url: "v1/sites",
   });
 

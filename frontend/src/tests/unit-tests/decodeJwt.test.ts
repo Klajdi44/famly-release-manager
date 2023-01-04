@@ -13,5 +13,3 @@ describe("Test behaviour of the function decodeJwt that is responsible to decode
     expect(user.exp).toBe(1671134097);
   });
 });
-
-export {};
