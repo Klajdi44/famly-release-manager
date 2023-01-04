@@ -42,6 +42,17 @@ export const scheduleReleaseToggle = async (req: Request, res: Response) => {
     const job = cron.scheduleJob(new Date(date), async function () {
       console.log("----- cron run", "ReleaseToggleId:", id);
 
+      const releaseToggleScheduledForRelease =
+        await prisma.releaseToggle.findUnique({
+          where: {
+            id,
+          },
+        });
+
+      if (!releaseToggleScheduledForRelease) {
+        return;
+      }
+
       await prisma.releaseToggle.update({
         where: {
           id: id,
