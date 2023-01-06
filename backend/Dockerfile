@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package*.json .
 
-COPY ./ .
+COPY ./ ./
 
 ENTRYPOINT ["sh","./entrypoint.sh"]
 

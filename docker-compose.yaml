@@ -29,8 +29,8 @@ services:
       - "5000:5000"
     volumes:
       - ./backend:/app
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
+      # - "/etc/timezone:/etc/timezone:ro"
+      # - "/etc/localtime:/etc/localtime:ro"
     depends_on:
       - database_prisma
       - redis
