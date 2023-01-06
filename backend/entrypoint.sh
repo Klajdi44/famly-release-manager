@@ -12,4 +12,10 @@ echo 'generating primsa ------------'
 # initialize prisma client
 npx prisma generate
 
+# Migrate DB
+npx prisma migrate dev
+
+# Seed DB
+npx prisma db seed
+
 npm run start:dev
