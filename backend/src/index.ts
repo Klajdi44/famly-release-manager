@@ -7,6 +7,7 @@ import { router as prismaRouter } from "./routes/scheduleRelease";
 import { router as authRouter } from "./routes/auth";
 import { router as countryRouter } from "./routes/country";
 import { router as subscriptionRouter } from "./routes/subscription";
+import { router as isActiveForSiteRouter } from "./routes/isActiveForSite";
 
 import * as Auth from "./middlewares/auth.middleware";
 import compression from "compression";
@@ -35,6 +36,7 @@ app.use("/api/v1/schedule", prismaRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/subscriptions", subscriptionRouter);
 app.use("/api/v1/countries", countryRouter);
+app.use("/api/v1/is-active-for-site", isActiveForSiteRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(
