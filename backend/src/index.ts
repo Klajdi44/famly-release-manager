@@ -14,6 +14,7 @@ import helmet from "helmet";
 import bodyParser from "body-parser";
 import cors from "cors";
 import { config } from "./config";
+import { scheduleReset } from "./api/utils/scheduleReset";
 
 dotenv.config();
 
@@ -36,8 +37,9 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/subscriptions", subscriptionRouter);
 app.use("/api/v1/countries", countryRouter);
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT, async () => {
   console.log(
     `### The app is listening at http://localhost:${process.env.PORT} ###`
   );
+  await scheduleReset();
 });
