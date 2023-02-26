@@ -40,7 +40,7 @@ const isActiveForSite = async (req: Request, res: Response) => {
     segment.sites.some(site => site.id === siteId)
   );
 
-  res.send(isActiveForSite);
+  res.send(isActiveForSite && releaseToggle.isActive);
 };
 
 export { isActiveForSite };
