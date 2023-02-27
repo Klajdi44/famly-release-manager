@@ -7,10 +7,6 @@ services:
     #   - "5433"
     ports:
       - "5433:5432"
-    environment:
-      - POSTGRES_USER=famly_prisma
-      - POSTGRES_PASSWORD=secret_prisma
-      - POSTGRES_DB=db_dev_prisma
     volumes:
       - famly_db_dev_data_prisma:/var/lib/postgresql/data
     restart: on-failure
