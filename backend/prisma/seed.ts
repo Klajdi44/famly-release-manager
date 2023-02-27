@@ -1,99 +1,42 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-async function main() {
+const main = async () => {
   console.log("** Database seeding...");
 
   console.log("** Adding users createMany...");
-  const users = await prisma.user.createMany({
+  await prisma.user.createMany({
     data: [
       {
-        firstName: "Andrei",
-        lastName: "Mihutoni",
-        email: "andrei@example.com",
+        firstName: "bret",
+        lastName: "bretson",
+        email: "bret@example.com",
         password:
           "$2b$10$mxtWyHbkM1V11k5GAsZUDeFJ1Dxe4ihsqh.7tcYIcfeeInNcCmkvy",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        firstName: "Klajdi",
-        lastName: "Ajdini",
-        email: "klajdi@example.com",
+        firstName: "bob",
+        lastName: "bobson",
+        email: "bob@example.com",
         password:
           "$2b$10$SPPyddDACcCTHru4nUbxTu9oNTOb6A0UrR/K3Wu21sGDAaAgSuAn.",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        firstName: "Jonas",
-        lastName: "Bøgh",
-        email: "jonas@example.com",
+        firstName: "larry",
+        lastName: "larryson",
+        email: "larry@example.com",
         password:
           "$2b$10$lM/hpUT8jQAiBEW.okK/ouYNUcWxUj42oofhQw41WY8VOMRW1cQcy",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        firstName: "Kea",
-        lastName: "Kea",
-        email: "kea@example.com",
-        password:
-          "$2b$10$Y3H.uePlwvxbK4jiBJkaxOzMsm6umcZb0L9YOAsYnaGfRuHKoyMW.",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        firstName: "Kea",
-        lastName: "Kea",
-        email: "test@example.com",
-        password:
-          "$2b$10$GhG/DCtyWTVJrOcthMfJMOLyPrngXXZzhWsA42ENN1K369Wzn.WIu",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     ],
     skipDuplicates: true,
   });
-  console.log(users);
-
-  // const andrei = await prisma.user.upsert({
-  //   where: { email: 'andrei@example.com' },
-  //   update: {},
-  //   create: {
-  //     firstName: 'Andrei',
-  //     lastName: 'Mihutoni',
-  //     email: 'andrei@example.com',
-  //     password: '$2b$10$mxtWyHbkM1V11k5GAsZUDeFJ1Dxe4ihsqh.7tcYIcfeeInNcCmkvy',
-  //     createdAt: new Date(),
-  //     updatedAt: new Date(),
-  //   },
-  // })
-  // const klajdi = await prisma.user.upsert({
-  //   where: { email: 'klajdi@example.com' },
-  //   update: {},
-  //   create: {
-  //     firstName: 'Klajdi',
-  //     lastName: 'Ajdini',
-  //     email: 'klajdi@example.com',
-  //     password: '$2b$10$SPPyddDACcCTHru4nUbxTu9oNTOb6A0UrR/K3Wu21sGDAaAgSuAn.',
-  //     createdAt: new Date(),
-  //     updatedAt: new Date(),
-  //   },
-  // })
-  // const jonas = await prisma.user.upsert({
-  //   where: { email: 'jonas@example.com' },
-  //   update: {},
-  //   create: {
-  //     firstName: 'Jonas',
-  //     lastName: 'Bøgh',
-  //     email: 'jonas@example.com',
-  //     password: '$2b$10$lM/hpUT8jQAiBEW.okK/ouYNUcWxUj42oofhQw41WY8VOMRW1cQcy',
-  //     createdAt: new Date(),
-  //     updatedAt: new Date(),
-  //   },
-  // })
-  // console.log({ andrei, klajdi, jonas })
 
   console.log("** Adding countries...");
   const countries = await prisma.country.createMany({
@@ -1033,5 +976,13 @@ async function main() {
     skipDuplicates: true,
   });
   console.log(releaseToggle);
-}
-main();
+};
+
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async e => {
+    console.error(e);
+    await prisma.$disconnect();
+  });

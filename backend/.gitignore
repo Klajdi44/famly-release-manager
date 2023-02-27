@@ -2,7 +2,7 @@
 /node_modules
 
 # env variables
-# /.env
+*.env
 
 # JWT keys
 private.pem

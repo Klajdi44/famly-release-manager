@@ -23,15 +23,11 @@ $
 
 ## Running the app
 
+Since the project is done using docker, it is recommended to use every command inside a docker container (npm install f.x)
+
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+# This should re run in the root folder (you should not be inside a container in order to run this)
+docker compose up
 ```
 
 ### Middleware
@@ -55,11 +51,33 @@ Our API needs to be accessible from different client origins, for example, from 
 
 ## DB
 
+you need to be in the backend folder first, in order to do that run:
+
 ```bash
-# db sequelize init
-$ npx sequelize init --force
+docker compose exec backend sh
+```
 
+```bash
+#Generate prisma client
+npx prisma generate
+```
 
-# generate the user model
-$ npx sequelize-cli model:generate --name User --attributes firstName:string,lastName:string,email:string
+```bash
+#seed the database
+npx prisma db seed
+```
+
+```bash
+#run migrations
+npx prisma migrate dev
+```
+
+```bash
+#if you want to create a new migration:
+npx prisma migrate dev --name <NAME_OF_MIGRATION>
+```
+
+```bash
+#if you want to reset all data:
+npx prisma migrate reset
 ```
